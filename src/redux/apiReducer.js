@@ -19,6 +19,7 @@ const apiReducer = (state=initialState, action) => {
                 ...state,
                 data: action.payload,
                 loading: false,
+                message: '',
             };
         case API_ERROR:
             return {
