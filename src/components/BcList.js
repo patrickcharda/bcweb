@@ -1,28 +1,41 @@
-import {ScrollView, Text, ActivityIndicator, StyleSheet, Alert} from 'react-native';
-import apiCall from '../redux/apiCall';
+import {
+  ScrollView,
+  SafeAreaView,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import apiCall from "../redux/apiCall";
 import * as React from "react";
-import { useSelector, useDispatch } from "react-redux";  
-import Login from "./Login";
+import { useSelector, useDispatch } from "react-redux";
+import Message from "./Message";
+
 
 const BcList = () => {
   const dispatch = useDispatch();
-  
+
+  const [isOpen, setIsOpen] = React.useState(false);
   //Alert.alert('message is : ', message);
 
-  const isEmpty = (variable) => {return variable === null || variable === undefined || variable === ''};
-
+  //const isEmpty = (variable) => {return variable === null || variable === undefined || variable === ''};
 
   // au chargement uniquement
   React.useEffect(() => {
-    dispatch(apiCall('https://demo-btw.monkey-soft.fr/bcweb/bcx/', token));
+    dispatch(apiCall("https://demo-btw.monkey-soft.fr/bcweb/bcx/", token));
   }, []);
 
-  const data = JSON.stringify(useSelector((state) => state.apiReducer.data.results));
+  const data = useSelector((state) => state.apiReducer.data.results);
+
+/*   const data = JSON.stringify(
+    useSelector((state) => state.apiReducer.data.results)
+  ); */
   //const error = JSON.stringify(useSelector((state) => state.apiReducer.error));
   const loading = useSelector((state) => state.apiReducer.loading);
   const token = useSelector((state) => state.tokenReducer.token);
 
-/*   return (
+  /*   return (
     <ScrollView style={styles.container}>
       {loading ? (
         <ActivityIndicator size="large" color="red" />
@@ -33,54 +46,75 @@ const BcList = () => {
       ) }
     </ScrollView>
   ); */
-  return (
-    <ScrollView style={styles.container}>
+
+/*   return (
+    <ScrollView>
+      <Message/>
       {loading ? (
         <ActivityIndicator size="large" color="red" />
-      ) : 
-        <Text>
-          {data}
-        </Text>
+      ) : <View>
+          {data.map((bc, index) => (
+            <Text key={index}>{bc.url}</Text>
+          ))}
+        </View>
+      }
+    </ScrollView>
+  ); */
+
+    return (
+    <ScrollView>
+      <Message/>
+      {loading ? (
+        <ActivityIndicator size="large" color="red" />
+      ) : <SafeAreaView>
+            <TouchableOpacity onPress={() => setIsOpen(!isOpen)}><Text>{isOpen ? 'Close Dropdown' : 'Open Dropdown'}</Text></TouchableOpacity>
+            {isOpen && data.map((bc, index) => (
+                  <TouchableOpacity key={index}>
+                    <Text>{bc.url}</Text>
+                  </TouchableOpacity>
+            ))}
+          </SafeAreaView>
       }
     </ScrollView>
   );
-}
+};
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: "#fff",
-    },
-    toolbar: {
-      backgroundColor: "#3498db",
-      color: "#fff",
-      textAlign: "center",
-      padding: 25,
-      fontSize: 20,
-    },
-    content: {
-      flex: 1,
-      padding: 10,
-    },
-    preview: {
-      backgroundColor: "#bdc3c7",
-      flex: 1,
-      height: 500,
-    },
-    input: {
-      backgroundColor: "#ecf0f1",
-      borderRadius: 3,
-      height: 40,
-      padding: 5,
-      marginBottom: 10,
-      flex: 1,
-    },
-    button: {
-      backgroundColor: "#3498db",
-      padding: 10,
-      borderRadius: 3,
-      marginBottom: 30,
-    },
-  });
+  container: {
+    flex: 1,
+    backgroundColor: "#aaa",
+    color: "#bdc3c7",
+  },
+  toolbar: {
+    backgroundColor: "#3498db",
+    color: "#fff",
+    textAlign: "center",
+    padding: 25,
+    fontSize: 20,
+  },
+  content: {
+    flex: 1,
+    padding: 10,
+  },
+  preview: {
+    backgroundColor: "#bdc3c7",
+    flex: 1,
+    height: 500,
+  },
+  input: {
+    backgroundColor: "#ecf0f1",
+    borderRadius: 3,
+    height: 40,
+    padding: 5,
+    marginBottom: 10,
+    flex: 1,
+  },
+  button: {
+    backgroundColor: "#3498db",
+    padding: 10,
+    borderRadius: 3,
+    marginBottom: 30,
+  },
+});
 
 export default BcList;

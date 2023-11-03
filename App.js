@@ -4,18 +4,26 @@ import Main from "./src/components/Main";
 import { Provider } from "react-redux";
 import { PersistGate } from 'redux-persist/integration/react'
 import storeAndPersistor from './src/redux/store';
+import { NavigationContainer } from '@react-navigation/native';
+
 
 /* const endpointBc = "https://demo-btw.monkey-soft.fr/bcweb/bcx/";
 const endpointRefreshToken = "https://demo-btw.monkey-soft.fr/refresh-token/"; */
 
+
+
 const App = () => {
   const { store, persistor } = storeAndPersistor;
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <Main/>
-      </PersistGate>
-    </Provider>
+    
+      <Provider store={store}>
+        <PersistGate loading={null} persistor={persistor}>
+          <NavigationContainer>
+            <Main/>
+          </NavigationContainer>
+        </PersistGate>
+      </Provider>
+    
   );
 };
 

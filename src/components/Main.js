@@ -3,16 +3,17 @@ import {
   View,
   StyleSheet,
 } from 'react-native';
-import Login from "./Login";
-import BcList from "./BcList";
-import Message from "./Message";
+import LoginScreen from "./screens/LoginScreen";
+import BcListScreen from "./screens/BcListScreen";
+//import Message from "./Message";
 import { useSelector } from "react-redux";  
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 
 /* const endpointBc = "https://demo-btw.monkey-soft.fr/bcweb/bcx/";
 const endpointRefreshToken = "https://demo-btw.monkey-soft.fr/refresh-token/"; */
 
-
+const Stack = createNativeStackNavigator();
 
 const Main = () => {
   const logged = useSelector((state) => state.tokenReducer.isLogged);
@@ -26,11 +27,23 @@ const Main = () => {
   //let reducer1 = retrievedStore.reducer1; // should now have your reducer
   
 
+/*   return (
+    <Stack.Navigator>
+      <View style={styles.container}>
+        <Message/>
+        { logged ? <Stack.Screen name="BcList" component={BcListScreen} options={{ title: 'Login' }}/> : <Stack.Screen name="Login" component={LoginScreen} />}
+      </View>
+    </Stack.Navigator>
+  ); */
+
   return (
-    <View style={styles.container}>
-      <Message/>
-      { logged ? <BcList/> : <Login/>}
-    </View>
+
+      <Stack.Navigator>
+
+          { logged ? <Stack.Screen name="BcList" component={BcListScreen} options={{ title: 'Liste des Bons de chargement' }}/> : <Stack.Screen name="Login" component={LoginScreen} options={{ title: 'Login' }}/>}
+
+      </Stack.Navigator>
+
   );
 };
 
