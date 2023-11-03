@@ -1,6 +1,4 @@
-import {
-    Button
-} from 'react-native';
+import { Button } from 'react-native';
 import { signout } from "../redux/actions";
 import * as React from "react";
 import { useDispatch } from "react-redux";  

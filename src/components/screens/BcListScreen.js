@@ -1,14 +1,14 @@
 import BcList from '../BcList';
 //import { CommonActions } from '@react-navigation/native';
 import LogoutButton from '../LogoutButton';
-import {View} from 'react-native';
+import { SafeAreaView } from 'react-native';
 
 const BcListScreen = ({ navigation }) => {
     return (
-        <View>
+        <SafeAreaView>
             <LogoutButton/>
             <BcList/>
-        </View>
+        </SafeAreaView>
     );
 };
 
