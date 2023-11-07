@@ -1,6 +1,6 @@
 /* import axios from "axios";
 const API_URL = "https://demo-btw.monkey-soft.fr/"; */
-import storeAndPersistor from './store';
+import storeAndPersistor from "./store";
 const { persistor } = storeAndPersistor;
 
 //action's type for login
@@ -9,11 +9,42 @@ export const ADD_REFRESH_TOKEN = "ADD_REFRESH_TOKEN";
 export const TOGGLE_IS_LOGGED = "TOGGLE_IS_LOGGED";
 export const SIGNOUT = "SIGNOUT";
 
-//action's type FOR api
+//action's type for api
 export const API_PENDING = "API_PENDING";
 export const API_SUCCESS = "API_SUCCESS";
 export const API_ERROR = "API_ERROR";
+export const API_EMPTY_DATA = "API_EMPTY_DATA"
 
+//action's type for bc
+export const RECORD_SELECTED_BC = "RECORD_SELECTED_BC";
+
+//action's type for pces and accs (pièces et accessoires)
+export const FETCH_PCE_SUCCESS = "FETCH_PCE_SUCCESS"
+export const FETCH_ACC_SUCCESS = "FETCH_ACC_SUCCESS"
+
+//action creators for API to get pces and accs
+export const fetchPceSuccess = (pce) => {
+  return {
+    type: FETCH_PCE_SUCCESS,
+    payload: pce,
+  };
+};
+
+export const fetchAccSuccess = (acc) => {
+  return {
+    type: FETCH_ACC_SUCCESS,
+    payload: acc,
+  }
+}
+
+
+//action creators for bc
+export const recordSelectedBc = (bc) => {
+  return {
+    type: RECORD_SELECTED_BC,
+    payload: bc,
+  };
+};
 
 //action creators for login
 export const addToken = (token) => {
@@ -41,8 +72,8 @@ export const signout = () => {
   persistor.purge();
   return {
     type: SIGNOUT,
-  }
-}
+  };
+};
 
 // action creators for API
 
@@ -59,3 +90,9 @@ export const fetchError = (error) => ({
   type: API_ERROR,
   payload: error,
 });
+
+export const apiEmptyData = () => ({
+  type: API_EMPTY_DATA
+});
+
+

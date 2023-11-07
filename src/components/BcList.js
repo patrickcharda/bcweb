@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import apiCall from "../redux/apiCall";
+import { recordSelectedBc, addPce, addAcc } from "../redux/actions";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Message from "./Message";
@@ -28,13 +29,39 @@ const BcList = () => {
 
   const data = useSelector((state) => state.apiReducer.data.results);
 
-/*   const data = JSON.stringify(
+  /*   const data = JSON.stringify(
     useSelector((state) => state.apiReducer.data.results)
   ); */
   //const error = JSON.stringify(useSelector((state) => state.apiReducer.error));
   const loading = useSelector((state) => state.apiReducer.loading);
   const token = useSelector((state) => state.tokenReducer.token);
+  let bc = undefined;
 
+  const defineBc = (selectedBc) => {
+    bc = selectedBc;
+    console.log(
+      "THIS IS THE BC " +
+        bc.url +
+        " pces : " +
+        bc.pieces[0] +
+        " pdts : " +
+        bc.produits[0]
+    );
+    dispatch(recordSelectedBc(bc));
+    getPieces(bc.pieces);
+  };
+
+  const getPieces = (tabPces) => {
+    pcesList = tabPces;
+    //dispatch(apiEmptyData());
+    pcesList.forEach((pce) => {
+      //console.log(pce.slice(42,pce.length));
+      //appel API pr récupérer toutes les infos de la pièce
+      dispatch(apiCall("https://demo-btw.monkey-soft.fr/bcweb/pce/"+pce.slice(42,pce.length), token));
+      //console.log(useSelector((state) => state.apiReducer));
+      //fullPces.push(state.apiReducer.data);
+    });
+  };
   /*   return (
     <ScrollView style={styles.container}>
       {loading ? (
@@ -47,7 +74,7 @@ const BcList = () => {
     </ScrollView>
   ); */
 
-/*   return (
+  /*   return (
     <ScrollView>
       <Message/>
       {loading ? (
@@ -61,20 +88,24 @@ const BcList = () => {
     </ScrollView>
   ); */
 
-    return (
+  return (
     <ScrollView>
-      <Message/>
+      <Message />
       {loading ? (
         <ActivityIndicator size="large" color="red" />
-      ) : <SafeAreaView>
-            <TouchableOpacity onPress={() => setIsOpen(!isOpen)}><Text>{isOpen ? 'Close Dropdown' : 'Open Dropdown'}</Text></TouchableOpacity>
-            {isOpen && data.map((bc, index) => (
-                  <TouchableOpacity key={index}>
-                    <Text>{bc.url}</Text>
-                  </TouchableOpacity>
+      ) : (
+        <SafeAreaView>
+          <TouchableOpacity onPress={() => setIsOpen(!isOpen)}>
+            <Text>{isOpen ? "Close Dropdown" : "Open Dropdown"}</Text>
+          </TouchableOpacity>
+          {isOpen &&
+            data.map((bc, index) => (
+              <TouchableOpacity onPress={() => defineBc(bc)} key={index}>
+                <Text>{bc.url}</Text>
+              </TouchableOpacity>
             ))}
-          </SafeAreaView>
-      }
+        </SafeAreaView>
+      )}
     </ScrollView>
   );
 };

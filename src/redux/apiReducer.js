@@ -1,4 +1,4 @@
-import { API_PENDING, API_SUCCESS, API_ERROR } from "./actions";
+import { API_PENDING, API_SUCCESS, API_ERROR, API_EMPTY_DATA } from "./actions";
 
 const initialState = { 
     loading: false,
@@ -26,6 +26,11 @@ const apiReducer = (state=initialState, action) => {
                 ...state,
                 error: action.payload,
                 loading: false, message: "Le serveur rencontre un problème. Veuillez réessayer ultérieurement. ",
+            };
+        case API_EMPTY_DATA:
+            return {
+                ...state,
+                data:'',
             }
         default:
             return state;
