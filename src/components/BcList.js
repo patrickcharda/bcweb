@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import apiCall from "../redux/apiCall";
+import { recordSelectedBc, purgePcesAccs } from "../redux/actions";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Message from "./Message";
@@ -17,9 +18,6 @@ const BcList = () => {
   const dispatch = useDispatch();
 
   const [isOpen, setIsOpen] = React.useState(false);
-  //Alert.alert('message is : ', message);
-
-  //const isEmpty = (variable) => {return variable === null || variable === undefined || variable === ''};
 
   // au chargement uniquement
   React.useEffect(() => {
@@ -28,53 +26,53 @@ const BcList = () => {
 
   const data = useSelector((state) => state.apiReducer.data.results);
 
-/*   const data = JSON.stringify(
-    useSelector((state) => state.apiReducer.data.results)
-  ); */
   //const error = JSON.stringify(useSelector((state) => state.apiReducer.error));
   const loading = useSelector((state) => state.apiReducer.loading);
   const token = useSelector((state) => state.tokenReducer.token);
+  let bc = undefined;
 
-  /*   return (
-    <ScrollView style={styles.container}>
-      {loading ? (
-        <ActivityIndicator size="large" color="red" />
-      ) : isEmpty(data) ? <Login/> :(
-        <Text>
-          {data}
-        </Text>
-      ) }
-    </ScrollView>
-  ); */
+  const defineBc = (selectedBc) => {
+    bc = selectedBc;
+    console.log(
+      "THIS IS THE BC " +
+        bc.url +
+        " pces : " +
+        bc.pieces[0] +
+        " pdts : " +
+        bc.produits[0]
+    );
+    dispatch(recordSelectedBc(bc));
+    dispatch(purgePcesAccs());
+    getPieces(bc.pieces);
+  };
 
-/*   return (
+  const getPieces = (tabPces) => {
+    pcesList = tabPces;
+    pcesList.forEach((pce) => {
+      console.log(pce.slice(42,pce.length)); //=> récupération du numéro de pce
+      //appel API pr récupérer toutes les infos de la pièce
+      dispatch(apiCall("https://demo-btw.monkey-soft.fr/bcweb/pce/"+pce.slice(42,pce.length), token));
+    });
+  };
+
+  return (
     <ScrollView>
-      <Message/>
+      <Message />
       {loading ? (
         <ActivityIndicator size="large" color="red" />
-      ) : <View>
-          {data.map((bc, index) => (
-            <Text key={index}>{bc.url}</Text>
-          ))}
-        </View>
-      }
-    </ScrollView>
-  ); */
-
-    return (
-    <ScrollView>
-      <Message/>
-      {loading ? (
-        <ActivityIndicator size="large" color="red" />
-      ) : <SafeAreaView>
-            <TouchableOpacity onPress={() => setIsOpen(!isOpen)}><Text>{isOpen ? 'Close Dropdown' : 'Open Dropdown'}</Text></TouchableOpacity>
-            {isOpen && data.map((bc, index) => (
-                  <TouchableOpacity key={index}>
-                    <Text>{bc.url}</Text>
-                  </TouchableOpacity>
+      ) : (
+        <SafeAreaView>
+          <TouchableOpacity onPress={() => setIsOpen(!isOpen)}>
+            <Text>{isOpen ? "Close Dropdown" : "Open Dropdown"}</Text>
+          </TouchableOpacity>
+          {isOpen &&
+            data.map((bc, index) => (
+              <TouchableOpacity onPress={() => defineBc(bc)} key={index}>
+                <Text>{bc.url}</Text>
+              </TouchableOpacity>
             ))}
-          </SafeAreaView>
-      }
+        </SafeAreaView>
+      )}
     </ScrollView>
   );
 };
