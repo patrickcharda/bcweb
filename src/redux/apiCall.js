@@ -1,5 +1,5 @@
 import axios from "axios";
-import { fetchData, fetchSuccess, fetchError, signout, fetchPceSuccess, fetchAccSuccess } from "./actions";
+import { fetchData, fetchSuccess, fetchError, signout, fetchPceSuccess, fetchAccSuccess, fetchDataPcesAccs } from "./actions";
 
 const apiCall = (url, token) => (dispatch) => {
   const config = {
@@ -30,7 +30,7 @@ const apiCall = (url, token) => (dispatch) => {
     });
   }
   if (url.includes("/bcweb/pce")) {
-    dispatch(fetchData());
+    dispatch(fetchDataPcesAccs());
     return new Promise(() => {
       axios
         .get(url, config)
@@ -54,7 +54,7 @@ const apiCall = (url, token) => (dispatch) => {
     });
   }
   if (url.includes("/bcweb/pdt")) {
-    dispatch(fetchData());
+    dispatch(fetchDataPcesAccs());
     return new Promise(() => {
       axios
         .get(url, config)

@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 import apiCall from "../redux/apiCall";
-import { recordSelectedBc, addPce, addAcc } from "../redux/actions";
+import { recordSelectedBc, purgePcesAccs } from "../redux/actions";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Message from "./Message";
@@ -18,9 +18,6 @@ const BcList = () => {
   const dispatch = useDispatch();
 
   const [isOpen, setIsOpen] = React.useState(false);
-  //Alert.alert('message is : ', message);
-
-  //const isEmpty = (variable) => {return variable === null || variable === undefined || variable === ''};
 
   // au chargement uniquement
   React.useEffect(() => {
@@ -29,9 +26,6 @@ const BcList = () => {
 
   const data = useSelector((state) => state.apiReducer.data.results);
 
-  /*   const data = JSON.stringify(
-    useSelector((state) => state.apiReducer.data.results)
-  ); */
   //const error = JSON.stringify(useSelector((state) => state.apiReducer.error));
   const loading = useSelector((state) => state.apiReducer.loading);
   const token = useSelector((state) => state.tokenReducer.token);
@@ -48,45 +42,18 @@ const BcList = () => {
         bc.produits[0]
     );
     dispatch(recordSelectedBc(bc));
+    dispatch(purgePcesAccs());
     getPieces(bc.pieces);
   };
 
   const getPieces = (tabPces) => {
     pcesList = tabPces;
-    //dispatch(apiEmptyData());
     pcesList.forEach((pce) => {
-      //console.log(pce.slice(42,pce.length));
+      console.log(pce.slice(42,pce.length)); //=> récupération du numéro de pce
       //appel API pr récupérer toutes les infos de la pièce
       dispatch(apiCall("https://demo-btw.monkey-soft.fr/bcweb/pce/"+pce.slice(42,pce.length), token));
-      //console.log(useSelector((state) => state.apiReducer));
-      //fullPces.push(state.apiReducer.data);
     });
   };
-  /*   return (
-    <ScrollView style={styles.container}>
-      {loading ? (
-        <ActivityIndicator size="large" color="red" />
-      ) : isEmpty(data) ? <Login/> :(
-        <Text>
-          {data}
-        </Text>
-      ) }
-    </ScrollView>
-  ); */
-
-  /*   return (
-    <ScrollView>
-      <Message/>
-      {loading ? (
-        <ActivityIndicator size="large" color="red" />
-      ) : <View>
-          {data.map((bc, index) => (
-            <Text key={index}>{bc.url}</Text>
-          ))}
-        </View>
-      }
-    </ScrollView>
-  ); */
 
   return (
     <ScrollView>

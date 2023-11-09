@@ -1,8 +1,3 @@
-/* import axios from "axios";
-const API_URL = "https://demo-btw.monkey-soft.fr/"; */
-import storeAndPersistor from "./store";
-const { persistor } = storeAndPersistor;
-
 //action's type for login
 export const ADD_TOKEN = "ADD_TOKEN";
 export const ADD_REFRESH_TOKEN = "ADD_REFRESH_TOKEN";
@@ -14,6 +9,7 @@ export const API_PENDING = "API_PENDING";
 export const API_SUCCESS = "API_SUCCESS";
 export const API_ERROR = "API_ERROR";
 export const API_EMPTY_DATA = "API_EMPTY_DATA"
+export const API_PENDING_PCES_ACCS = "API_PENDING_PCES_ACCS"
 
 //action's type for bc
 export const RECORD_SELECTED_BC = "RECORD_SELECTED_BC";
@@ -21,6 +17,7 @@ export const RECORD_SELECTED_BC = "RECORD_SELECTED_BC";
 //action's type for pces and accs (pièces et accessoires)
 export const FETCH_PCE_SUCCESS = "FETCH_PCE_SUCCESS"
 export const FETCH_ACC_SUCCESS = "FETCH_ACC_SUCCESS"
+export const PURGE_PCES_ACCS = "PURGE_PCES_ACCS"
 
 //action creators for API to get pces and accs
 export const fetchPceSuccess = (pce) => {
@@ -34,6 +31,12 @@ export const fetchAccSuccess = (acc) => {
   return {
     type: FETCH_ACC_SUCCESS,
     payload: acc,
+  }
+}
+
+export const purgePcesAccs = () => {
+  return {
+    type: PURGE_PCES_ACCS,
   }
 }
 
@@ -79,6 +82,10 @@ export const signout = () => {
 
 export const fetchData = () => ({
   type: API_PENDING,
+});
+
+export const fetchDataPcesAccs = () => ({
+  type: API_PENDING_PCES_ACCS,
 });
 
 export const fetchSuccess = (data) => ({
