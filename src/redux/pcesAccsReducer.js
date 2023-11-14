@@ -1,8 +1,13 @@
-import { FETCH_ACC_SUCCESS, FETCH_PCE_SUCCESS, PURGE_PCES_ACCS, API_PENDING_PCES_ACCS } from "./actions";
+import {
+  FETCH_ACC_SUCCESS,
+  FETCH_PCE_SUCCESS,
+  PURGE_PCES_ACCS,
+  API_PENDING_PCES_ACCS,
+} from "./actions";
 
 const initialState = {
   pces: [],
-  accs:[],
+  accs: [],
   loading: false,
 };
 
@@ -13,22 +18,24 @@ const pcesAccsReducer = (state = initialState, action) => {
         ...state,
         loading: true,
       };
-    case  FETCH_PCE_SUCCESS:
+    case FETCH_PCE_SUCCESS:
       return {
         ...state,
         pces: [...state.pces, action.payload],
+        loading: false,
       };
     case FETCH_ACC_SUCCESS:
       return {
         ...state,
         accs: [...state.accs, action.payload],
-      }
+        loading: false,
+      };
     case PURGE_PCES_ACCS:
       return {
         ...state,
         pces: [],
         accs: [],
-      }
+      };
     default:
       return state;
   }

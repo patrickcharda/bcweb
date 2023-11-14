@@ -1,3 +1,5 @@
+import storeAndPersistor from './store';
+const { persistor } = storeAndPersistor;
 //action's type for login
 export const ADD_TOKEN = "ADD_TOKEN";
 export const ADD_REFRESH_TOKEN = "ADD_REFRESH_TOKEN";
