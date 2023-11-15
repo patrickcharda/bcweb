@@ -33,18 +33,15 @@ const Bc = () => {
                 <BcPce key={piece.id} piece={piece}/>
             ))
           }
-          
-
-
         </SafeAreaView>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  containerBc: {
     flex: 1,
-    backgroundColor: "#aaa",
+    backgroundColor: "#3498db",
     color: "#bdc3c7",
   },
   toolbar: {

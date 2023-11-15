@@ -9,6 +9,9 @@ const initialState = {
   pces: [],
   accs: [],
   loading: false,
+  pcesLoaded:[],
+  pcesProp:[],
+  pcesOther:[],
 };
 
 const pcesAccsReducer = (state = initialState, action) => {
@@ -19,11 +22,28 @@ const pcesAccsReducer = (state = initialState, action) => {
         loading: true,
       };
     case FETCH_PCE_SUCCESS:
-      return {
-        ...state,
-        pces: [...state.pces, action.payload],
-        loading: false,
-      };
+      if (action.payload && action.payload.pce_charge) {
+        return {
+          ...state,
+          pces: [...state.pces, action.payload],
+          pcesLoaded: [...state.pcesLoaded, action.payload],
+          loading: false,
+        } 
+      } else if (action.payload && action.payload.pce_prop_charge) {
+        return {
+          ...state,
+          pces: [...state.pces, action.payload],
+          pcesProp: [...state.pcesProp, action.payload],
+          loading: false,
+        }
+      } else {
+        return {
+          ...state,
+          pces: [...state.pces, action.payload],
+          pcesOther: [...state.pcesOther, action.payload],
+          loading: false,
+        }
+      }
     case FETCH_ACC_SUCCESS:
       return {
         ...state,
@@ -35,6 +55,9 @@ const pcesAccsReducer = (state = initialState, action) => {
         ...state,
         pces: [],
         accs: [],
+        pcesLoaded: [],
+        pcesProp: [],
+        pcesOther: [],
       };
     default:
       return state;

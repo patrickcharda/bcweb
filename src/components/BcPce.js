@@ -10,15 +10,15 @@ import * as React from "react";
 
 const BcPce = ( {piece} ) => {
 
+  const pieceJson = JSON.stringify(piece)
 
   return (
     <ScrollView style={styles.container}>
         <SafeAreaView>
-
-                <Text>{piece.id}</Text>
-
+          <Text>{piece.id}</Text>
+          <Text>{pieceJson}</Text>
+          <Text></Text>
         </SafeAreaView>
-
     </ScrollView>
   );
 };

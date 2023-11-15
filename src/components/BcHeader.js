@@ -11,7 +11,7 @@ const BcHeader = ({ bc }) => {
 
   //const bcJSON = JSON.stringify(useSelector((state) => state.bcReducer.bc));
   return (
-    <ScrollView>
+    <ScrollView style={styles.container}>
         <SafeAreaView>
             <Text>{bc.bc_num}</Text>
             <Text>{"N° Aff: "+bc.bc_num_affaire}</Text>
@@ -31,7 +31,7 @@ const BcHeader = ({ bc }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#aaa",
+    backgroundColor: "#e88",
     color: "#bdc3c7",
   },
   toolbar: {
