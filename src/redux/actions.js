@@ -1,4 +1,4 @@
-import storeAndPersistor from './store';
+import storeAndPersistor from "./store";
 const { persistor } = storeAndPersistor;
 //action's type for login
 export const ADD_TOKEN = "ADD_TOKEN";
@@ -10,22 +10,31 @@ export const SIGNOUT = "SIGNOUT";
 export const API_PENDING = "API_PENDING";
 export const API_SUCCESS = "API_SUCCESS";
 export const API_ERROR = "API_ERROR";
-export const API_EMPTY_DATA = "API_EMPTY_DATA"
-export const API_PENDING_PCES_ACCS = "API_PENDING_PCES_ACCS"
+export const API_EMPTY_DATA = "API_EMPTY_DATA";
+export const API_PENDING_PCES_ACCS = "API_PENDING_PCES_ACCS";
 
 //action's type for bc
 export const RECORD_SELECTED_BC = "RECORD_SELECTED_BC";
 
 //action's type for pces and accs (pièces et accessoires)
-export const FETCH_PCE_SUCCESS = "FETCH_PCE_SUCCESS"
-export const FETCH_ACC_SUCCESS = "FETCH_ACC_SUCCESS"
-export const PURGE_PCES_ACCS = "PURGE_PCES_ACCS"
+export const FETCH_PCE_SUCCESS = "FETCH_PCE_SUCCESS";
+export const FETCH_ACC_SUCCESS = "FETCH_ACC_SUCCESS";
+export const PURGE_PCES_ACCS = "PURGE_PCES_ACCS";
+export const CHANGE_PCE_LOADED_STATUS = "CHANGE_PCE_LOADED_STATUS";
+
+//action creators to modify lists of pces
+export const changePceLoadedStatus = (pce) => {
+  return {
+    type: CHANGE_PCE_LOADED_STATUS,
+    payload: pce,
+  };
+};
 
 //action creators for API to get pces and accs
 export const fetchPceSuccess = (pce) => {
   return {
     type: FETCH_PCE_SUCCESS,
-    payload: pce,
+    payload: pce
   };
 };
 
@@ -33,15 +42,14 @@ export const fetchAccSuccess = (acc) => {
   return {
     type: FETCH_ACC_SUCCESS,
     payload: acc,
-  }
-}
+  };
+};
 
 export const purgePcesAccs = () => {
   return {
     type: PURGE_PCES_ACCS,
-  }
-}
-
+  };
+};
 
 //action creators for bc
 export const recordSelectedBc = (bc) => {
@@ -101,7 +109,5 @@ export const fetchError = (error) => ({
 });
 
 export const apiEmptyData = () => ({
-  type: API_EMPTY_DATA
+  type: API_EMPTY_DATA,
 });
-
-

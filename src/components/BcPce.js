@@ -3,20 +3,29 @@ import {
   SafeAreaView,
   Text,
   StyleSheet,
+  Button,
+  Alert,
 } from "react-native";
 
+import { useSelector, useDispatch } from "react-redux";
+import { changePceLoadedStatus } from "../redux/actions";
 import * as React from "react";
 
 
 const BcPce = ( {piece} ) => {
 
   const pieceJson = JSON.stringify(piece)
+  const pce = piece;
+  const dispatch = useDispatch();
 
   return (
     <ScrollView style={styles.container}>
         <SafeAreaView>
           <Text>{piece.id}</Text>
           <Text>{pieceJson}</Text>
+          <Button
+          title="Load or unload"
+          onPress={() => dispatch(changePceLoadedStatus(pce))}></Button>
           <Text></Text>
         </SafeAreaView>
     </ScrollView>
