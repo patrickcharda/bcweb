@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   StyleSheet,
   TouchableOpacity,
-  View,
 } from "react-native";
 import apiCall from "../redux/apiCall";
 import { recordSelectedBc, purgePcesAccs } from "../redux/actions";

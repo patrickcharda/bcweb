@@ -12,18 +12,29 @@ import {
   TouchableOpacity,
 } from "react-native";
 
+
+
 const Bc = () => {
 
   const [isOpened, setIsOpened] = React.useState(false);
 
   const bonChargement = useSelector((state) => state.bcReducer.bc);
   const pces = useSelector((state) => state.pcesAccsReducer.pces);
+  const pcesLoaded = useSelector((state) => state.pcesAccsReducer.pcesLoaded);
+
+  let nbPcesChargees = pcesLoaded.length;
+  let poids = 0;
+  pcesLoaded.map((pce) => 
+  poids += parseFloat(pce.pce_poids)
+  )
 
   return (
     <ScrollView>
         <SafeAreaView>
           <TouchableOpacity onPress={() => setIsOpened(!isOpened)}>
             <Text>{isOpened ? "Masquer détails BC n° "+bonChargement.bc_num  : "Voir détails BC n° "+bonChargement.bc_num}</Text>
+            <Text>{ nbPcesChargees ==  0 ? "aucune pièce chargée" : nbPcesChargees === 1 ? nbPcesChargees + " pièce chargée" : nbPcesChargees +" pièces chargées "}</Text>
+            <Text>{poids + " T"}</Text>
           </TouchableOpacity>
           {isOpened &&
             <BcHeader bc={bonChargement}/>
