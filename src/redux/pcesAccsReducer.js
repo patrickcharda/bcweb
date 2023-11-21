@@ -1,3 +1,4 @@
+import { cloneDeep } from 'lodash';
 import {
   FETCH_ACC_SUCCESS,
   FETCH_PCE_SUCCESS,
@@ -23,56 +24,63 @@ const pcesAccsReducer = (state = initialState, action) => {
         loading: true,
       };
     case CHANGE_PCE_LOADED_STATUS:
-      if (action.payload && action.payload.pce_charge) {
-        // supprimer piece de la liste des pièces chargées
-        const index1 = state.pcesLoaded.findIndex(pce => pce.pce_id === action.payload.pce_id);
-        const newArray1 = [...state.pcesLoaded];
-        newArray1.splice(index1, 1);
+      let changedElement = Object.assign({},action.payload);
+      changedElement.pce_charge = !changedElement.pce_charge; // on permute chargée/déchargée
+      const newArrayPces = cloneDeep(state.pces);//JSON.parse(JSON.stringify(state.pces)); //[...state.pces];
+      const newArrayPcesLoaded = cloneDeep(state.pcesLoaded);//JSON.parse(JSON.stringify(state.pcesLoaded));//[...state.pcesLoaded];
+      const newArrayPcesProp = cloneDeep(state.pcesProp);//JSON.parse(JSON.stringify(state.pcesProp));//[...state.pcesProp];
+      const newArrayPcesOther = cloneDeep(state.pcesOther);//JSON.parse(JSON.stringify(state.pcesOther));//[...state.pcesOther];
+      // on change tout de suite le statut de chargement de la pce ds la future liste des pieces 
+      const indexPces = newArrayPces.findIndex(pce => pce.id === action.payload.id);
+      newArrayPces[indexPces].pce_charge = changedElement.pce_charge; // on change le statut de la pce ds la liste des pces
+
+      if (action.payload && action.payload.pce_charge === true) {
+        // décharger = supprimer piece de la liste des pièces chargées et modifier statut pce ds liste ttes pces
+        const indexPcesLoaded = newArrayPcesLoaded.findIndex(pce => pce.id === action.payload.id);
+        newArrayPcesLoaded.splice(indexPcesLoaded, 1); //on supprime à l'index
+
         if (action.payload.pce_prop_charge) {
           // ajouter la pce dans la liste des pièces proposées
-          const newArray2 = [...state.pcesProp];
-          action.payload.pce_charge = false; 
-          newArray2.push(action.payload)
+          newArrayPcesProp.push(changedElement)
           return {
             ...state, 
-            pcesLoaded: newArray1,
-            pcesProp: newArray2,
+            pcesLoaded: newArrayPcesLoaded,
+            pcesProp: newArrayPcesProp,
+            pces: newArrayPces,
           }
         } else {
           // ajouter la pce ds la liste des autres pces (ni chargées ni proposées)
-          const newArray3 = [...state.pcesOther];
-          action.payload.pce_charge = false; 
-          newArray3.push(action.payload);
+          newArrayPcesOther.push(changedElement);
           return {
             ...state, 
-            pcesLoaded: newArray1,
-            pcesOther: newArray3,
+            pcesLoaded: newArrayPcesLoaded,
+            pcesOther: newArrayPcesOther,
+            pces: newArrayPces,
           }
         }
       } else {
-        // charger la pièce
-        action.payload.pce_charge = true;
-        const newArray1 = [...state.pcesLoaded];
-        newArray1.push(action.payload);
+        // charger la pièce 
+        newArrayPcesLoaded.push(changedElement);
+
         if (action.payload.pce_prop_charge) {
-          // supprimer de la liste des pièces proposées
-          const index1 = state.pcesProp.findIndex(pce => pce.pce_id === action.payload.pce_id);
-          const newArray2 = [...state.pcesProp];
-          newArray2.splice(index1, 1);
+          // supprimer de la liste des pièces proposées (puisque pce passée dans la liste des pces chargées)
+          const indexPcesProp = newArrayPcesProp.findIndex(pce => pce.id === action.payload.id);
+          newArrayPcesProp.splice(indexPcesProp, 1);
           return {
             ...state,
-            pcesLoaded: newArray1,
-            pcesProp: newArray2,
+            pcesLoaded: newArrayPcesLoaded,
+            pcesProp: newArrayPcesProp,
+            pces: newArrayPces,
           }
         } else {
-          // supprimer de la liste des autres pièces 
-          const index2 = state.pcesOther.findIndex(pce => pce.pce_id === action.payload.pce_id);
-          const newArray3 = [...state.pcesOther];
-          newArray3.splice(index2, 1);
+          // supprimer de la liste des autres pièces (puisque pce passée dans la liste des pces chargées)
+          const indexPcesOther = newArrayPcesOther.findIndex(pce => pce.id === action.payload.id);
+          newArrayPcesOther.splice(indexPcesOther, 1);
           return {
             ...state,
-            pcesLoaded: newArray1,
-            pcesOther: newArray3,
+            pcesLoaded: newArrayPcesLoaded,
+            pcesOther: newArrayPcesOther,
+            pces: newArrayPces,
           }
         }
       };

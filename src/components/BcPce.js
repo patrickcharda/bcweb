@@ -7,7 +7,7 @@ import {
   Alert,
 } from "react-native";
 
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { changePceLoadedStatus } from "../redux/actions";
 import * as React from "react";
 
