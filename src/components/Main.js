@@ -4,7 +4,9 @@ import LoginScreen from "./screens/LoginScreen";
 import BcListScreen from "./screens/BcListScreen";
 import BcScreen from "./screens/BcScreen";
 //import Message from "./Message";
-import { useSelector } from "react-redux";
+import { signout, purgePcesAccs } from "../redux/actions";
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect } from 'react';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 /* const endpointBc = "https://demo-btw.monkey-soft.fr/bcweb/bcx/";
@@ -14,7 +16,13 @@ const Stack = createNativeStackNavigator();
 
 const Main = () => {
   const logged = useSelector((state) => state.tokenReducer.isLogged);
+  const dispatch = useDispatch();
   //const hasPcesOrAccs = useSelector((state) => ! state.pcesAccsReducer.empty);
+
+  useEffect(() => {
+    dispatch(signout());
+    dispatch(purgePcesAccs());
+  }, [dispatch]);
 
   return (
     <Stack.Navigator>

@@ -11,24 +11,18 @@ import { useSelector, useDispatch } from "react-redux";
 import { addToken, addRefreshToken, toggleIsLogged } from '../redux/actions';
 import * as React from "react";
 import axios from 'axios';
-import { MyClientJSFunction } from '../MyClientJS';
 
 
 const Login = () => {
 
-  const client = new MyClientJSFunction();
-  const fingerprint = client.getFingerPrint();
-  Alert.alert("FINGERPRINT : ", fingerprint);
+
   const dispatch = useDispatch();
   
   const token = useSelector((state) => state.tokenReducer.token);
   const refreshToken = useSelector((state) => state.tokenReducer.refreshToken);
   const logged = useSelector((state) => state.tokenReducer.isLogged);
 
-  //const endpointRefreshToken = "https://demo-btw.monkey-soft.fr/refresh-token/";
-  const endpointRefreshToken = "http://127.0.0.1:8000/refresh-token/";
-
-
+  const endpointRefreshToken = "https://demo-btw.monkey-soft.fr/refresh-token/";
 
   const renewToken = async (newRefreshToken) => {
     try {
@@ -56,8 +50,7 @@ const Login = () => {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
 
-  //const endpointLogin = "https://demo-btw.monkey-soft.fr/login/";
-  const endpointLogin = "http://127.0.0.1:8000/login/";
+  const endpointLogin = "https://demo-btw.monkey-soft.fr/login/";
 
   const onSave = async () => {
     try {
@@ -95,30 +88,30 @@ const Login = () => {
   const onPasswordChange = (password) => setPassword(password);
 
 
-  return (
+    return (
 
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.toolbar}>LOGIN</Text>
-      <ScrollView style={styles.content}>
-      <TextInput
-          style={styles.input}
-          onChangeText={onUsernameChange}
-          value={username}
-          placeholder="Username"
-      />
-      <TextInput
-          style={styles.input}
-          onChangeText={onPasswordChange}
-          value={password}
-          placeholder="Password"
-      />
-      <TouchableOpacity onPress={onSave} style={styles.button}>
-          <Text>Envoyer</Text>
-      </TouchableOpacity>
-      </ScrollView>
-    </SafeAreaView>
+        <SafeAreaView style={styles.container}>
+          <Text style={styles.toolbar}>LOGIN</Text>
+          <ScrollView style={styles.content}>
+          <TextInput
+              style={styles.input}
+              onChangeText={onUsernameChange}
+              value={username}
+              placeholder="Username"
+          />
+          <TextInput
+              style={styles.input}
+              onChangeText={onPasswordChange}
+              value={password}
+              placeholder="Password"
+          />
+          <TouchableOpacity onPress={onSave} style={styles.button}>
+              <Text>Envoyer</Text>
+          </TouchableOpacity>
+          </ScrollView>
+        </SafeAreaView>
 
-  )  
+    )
 }
 
 const styles = StyleSheet.create({
@@ -157,5 +150,5 @@ const styles = StyleSheet.create({
       marginBottom: 30,
     },
   });
- 
+
 export default Login;
