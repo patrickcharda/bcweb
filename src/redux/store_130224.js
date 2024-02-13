@@ -6,8 +6,8 @@ import bcReducer from "./bcReducer";
 import pcesAccsReducer from "./pcesAccsReducer";
 import {createLogger} from 'redux-logger';
 import thunk from 'redux-thunk';
-//import AsyncStorage from '@react-native-async-storage/async-storage';
-import ExpoFileSystemStorage from 'redux-persist-expo-filesystem';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 import {
   persistReducer,
@@ -18,8 +18,6 @@ import {
   PERSIST,
   PURGE,
   REGISTER,} from "redux-persist";
-
-
 
 const appReducers = combineReducers({
   tokenReducer,
@@ -33,7 +31,7 @@ const logger = createLogger();
 
 const persistConfig = {
   key: 'root',
-  storage: ExpoFileSystemStorage,
+  storage: AsyncStorage,
   whitelist: ['tokenReducer', 'bcReducer', 'pcesAccsReducer'],
   timeout: 200000,
 }

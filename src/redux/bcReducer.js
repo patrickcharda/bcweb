@@ -1,4 +1,4 @@
-import { RECORD_SELECTED_BC } from "./actions";
+import { RECORD_SELECTED_BC, PURGE_BC } from "./actions";
 
 const initialState = {
   bc: {},
@@ -11,6 +11,11 @@ const bcReducer = (state = initialState, action) => {
         ...state,
         bc: action.payload,
       };
+    case PURGE_BC:
+      return {
+        ...state,
+        bc: {},
+      }
     default:
       return state;
   }

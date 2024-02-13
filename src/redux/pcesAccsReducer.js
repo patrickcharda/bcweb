@@ -27,9 +27,9 @@ const pcesAccsReducer = (state = initialState, action) => {
       let changedElement = Object.assign({},action.payload);
       changedElement.pce_charge = !changedElement.pce_charge; // on permute chargée/déchargée
       const newArrayPces = cloneDeep(state.pces);//JSON.parse(JSON.stringify(state.pces)); //[...state.pces];
-      const newArrayPcesLoaded = cloneDeep(state.pcesLoaded);//JSON.parse(JSON.stringify(state.pcesLoaded));//[...state.pcesLoaded];
-      const newArrayPcesProp = cloneDeep(state.pcesProp);//JSON.parse(JSON.stringify(state.pcesProp));//[...state.pcesProp];
-      const newArrayPcesOther = cloneDeep(state.pcesOther);//JSON.parse(JSON.stringify(state.pcesOther));//[...state.pcesOther];
+      const newArrayPcesLoaded = cloneDeep(state.pcesLoaded);
+      const newArrayPcesProp = cloneDeep(state.pcesProp);
+      const newArrayPcesOther = cloneDeep(state.pcesOther);
       // on change tout de suite le statut de chargement de la pce ds la future liste des pieces 
       const indexPces = newArrayPces.findIndex(pce => pce.id === action.payload.id);
       newArrayPces[indexPces].pce_charge = changedElement.pce_charge; // on change le statut de la pce ds la liste des pces

@@ -33,3 +33,8 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Perso
+NotesDev.docx
+src/redux/bcweb_mobapp.code-workspace
+~$tesDev.docx

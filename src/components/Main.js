@@ -1,13 +1,16 @@
 import * as React from "react";
-import { View, StyleSheet } from "react-native";
+import {
+  View,
+  StyleSheet,
+} from 'react-native';
 import LoginScreen from "./screens/LoginScreen";
 import BcListScreen from "./screens/BcListScreen";
 import BcScreen from "./screens/BcScreen";
 //import Message from "./Message";
-import { signout, purgePcesAccs } from "../redux/actions";
-import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from 'react';
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+//import { signout, purgePcesAccs } from "../redux/actions";
+import { useSelector, useDispatch } from "react-redux";  
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+//import { useEffect } from 'react';
 
 /* const endpointBc = "https://demo-btw.monkey-soft.fr/bcweb/bcx/";
 const endpointRefreshToken = "https://demo-btw.monkey-soft.fr/refresh-token/"; */
@@ -16,34 +19,36 @@ const Stack = createNativeStackNavigator();
 
 const Main = () => {
   const logged = useSelector((state) => state.tokenReducer.isLogged);
+  //const token = useSelector((state) => state.tokenReducer.token);
   const dispatch = useDispatch();
-  //const hasPcesOrAccs = useSelector((state) => ! state.pcesAccsReducer.empty);
-
-  useEffect(() => {
+  
+  /* useEffect(() => {
     dispatch(signout());
     dispatch(purgePcesAccs());
-  }, [dispatch]);
+  }, [dispatch]); */
+
 
   return (
+
     <Stack.Navigator>
-      {logged ? 
-        [<Stack.Screen
-          name="BcList"
-          component={BcListScreen}
-          options={{ title: "Liste des Bons de chargement" }}
-          key="1"
-        />,<Stack.Screen
-          name="Bc"
-          component={BcScreen}
-          options={{ title: "Bon de chargement" }}
-          key="2"
-        />]
-         : (
-        <Stack.Screen
-          name="Login"
-          component={LoginScreen}
-          options={{ title: "Login" }}
-        />
+    {logged ? 
+      [<Stack.Screen
+        name="BcList"
+        component={BcListScreen}
+        options={{ title: "Liste des Bons de chargement" }}
+        key="1"
+      />,<Stack.Screen
+        name="Bc"
+        component={BcScreen}
+        options={{ title: "Bon de chargement" }}
+        key="2"
+      />]
+       : (
+      <Stack.Screen
+        name="Login"
+        component={LoginScreen}
+        options={{ title: "Login" }}
+      />
       )}
     </Stack.Navigator>
   );
