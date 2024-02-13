@@ -21,6 +21,8 @@ const Bc = () => {
   const bonChargement = useSelector((state) => state.bcReducer.bc);
   const pces = useSelector((state) => state.pcesAccsReducer.pces);
   const pcesLoaded = useSelector((state) => state.pcesAccsReducer.pcesLoaded);
+  const pcesProp = useSelector((state) => state.pcesAccsReducer.pcesProp);
+  const pcesOther = useSelector((state) => state.pcesAccsReducer.pcesOther);
 
   let nbPcesChargees = pcesLoaded.length;
   let poids = 0;
@@ -39,9 +41,23 @@ const Bc = () => {
           {isOpened &&
             <BcHeader bc={bonChargement}/>
           }
-          <Text></Text>
-          {pces.map((piece) => (
+          <Text style={styles.text1}>Pièces Chargées</Text>
+          {/* {pces.map((piece) => (
                 <BcPce key={piece.id} piece={piece}/>
+            ))
+          } */}
+          {pcesLoaded.map((piece) => (
+                <BcPce key={piece.id} piece={piece} loaded={true}/>
+            ))
+          }
+          <Text style={styles.text2}>Pièces Proposées</Text>
+          {pcesProp.map((piece) => (
+                <BcPce key={piece.id} piece={piece} loaded={false}/>
+            ))
+          }
+          <Text style={styles.text3}>Pièces Autres</Text>
+          {pcesOther.map((piece) => (
+                <BcPce key={piece.id} piece={piece} loaded={false}/>
             ))
           }
         </SafeAreaView>
@@ -84,6 +100,24 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 3,
     marginBottom: 30,
+  },
+  text1: {
+    color: 'green',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  text2: {
+    color: 'blue',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  text3: {
+    color: 'grey',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 

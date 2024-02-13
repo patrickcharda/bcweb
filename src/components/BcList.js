@@ -55,7 +55,7 @@ const BcList = () => {
       dispatch(apiCall("https://demo-btw.monkey-soft.fr/bcweb/pce/"+pce.slice(42,pce.length), token));
     });
     //appeler écran BCScreen
-    
+  
     navigation.navigate('Bc');
   };
 
