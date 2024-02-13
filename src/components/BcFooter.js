@@ -14,11 +14,12 @@ import { useSelector, useDispatch } from "react-redux";
 import Message from "./Message";
 import { useNavigation } from '@react-navigation/native';
 
-
 const BcList = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigation();
+
   const [isOpen, setIsOpen] = React.useState(false);
+
+  const navigation = useNavigation();
 
   // au chargement uniquement
   React.useEffect(() => {
@@ -45,6 +46,9 @@ const BcList = () => {
     dispatch(recordSelectedBc(bc));
     dispatch(purgePcesAccs());
     getPieces(bc.pieces);
+    getProduits(bc.produits);
+    //charger ecran bcScreen
+    navigation.push("Bc");
   };
 
   const getPieces = (tabPces) => {
@@ -54,9 +58,14 @@ const BcList = () => {
       //appel API pr récupérer toutes les infos de la pièce
       dispatch(apiCall("https://demo-btw.monkey-soft.fr/bcweb/pce/"+pce.slice(42,pce.length), token));
     });
-    //appeler écran BCScreen
-    
-    navigation.navigate('Bc');
+  };
+
+  const getProduits = (tabAccs) => {
+    accsList = tabAccs;
+    accsList.forEach((acc) => {
+      console.log(" ECHO ACC " +(acc.slice(42,acc.length)));
+      dispatch(apiCall("https://demo-btw.monkey-soft.fr/bcweb/pdt/"+acc.slice(42,acc.length), token));
+    });
   };
 
   return (

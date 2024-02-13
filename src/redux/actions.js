@@ -1,3 +1,6 @@
+import storeAndPersistor from "./store";
+const { persistor } = storeAndPersistor;
+
 //action's type for login
 export const ADD_TOKEN = "ADD_TOKEN";
 export const ADD_REFRESH_TOKEN = "ADD_REFRESH_TOKEN";
@@ -13,13 +16,21 @@ export const API_PENDING_PCES_ACCS = "API_PENDING_PCES_ACCS"
 
 //action's type for bc
 export const RECORD_SELECTED_BC = "RECORD_SELECTED_BC";
-
+export const PURGE_BC = "PURGE_BC";
 //action's type for pces and accs (pièces et accessoires)
 export const FETCH_PCE_SUCCESS = "FETCH_PCE_SUCCESS"
 export const FETCH_ACC_SUCCESS = "FETCH_ACC_SUCCESS"
 export const PURGE_PCES_ACCS = "PURGE_PCES_ACCS"
+export const CHANGE_PCE_LOADED_STATUS = "CHANGE_PCE_LOADED_STATUS";
 
 //action creators for API to get pces and accs
+export const changePceLoadedStatus = (pce) => {
+  return {
+    type: CHANGE_PCE_LOADED_STATUS,
+    payload: pce,
+  };
+};
+
 export const fetchPceSuccess = (pce) => {
   return {
     type: FETCH_PCE_SUCCESS,
@@ -48,6 +59,11 @@ export const recordSelectedBc = (bc) => {
     payload: bc,
   };
 };
+export const purgeBc = () => {
+  return {
+    type: PURGE_BC,
+  }
+}
 
 //action creators for login
 export const addToken = (token) => {
@@ -101,5 +117,3 @@ export const fetchError = (error) => ({
 export const apiEmptyData = () => ({
   type: API_EMPTY_DATA
 });
-
-
