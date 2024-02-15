@@ -1,5 +1,5 @@
 import {
-  ScrollView,
+  View,
   SafeAreaView,
   Text,
   StyleSheet,
@@ -11,7 +11,7 @@ const BcHeader = ({ bc }) => {
 
   //const bcJSON = JSON.stringify(useSelector((state) => state.bcReducer.bc));
   return (
-    <ScrollView style={styles.container}>
+
         <SafeAreaView>
             <Text>{bc.bc_num}</Text>
             <Text>{"N° Aff: "+bc.bc_num_affaire}</Text>
@@ -24,7 +24,7 @@ const BcHeader = ({ bc }) => {
             <Text>{"Observations: "+bc.bc_observ}</Text>
             <Text></Text>
         </SafeAreaView>
-    </ScrollView>
+    
   );
 };
 

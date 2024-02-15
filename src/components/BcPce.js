@@ -12,7 +12,7 @@ import { changePceLoadedStatus } from "../redux/actions";
 import * as React from "react";
 
 
-const BcPce = ( {piece} ) => {
+const BcPce = ( {piece, loaded} ) => {
 
   const pieceJson = JSON.stringify(piece)
   const pce = piece;
@@ -24,7 +24,7 @@ const BcPce = ( {piece} ) => {
           <Text>{piece.id}</Text>
           <Text>{pieceJson}</Text>
           <Button
-          title="Load or unload"
+          title={loaded ? "Unload" : "Load"}
           onPress={() => dispatch(changePceLoadedStatus(pce))}></Button>
           <Text></Text>
         </SafeAreaView>
