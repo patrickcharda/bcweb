@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#3498db",
     color: "#fff",
     textAlign: "center",
-    padding: 25,
+    padding: 5,
     fontSize: 20,
   },
   content: {

@@ -7,15 +7,14 @@ import { useSelector } from "react-redux";
 import {
   ScrollView,
   SafeAreaView,
+  View,
   Text,
   StyleSheet,
   TouchableOpacity,
+  Button,
 } from "react-native";
 
-
-
 const Bc = () => {
-
   const [isOpened, setIsOpened] = React.useState(false);
 
   const bonChargement = useSelector((state) => state.bcReducer.bc);
@@ -26,50 +25,62 @@ const Bc = () => {
 
   let nbPcesChargees = pcesLoaded.length;
   let poids = 0;
-  pcesLoaded.map((pce) => 
-  poids += parseFloat(pce.pce_poids)
-  )
+  pcesLoaded.map((pce) => (poids += parseFloat(pce.pce_poids)));
+
+  const recordBc = () => {
+    //on se base sur le tableau pces du state pour executer les appels api de mise à jour de la base de données
+    console.log(pces)
+  };
 
   return (
-    <ScrollView>
-        <SafeAreaView>
-          <TouchableOpacity onPress={() => setIsOpened(!isOpened)}>
-            <Text>{isOpened ? "Masquer détails BC n° "+bonChargement.bc_num  : "Voir détails BC n° "+bonChargement.bc_num}</Text>
-            <Text>{ nbPcesChargees ==  0 ? "aucune pièce chargée" : nbPcesChargees === 1 ? nbPcesChargees + " pièce chargée" : nbPcesChargees +" pièces chargées "}</Text>
-            <Text>{poids + " T"}</Text>
-          </TouchableOpacity>
-          {isOpened &&
-            <BcHeader bc={bonChargement}/>
-          }
-          <Text style={styles.text1}>Pièces Chargées</Text>
-          {/* {pces.map((piece) => (
-                <BcPce key={piece.id} piece={piece}/>
-            ))
-          } */}
-          {pcesLoaded.map((piece) => (
-                <BcPce key={piece.id} piece={piece} loaded={true}/>
-            ))
-          }
-          <Text style={styles.text2}>Pièces Proposées</Text>
-          {pcesProp.map((piece) => (
-                <BcPce key={piece.id} piece={piece} loaded={false}/>
-            ))
-          }
-          <Text style={styles.text3}>Pièces Autres</Text>
-          {pcesOther.map((piece) => (
-                <BcPce key={piece.id} piece={piece} loaded={false}/>
-            ))
-          }
-        </SafeAreaView>
-    </ScrollView>
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollable_View}>
+        <TouchableOpacity onPress={() => setIsOpened(!isOpened)}>
+          <Text>
+            {isOpened
+              ? "Masquer détails BC n° " + bonChargement.bc_num
+              : "Voir détails BC n° " + bonChargement.bc_num}
+          </Text>
+          <Text>
+            {nbPcesChargees == 0
+              ? "aucune pièce chargée"
+              : nbPcesChargees === 1
+              ? nbPcesChargees + " pièce chargée"
+              : nbPcesChargees + " pièces chargées "}
+          </Text>
+          <Text>{poids + " T"}</Text>
+        </TouchableOpacity>
+        {isOpened && <BcHeader bc={bonChargement} />}
+      </ScrollView>
+      <ScrollView styles={styles.scrollableView2}>
+        <Text style={styles.text1}>Pièces Chargées</Text>
+        {pcesLoaded.map((piece) => (
+          <BcPce key={piece.id} piece={piece} loaded={true} />
+        ))}
+        <Text style={styles.text2}>Pièces Proposées</Text>
+        {pcesProp.map((piece) => (
+          <BcPce key={piece.id} piece={piece} loaded={false} />
+        ))}
+        <Text style={styles.text3}>Pièces Autres</Text>
+        {pcesOther.map((piece) => (
+          <BcPce key={piece.id} piece={piece} loaded={false} />
+        ))}
+        <Text>{"\n\n"}</Text>
+        <Button onPress={() => recordBc()} title="Enregistrer"></Button>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  containerBc: {
+  container: {
     flex: 1,
-    backgroundColor: "#3498db",
-    color: "#bdc3c7",
+  },
+  scrollableView1: {
+    flex: 0.7,
+  },
+  scrollableView2: {
+    flex: 0.3,
   },
   toolbar: {
     backgroundColor: "#3498db",
@@ -102,22 +113,22 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   text1: {
-    color: 'green',
+    color: "green",
     fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
   },
   text2: {
-    color: 'blue',
+    color: "blue",
     fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
   },
   text3: {
-    color: 'grey',
+    color: "grey",
     fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 
