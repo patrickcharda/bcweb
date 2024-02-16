@@ -20,16 +20,18 @@ const BcList = () => {
   const navigation = useNavigation();
   const [isOpen, setIsOpen] = React.useState(false);
 
+  const loading = useSelector((state) => state.apiReducer.loading);
+  const token = useSelector((state) => state.tokenReducer.token);
+
   // au chargement uniquement
   React.useEffect(() => {
-    dispatch(apiCall("https://demo-btw.monkey-soft.fr/bcweb/bcx/", token));
+    dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/bcx/", token));
   }, []);
 
   const data = useSelector((state) => state.apiReducer.data.results);
 
   //const error = JSON.stringify(useSelector((state) => state.apiReducer.error));
-  const loading = useSelector((state) => state.apiReducer.loading);
-  const token = useSelector((state) => state.tokenReducer.token);
+  
   let bc = undefined;
 
   const defineBc = (selectedBc) => {
@@ -52,7 +54,7 @@ const BcList = () => {
     pcesList.forEach((pce) => {
       console.log(pce.slice(42,pce.length)); //=> récupération du numéro de pce
       //appel API pr récupérer toutes les infos de la pièce
-      dispatch(apiCall("https://demo-btw.monkey-soft.fr/bcweb/pce/"+pce.slice(42,pce.length), token));
+      dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/pce/"+pce.slice(48,pce.length), token));
     });
     //appeler écran BCScreen
   
@@ -72,7 +74,7 @@ const BcList = () => {
           {isOpen &&
             data.map((bc, index) => (
               <TouchableOpacity onPress={() => defineBc(bc)} key={index}>
-                <Text>{bc.url}</Text>
+                <Text>{bc.bc_num}</Text>
               </TouchableOpacity>
             ))}
         </SafeAreaView>

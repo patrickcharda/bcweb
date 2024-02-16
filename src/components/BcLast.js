@@ -17,10 +17,11 @@ import { useNavigation } from '@react-navigation/native';
 // composant récupérant dans le state le dernier composant utilisé
 
 const BcLast = () => {
-
+  
   const lastEditedBc = useSelector((state) => state.bcReducer.bc);
   const navigation = useNavigation();
-
+  const isBcEmpty = Object.keys(lastEditedBc).length === 0;
+  
   const openBc = () => {
     navigation.navigate('Bc');
   };
@@ -28,9 +29,11 @@ const BcLast = () => {
 
   return (
     <View>
-      <TouchableOpacity onPress={() => openBc()} >
+      {!isBcEmpty && (
+        <TouchableOpacity onPress={() => openBc()} >
           <Text>{ '\n\nCliquer pour réouvrir le dernier bon de chargement édité depuis cet appareil : '}{lastEditedBc.bc_num}</Text>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

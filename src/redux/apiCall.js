@@ -1,9 +1,15 @@
 import axios from "axios";
 import { fetchData, fetchSuccess, fetchError, signout, fetchPceSuccess, fetchAccSuccess, fetchDataPcesAccs } from "./actions";
+import * as Device from 'expo-device';
+import * as Application from 'expo-application';
+
+const appliname = "bcweb";
+const fingerprint = Application.getAndroidId().toString()+Application.nativeBuildVersion+Device.deviceYearClass.toString();
 
 const apiCall = (url, token) => (dispatch) => {
+  console.log("FINGERPRINT "+fingerprint);
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${token}`, appliname:appliname, fingerprint:fingerprint },
   };
   if (url.includes("/bcweb/bc")) {
     dispatch(fetchData());

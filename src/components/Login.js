@@ -17,10 +17,7 @@ import * as Application from 'expo-application';
 
 const Login = () => {
 
-
-  
-
-  React.useEffect(() => {
+  /* React.useEffect(() => {
     console.log('Device manufacturer: ' + Device.manufacturer);
     console.log(Device.brand);
     console.log(Device.designName);
@@ -33,51 +30,144 @@ const Login = () => {
     console.log(Application.nativeApplicationVersion);
     console.log(Application.nativeBuildVersion);
     console.log(Application.getAndroidId());
-  }, []);
+    fingerprint = Application.getAndroidId().toString()+Application.nativeBuildVersion+Device.deviceYearClass.toString();
+    console.log("fingerprint: "+fingerprint);
+  }, []); */
 
   const dispatch = useDispatch();
 
-  const token = useSelector((state) => state.tokenReducer.token);
-  const refreshToken = useSelector((state) => state.tokenReducer.refreshToken);
-  const logged = useSelector((state) => state.tokenReducer.isLogged);
+  //const token = useSelector((state) => state.tokenReducer.token);
+  //const refreshToken = useSelector((state) => state.tokenReducer.refreshToken);
+  var logged = useSelector((state) => state.tokenReducer.isLogged);
+  console.log("first logged "+logged);
+  var refreshToken = useSelector((state) => state.tokenReducer.refreshToken);
+  console.log("first refresh token "+refreshToken);
+  var accessToken = useSelector((state) => state.tokenReducer.token);
+  console.log("first token "+accessToken);
+  var appliname = "bcweb";
+  var fingerprint = Application.getAndroidId().toString()+Application.nativeBuildVersion+Device.deviceYearClass.toString();
+  
+  const endpointRefreshToken = "https://back-xxx.monkey-soft.fr:54443/apps/apprefresh/";
+  //const endpointLogin = "https://demo-btw.monkey-soft.fr/login/";
+  const endpointPreLogin = "https://back-xxx.monkey-soft.fr:54443/apps/preapplogin/";
+  const endpointLogin = "https://back-xxx.monkey-soft.fr:54443/apps/applogin/";
+  const endpointLogout = "https://back-xxx.monkey-soft.fr:54443/apps/userapplogout/";
+  const endpointCommandLine = "https://back-xxx.monkey-soft.fr:54443/bcweb/hascommandline/";
 
-  const endpointRefreshToken = "https://demo-btw.monkey-soft.fr/refresh-token/";
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
 
-  const renewToken = async (newRefreshToken) => {
+  const onUsernameChange = (username) => setUsername(username);
+  const onPasswordChange = (password) => setPassword(password);
+
+  const hasCommandLine = async () => {
     try {
       const response = await axios.post(
-        endpointRefreshToken,
+        endpointCommandLine,
         JSON.stringify({
-          refresh: newRefreshToken,
+          username: username,
         }),
         {
           headers: {
             "Content-Type": "application/json;charset=UTF-8",
+            "Authorization": accessToken,
+            "appliname": appliname,
+            "fingerprint": fingerprint,
+          },
+        }
+      );
+      console.log("hascommandline : "+response.data.id);
+    } catch (error) {
+      Alert.alert("Error", `There was an error while refreshing : ${error}`);
+    }
+  };
+
+  const renewToken = async () => {
+    try {
+      console.log("the refresh token : "+refreshToken);
+      console.log("the access token : "+accessToken);
+      const response = await axios.post(
+        endpointRefreshToken,
+        JSON.stringify({
+          refresh: refreshToken,
+          access: accessToken,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+            "appliname": appliname,
+            "fingerprint": fingerprint,
           },
         }
       );
       //let tok = response.data.access + "€";
+      console.log("TEST");
+      
       dispatch(addToken(response.data.access));
+      console.log("the new access token : "+accessToken);
+      dispatch(toggleIsLogged(logged));
+      console.log("the new logged value : "+logged);
+      await hasCommandLine();
       //Alert.alert("new AccessToken : ", response.data.access);
     } catch (error) {
       //Alert.alert("Error", `There was an error while refreshing : ${error}`);
     }
   };
 
-
-
-  const [username, setUsername] = React.useState("");
-  const [password, setPassword] = React.useState("");
-
-  const endpointLogin = "https://demo-btw.monkey-soft.fr/login/";
-
-  const onSave = async () => {
+  const appLogin = async () => {
     try {
+      console.log("the fingerprint is : "+fingerprint);
+      console.log("the appliname is : "+appliname);
       const response = await axios.post(
         endpointLogin,
         JSON.stringify({
           username: username,
-         password: password,
+          password: password,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+            "appliname": appliname,
+            "fingerprint": fingerprint,
+          },
+        }
+      );
+      accessToken = response.data.access;
+      console.log("second access token "+accessToken);
+      refreshToken = response.data.refresh;
+      console.log("second refresh token "+refreshToken);
+      dispatch(addToken(accessToken));
+      dispatch(addRefreshToken(refreshToken));
+      await renewToken();
+    }  catch (error) {
+      //Alert.alert("Error", `There was an error while logging: ${error}`);
+    }
+  };
+
+  const appLogout = async () => {
+    try {
+      const response = await axios.get(
+        endpointLogout,
+        {
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+            "appliname": appliname,
+            "username": username,
+          },
+        }
+      );
+    } catch (error) {
+      //Alert.alert("Error", `There was an error while logging: ${error}`);
+    }
+  };
+
+  const onSave = async () => {
+    try {
+      const response = await axios.post(
+        endpointPreLogin,
+        JSON.stringify({
+          username: username,
+          password: password,
         }),
         {
           headers: {
@@ -85,26 +175,38 @@ const Login = () => {
           },
         }
       );
-      let accessToken = response.data.access;
-      let newRefreshToken = response.data.refresh;
-
-      dispatch(addToken(accessToken));
+      /* let accessToken = response.data.access;
+      let newRefreshToken = response.data.refresh; */
+      //await appLogout();
+      let hasSession = response.data.opened_session;
+      console.log(hasSession);
+      if (hasSession === "no") {
+        console.log("pas de session ouverte");
+        // appeler fonction asynchrone de login
+        console.log("the fingerprint is : "+fingerprint);
+        console.log("the appliname is : "+appliname);
+        await appLogin();
+      } else {
+        console.log("session déjà ouverte");
+        //await appLogout();
+        //await appLogin();
+      }
+      /* dispatch(addToken(accessToken));
       dispatch(toggleIsLogged(logged));
-      dispatch(addRefreshToken(newRefreshToken));
+      dispatch(addRefreshToken(newRefreshToken)); */
    
       //console.log(store.getState());
 
       //Alert.alert("Success", "Login successfull");
       //console.log (store.getState());
-      renewToken(newRefreshToken);
+      //await renewToken(newRefreshToken);
 
     } catch (error) {
       //Alert.alert("Error", `There was an error while logging: ${error}`);
     }
   };
 
-  const onUsernameChange = (username) => setUsername(username);
-  const onPasswordChange = (password) => setPassword(password);
+
 
 
   return (
