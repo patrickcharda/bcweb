@@ -6,6 +6,7 @@ import {
 import LoginScreen from "./screens/LoginScreen";
 import BcListScreen from "./screens/BcListScreen";
 import BcScreen from "./screens/BcScreen";
+import ShootSessionScreen from "./screens/ShootSessionScreen";
 //import Message from "./Message";
 //import { signout, purgePcesAccs } from "../redux/actions";
 import { useSelector, useDispatch } from "react-redux";  
@@ -43,13 +44,19 @@ const Main = () => {
         options={{ title: "Bon de chargement" }}
         key="2"
       />]
-       : (
+       : [
       <Stack.Screen
         name="Login"
         component={LoginScreen}
         options={{ title: "Login" }}
+        key="3"
+      />,<Stack.Screen
+        name="ShootSession"
+        component={ShootSessionScreen}
+        options={{ title: "Session" }}
+        key="4"
       />
-      )}
+      ]}
     </Stack.Navigator>
   );
 };

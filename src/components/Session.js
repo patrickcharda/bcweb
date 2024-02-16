@@ -6,60 +6,40 @@ import {
   Alert,
   ScrollView,
   TouchableOpacity,
+  Button,
+  BackHandler,
 } from 'react-native';
 import { useSelector, useDispatch } from "react-redux";  
 import { addToken, addRefreshToken, toggleIsLogged } from '../redux/actions';
 import * as React from "react";
 import axios from 'axios';
-import * as Device from 'expo-device';
-import * as Application from 'expo-application';
-import { useNavigation } from '@react-navigation/native';
 
 
-const Login = () => {
 
-  /* React.useEffect(() => {
-    console.log('Device manufacturer: ' + Device.manufacturer);
-    console.log(Device.brand);
-    console.log(Device.designName);
-    console.log(Device.deviceName);
-    console.log(Device.deviceType);
-    console.log(Device.deviceYearClass);
-    console.log(Device.modelId);
-    console.log('Application ID: ' + Application.applicationId);
-    console.log(Application.applicationName);
-    console.log(Application.nativeApplicationVersion);
-    console.log(Application.nativeBuildVersion);
-    console.log(Application.getAndroidId());
-    fingerprint = Application.getAndroidId().toString()+Application.nativeBuildVersion+Device.deviceYearClass.toString();
-    console.log("fingerprint: "+fingerprint);
-  }, []); */
+const Session = ({ username, password, appLogin, renewToken, hasCommandLine, appLogout, endpointRefreshToken, endpointLogin, endpointLogout, endpointCommandLine, appliname, fingerprint }) => {
 
-  const dispatch = useDispatch();
-  const navigation = useNavigation();
+   const dispatch = useDispatch();
 
+  //const token = useSelector((state) => state.tokenReducer.token);
+  //const refreshToken = useSelector((state) => state.tokenReducer.refreshToken);
   var logged = useSelector((state) => state.tokenReducer.isLogged);
   console.log("first logged "+logged);
   var refreshToken = useSelector((state) => state.tokenReducer.refreshToken);
   console.log("first refresh token "+refreshToken);
   var accessToken = useSelector((state) => state.tokenReducer.token);
   console.log("first token "+accessToken);
-  var appliname = "bcweb";
-  var fingerprint = Application.getAndroidId().toString()+Application.nativeBuildVersion+Device.deviceYearClass.toString();
+  /*var appliname = "bcweb";
+  var fingerprint = Application.getAndroidId().toString()+Application.nativeBuildVersion+Device.deviceYearClass.toString(); */
   
-  const endpointRefreshToken = "https://back-xxx.monkey-soft.fr:54443/apps/apprefresh/";
+  /* const endpointRefreshToken = "https://back-xxx.monkey-soft.fr:54443/apps/apprefresh/";
+  //const endpointLogin = "https://demo-btw.monkey-soft.fr/login/";
   const endpointPreLogin = "https://back-xxx.monkey-soft.fr:54443/apps/preapplogin/";
   const endpointLogin = "https://back-xxx.monkey-soft.fr:54443/apps/applogin/";
   const endpointLogout = "https://back-xxx.monkey-soft.fr:54443/apps/userapplogout/";
-  const endpointCommandLine = "https://back-xxx.monkey-soft.fr:54443/bcweb/hascommandline/";
+  const endpointCommandLine = "https://back-xxx.monkey-soft.fr:54443/bcweb/hascommandline/"; */
 
-  const [username, setUsername] = React.useState("");
-  const [password, setPassword] = React.useState("");
-
-  const onUsernameChange = (username) => setUsername(username);
-  const onPasswordChange = (password) => setPassword(password);
-
-  const hasCommandLine = async () => {
+  
+  /* const hasCommandLine = async () => {
     try {
       const response = await axios.post(
         endpointCommandLine,
@@ -158,79 +138,47 @@ const Login = () => {
     } catch (error) {
       //Alert.alert("Error", `There was an error while logging: ${error}`);
     }
-  };
+  }; */
 
-  const onSave = async () => {
+  const userAppLogout = async () => {
     try {
-      const response = await axios.post(
-        endpointPreLogin,
-        JSON.stringify({
-          username: username,
-          password: password,
-        }),
+      const response = await axios.get(
+        endpointLogout,
         {
           headers: {
             "Content-Type": "application/json;charset=UTF-8",
             "appliname": appliname,
+            "username": username,
           },
         }
       );
-      /* let accessToken = response.data.access;
-      let newRefreshToken = response.data.refresh; */
-      //await appLogout();
-      let hasSession = response.data.opened_session;
-      console.log(hasSession);
-      if (hasSession === "no") {
-        console.log("pas de session ouverte");
-        // appeler fonction asynchrone de login
-        console.log("the fingerprint is : "+fingerprint);
-        console.log("the appliname is : "+appliname);
-        await appLogin();
-      } else {
-        console.log("session déjà ouverte");
-        navigation.push('ShootSession', { username, password, appLogin, renewToken, hasCommandLine, appLogout, endpointRefreshToken, endpointLogin, endpointLogout, endpointCommandLine, appliname, fingerprint })
-        //await appLogout();
-        //await appLogin();
-      }
-      /* dispatch(addToken(accessToken));
-      dispatch(toggleIsLogged(logged));
-      dispatch(addRefreshToken(newRefreshToken)); */
-   
-      //console.log(store.getState());
-
-      //Alert.alert("Success", "Login successfull");
-      //console.log (store.getState());
-      //await renewToken(newRefreshToken);
-
     } catch (error) {
-      //Alert.alert("Error", `There was an error while logging: ${error}`);
+      Alert.alert("Error", `There was an error while user app logout: ${error}`);
+    }
+  }
+
+  const continuer = async () => {
+    try {
+        await userAppLogout();
+        await appLogin();
+    } catch (error) {
+      Alert.alert("Error", `There was an error while logging: ${error}`);
     }
   };
-
-
 
 
   return (
 
       <SafeAreaView style={styles.container}>
-        <Text style={styles.toolbar}>LOGIN</Text>
-        <ScrollView style={styles.content}>
-        <TextInput
-            style={styles.input}
-            onChangeText={onUsernameChange}
-            value={username}
-            placeholder="Username"
-        />
-        <TextInput
-            style={styles.input}
-            onChangeText={onPasswordChange}
-            value={password}
-            placeholder="Password"
-        />
-        <TouchableOpacity onPress={onSave} style={styles.button}>
-            <Text>Envoyer</Text>
-        </TouchableOpacity>
-        </ScrollView>
+        <Text style={styles.toolbar}>{`Une session est déjà ouverte pour cet utilisateur.\n
+                                       Vous pouvez au choix : \n\n
+                                       + CONTINUER - une nouvelle session prendra alors la place de l'existante \n
+                                       + QUITTER - pour sortir de l'application \n\n`}
+        </Text>
+        <Button onPress={() => {continuer();}} title="Continuer" style={styles.button}/>
+
+        <Button onPress={() => BackHandler.exitApp()} title="Quitter" style={styles.button}/>
+
       </SafeAreaView>
 
   )
@@ -273,4 +221,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Login;
+export default Session;

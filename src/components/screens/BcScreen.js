@@ -3,7 +3,7 @@ import Bc from '../Bc';
 import LogoutButton from "../LogoutButton";
 import { SafeAreaView, StyleSheet, BackHandler, Button } from "react-native";
 
-const BcScreen = ({}) => {
+const BcScreen = ({ navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
       <LogoutButton />
