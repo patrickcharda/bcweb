@@ -6,7 +6,7 @@ import * as Application from 'expo-application';
 const appliname = "bcweb";
 const fingerprint = Application.getAndroidId().toString()+Application.nativeBuildVersion+Device.deviceYearClass.toString();
 
-const apiCall = (url, token) => (dispatch) => {
+const apiCall = (url, token, tableau = []) => (dispatch) => {
   console.log("FINGERPRINT "+fingerprint);
   const config = {
     headers: { Authorization: `Bearer ${token}`, appliname:appliname, fingerprint:fingerprint },
@@ -40,6 +40,31 @@ const apiCall = (url, token) => (dispatch) => {
     return new Promise(() => {
       axios
         .get(url, config)
+        .then((response) => {
+          switch (response.status) {
+            case 401:
+            case 403:
+              dispatch(signout());
+              break;
+            case 200:
+            case 201:
+            case 202:
+              dispatch(fetchPceSuccess(response.data));
+              break;
+          }
+        })
+        .catch((error) => {
+          dispatch(fetchError(error.message));
+          //console.log("erreur : ", error);
+        });
+    });
+  }
+  if (url.includes("/bcweb/reprise/")) {
+    dispatch(fetchData());
+    return new Promise(() => {
+      let username = {"username": tableau[0]};
+      axios
+        .post(url, username, config)
         .then((response) => {
           switch (response.status) {
             case 401:

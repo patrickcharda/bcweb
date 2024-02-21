@@ -4,6 +4,7 @@ const { persistor } = storeAndPersistor;
 //action's type for login
 export const ADD_TOKEN = "ADD_TOKEN";
 export const ADD_REFRESH_TOKEN = "ADD_REFRESH_TOKEN";
+export const ADD_USER = "ADD_USER";
 export const TOGGLE_IS_LOGGED = "TOGGLE_IS_LOGGED";
 export const SIGNOUT = "SIGNOUT";
 
@@ -79,6 +80,13 @@ export const addRefreshToken = (refreshToken) => {
     payload: refreshToken,
   };
 };
+
+export const addUser = (username) => {
+  return {
+    type: ADD_USER,
+    payload: username,
+  }
+}
 
 export const toggleIsLogged = (isLogged) => {
   return {

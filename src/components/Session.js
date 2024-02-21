@@ -170,7 +170,7 @@ const Session = ({ username, password, appLogin, renewToken, hasCommandLine, app
   return (
 
       <SafeAreaView style={styles.container}>
-        <Text style={styles.toolbar}>{`Une session est déjà ouverte pour cet utilisateur.\n
+        <Text>{`Une session est déjà ouverte pour cet utilisateur.\n
                                        Vous pouvez au choix : \n\n
                                        + CONTINUER - une nouvelle session prendra alors la place de l'existante \n
                                        + QUITTER - pour sortir de l'application \n\n`}

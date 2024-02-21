@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useSelector, useDispatch } from "react-redux";  
-import { addToken, addRefreshToken, toggleIsLogged } from '../redux/actions';
+import { addToken, addRefreshToken, toggleIsLogged, addUser} from '../redux/actions';
 import * as React from "react";
 import axios from 'axios';
 import * as Device from 'expo-device';
@@ -104,6 +104,7 @@ const Login = () => {
       
       dispatch(addToken(response.data.access));
       console.log("the new access token : "+accessToken);
+      dispatch(addUser(username));
       dispatch(toggleIsLogged(logged));
       console.log("the new logged value : "+logged);
       await hasCommandLine();

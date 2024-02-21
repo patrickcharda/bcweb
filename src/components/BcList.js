@@ -22,10 +22,30 @@ const BcList = () => {
 
   const loading = useSelector((state) => state.apiReducer.loading);
   const token = useSelector((state) => state.tokenReducer.token);
+  const username = useSelector((state) => state.tokenReducer.username)
 
   // au chargement uniquement
-  React.useEffect(() => {
+  /* React.useEffect(() => {
     dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/bcx/", token));
+  }, []);
+  React.useEffect(() => {
+    let tab = [];
+    tab.push(username);
+    console.log("the username is "+tab[0]);
+    dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/reprise/", token, tab));
+  }, []); */
+
+  React.useEffect(() => {
+    dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/bcx/", token))
+      .then(() => {
+        let tab = [];
+        tab.push(username);
+        //console.log("the username is "+tab[0]);
+        return dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/reprise/", token, tab));
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }, []);
 
   const data = useSelector((state) => state.apiReducer.data.results);
