@@ -22,8 +22,12 @@ const BcList = () => {
 
   const loading = useSelector((state) => state.apiReducer.loading);
   const token = useSelector((state) => state.tokenReducer.token);
-  const username = useSelector((state) => state.tokenReducer.username)
+  const username = useSelector((state) => state.tokenReducer.username);
 
+
+  const NB_ITER = 4;
+  const DELAY_N_SECONDS = 5000;
+  
   // au chargement uniquement
   /* React.useEffect(() => {
     dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/bcx/", token));
@@ -50,11 +54,11 @@ const BcList = () => {
 
   const data = useSelector((state) => state.apiReducer.data.results);
 
-  //const error = JSON.stringify(useSelector((state) => state.apiReducer.error));
+  const error = JSON.stringify(useSelector((state) => state.apiReducer.error));
   
   let bc = undefined;
 
-  const defineBc = (selectedBc) => {
+  const defineBc = async (selectedBc) => {
     bc = selectedBc;
     console.log(
       "THIS IS THE BC " +
@@ -66,13 +70,60 @@ const BcList = () => {
     );
     dispatch(recordSelectedBc(bc));
     dispatch(purgePcesAccs());
+    await ouvrir(token, username, bc.bc_num);
+    await checkok(token, username);
     getPieces(bc.pieces);
   };
+  
+  const ouvrir = async (token, username, bc_num ) => {
+    
+    let tab = [];
+    tab.push(username);
+    tab.push(bc_num);
+    
+    try {
+      //si un bl est sélectionné ds la liste déroulante, mettre en pause pour pouvoir charger les données
+      if (bc_num != "") {
+          //let openBL = await Model.ouvrir(BASE_URL + "/bcweb/ouvrir/", token, username, this.args[0]);
+          dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/ouvrir/", token, tab));
+
+      }
+    } catch (error) {
+    //
+    }
+  }
+
+  const checkok = async (token, username) => {
+    let tabl = [];
+    tabl.push(username);
+    
+    try {
+      //si un bl est sélectionné ds la liste déroulante, mettre en pause pour pouvoir charger les données
+
+      let i = 0;
+      let signalToGo = false;
+      let result_checkok ="";
+      while ((i < NB_ITER) && (signalToGo==false)) {
+        await new Promise(resolve => setTimeout(resolve,DELAY_N_SECONDS));
+        dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/checkok/", token, tabl));
+        //const dataResponse = useSelector((state) => state.apiReducer.data);
+        console.log("command checkok ... ...");
+        console.log('data : '+JSON.stringify(data));
+        /* if (data.count > 0) {
+          signalToGo = true;
+          console.log('it is true');
+        } */
+        i++;
+      }
+    } catch (error) {
+    }
+    return ("");
+  }
 
   const getPieces = (tabPces) => {
     pcesList = tabPces;
     pcesList.forEach((pce) => {
-      console.log(pce.slice(42,pce.length)); //=> récupération du numéro de pce
+      console.log(pce.slice(48,pce.length)); //=> récupération du numéro de pce
       //appel API pr récupérer toutes les infos de la pièce
       dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/pce/"+pce.slice(48,pce.length), token));
     });

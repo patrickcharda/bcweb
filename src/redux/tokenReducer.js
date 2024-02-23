@@ -41,6 +41,7 @@ const tokenReducer = (state = initialState, action) => {
         token: "",
         refreshToken: "",
         isLogged: false,
+        username: "",
       };
     default:
       return state;
