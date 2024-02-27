@@ -11,6 +11,36 @@ const apiCall = (url, token, tableau = []) => (dispatch) => {
   const config = {
     headers: { Authorization: `Bearer ${token}`, appliname:appliname, fingerprint:fingerprint },
   };
+  if (url.includes("/apps/userapplogout/")) {
+    dispatch(fetchData());   
+    return new Promise(() => {
+      let username = tableau[0];
+      let conf = {
+        headers: { appliname:appliname, username:username },
+      };
+      axios
+        .get(url, conf)
+        .then((response) => {
+          switch (response.status) {
+            case 401:
+            case 403:
+              dispatch(signout());
+              break;
+            case 200:
+              dispatch(fetchSuccess(response.data));
+              break;
+            case 201:
+            case 202:
+              dispatch(fetchSuccess(response.data));
+              break;
+          }
+        })
+        .catch((error) => {
+          dispatch(fetchError(error.message));
+          //console.log("erreur : ", error);
+        });
+    });
+  }
   if (url.includes("/bcweb/bc")) {
     dispatch(fetchData());
     return new Promise(() => {

@@ -8,11 +8,17 @@ import {
   View,
 } from "react-native";
 import apiCall from "../redux/apiCall";
+import axios from 'axios';
 import { recordSelectedBc, purgePcesAccs } from "../redux/actions";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Message from "./Message";
 import { useNavigation } from '@react-navigation/native';
+import * as Device from 'expo-device';
+import * as Application from 'expo-application';
+
+const appliname = "bcweb";
+const fingerprint = Application.getAndroidId().toString()+Application.nativeBuildVersion+Device.deviceYearClass.toString();
 
 
 const BcList = () => {
@@ -27,6 +33,8 @@ const BcList = () => {
 
   const NB_ITER = 4;
   const DELAY_N_SECONDS = 5000;
+
+  const endpointCheckok = "https://back-xxx.monkey-soft.fr:54443/bcweb/checkok/";
   
   // au chargement uniquement
   /* React.useEffect(() => {
@@ -93,7 +101,7 @@ const BcList = () => {
     }
   }
 
-  const checkok = async (token, username) => {
+  /* const checkok = async (token, username) => {
     let tabl = [];
     tabl.push(username);
     
@@ -109,14 +117,68 @@ const BcList = () => {
         //const dataResponse = useSelector((state) => state.apiReducer.data);
         console.log("command checkok ... ...");
         console.log('data : '+JSON.stringify(data));
+        console.log('error : '+error);
         /* if (data.count > 0) {
           signalToGo = true;
           console.log('it is true');
-        } */
+        } 
         i++;
       }
     } catch (error) {
+      console.log('error : '+error);
     }
+    console.log('data : '+JSON.stringify(data));
+    console.log('error : '+error);
+    return ("");
+  } */
+
+  const checkok = async (token, username) => {
+    let tabl = [];
+    tabl.push(username);
+    
+    try {
+      //si un bl est sélectionné ds la liste déroulante, mettre en pause pour pouvoir charger les données
+
+      let i = 0;
+      let signalToGo = false;
+      let response ="";
+      while ((i < NB_ITER) && (signalToGo==false)) {
+        await new Promise(resolve => setTimeout(resolve,DELAY_N_SECONDS));
+          response = await axios.post(
+          endpointCheckok,
+          JSON.stringify({
+            username: username,
+            }),
+            {
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8",
+              "Authorization": token,
+              "appliname": appliname,
+              "fingerprint": fingerprint,
+              },
+            }
+          );
+        
+        console.log("REPONSE DATA CHECKOK "+ response.data.message);
+        if (response.data.message === "> ok") {
+          signalToGo = true;
+          console.log("SIGNALTOGO "+signalToGo);
+        }
+        i++;
+      }
+      if (signalToGo === true) {
+        /* let pcesDuBc = await axios.get(
+          "https://back-xxx.monkey-soft.fr:54443/bcweb/pcesdubc/" 
+        )*/
+
+      }
+
+
+    } catch (error) {
+      console.log('error : '+error);
+    }
+    console.log('data : '+JSON.stringify(data));
+    console.log('error : '+error);
     return ("");
   }
 

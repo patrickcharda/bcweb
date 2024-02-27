@@ -2,6 +2,7 @@ import * as React from "react";
 import {
   View,
   StyleSheet,
+  Button
 } from 'react-native';
 import LoginScreen from "./screens/LoginScreen";
 import BcListScreen from "./screens/BcListScreen";
@@ -38,12 +39,28 @@ const Main = () => {
         component={BcListScreen}
         options={{ title: "Liste des Bons de chargement" }}
         key="1"
-      />,<Stack.Screen
-        name="Bc"
+      />,
+      <Stack.Screen 
+        name="Bc" 
+        component={BcScreen} 
+        options={({ navigation }) => ({
+          headerLeft: () => (
+            <Button
+              onPress={() => navigation.replace('BcList')}
+              title="Retour à la liste des BC"
+            />
+          ),
+          })
+        }
+        key="2"
+      />,
+      <Stack.Screen
+        name="Bc_old"
         component={BcScreen}
         options={{ title: "Bon de chargement" }}
-        key="2"
-      />]
+        key="5"
+      /> 
+      ]
        : [
       <Stack.Screen
         name="Login"

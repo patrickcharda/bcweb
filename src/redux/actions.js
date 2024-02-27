@@ -112,7 +112,9 @@ export const fetchDataPcesAccs = () => ({
   type: API_PENDING_PCES_ACCS,
 });
 
-export const fetchSuccess = (data) => ({
+export const fetchSuccess = (data) => (
+  console.log("the data : "+JSON.stringify(data)),
+  {
   type: API_SUCCESS,
   payload: data,
 });
