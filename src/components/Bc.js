@@ -3,7 +3,8 @@ import BcPce from "./BcPce";
 //import BcAcc from "./BcAcc";
 //import BcFooter from ".BcFooter";
 import * as React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { changePceDate } from "../redux/actions";
 import {
   ScrollView,
   SafeAreaView,
@@ -13,12 +14,23 @@ import {
   TouchableOpacity,
   Button,
 } from "react-native";
+import * as Device from "expo-device";
+import * as Application from "expo-application";
+import axios from "axios";
+
+const appliname = "bcweb";
+const fingerprint =
+  Application.getAndroidId().toString() +
+  Application.nativeBuildVersion +
+  Device.deviceYearClass.toString();
 
 const Bc = () => {
+  const token = useSelector((state) => state.tokenReducer.token);
+  const dispatch = useDispatch();
   const [isOpened, setIsOpened] = React.useState(false);
 
   const bonChargement = useSelector((state) => state.bcReducer.bc);
-  const pces = useSelector((state) => state.pcesAccsReducer.pces);
+  //const pces = useSelector((state) => state.pcesAccsReducer.pces);
   const pcesLoaded = useSelector((state) => state.pcesAccsReducer.pcesLoaded);
   const pcesProp = useSelector((state) => state.pcesAccsReducer.pcesProp);
   const pcesOther = useSelector((state) => state.pcesAccsReducer.pcesOther);
@@ -28,8 +40,46 @@ const Bc = () => {
   pcesLoaded.map((pce) => (poids += parseFloat(pce.pce_poids)));
 
   const recordBc = () => {
-    //on se base sur le tableau pces du state pour executer les appels api de mise à jour de la base de données
-    console.log(pces)
+    /*
+    Pour économiser de la bande passante et de la charge, on ne se base que sur le tableau pces chargées du state pour executer les appels api de mise à jour de la base de données 
+    Le traitement se fait toujours par lots, mais il y a moins de données (pièces) à traiter
+    */
+
+    /* mise à jour du champ date pour horodater l'enreg ds la bdd (champs pce_date_web) */
+    //console.log(pcesLoaded);
+    pcesLoaded.map(pce => dispatch(changePceDate(pce)));
+    console.log(pcesLoaded);
+
+    // Tronçonner le tableau des pièces
+    let sliced_tab = []; // tableau de tableaux tronçons
+    for (let i = 0; i < pcesLoaded.length; i += 50) {
+      let chunk = pcesLoaded.slice(i, i + 50);
+      sliced_tab.push(chunk);
+    }
+
+    //màj les pces ds la bdd
+    for (let i = 0; i < sliced_tab.length; i++) {
+      console.log(JSON.stringify(sliced_tab[i]));
+      console.log(sliced_tab[i]);
+      patch(sliced_tab[i]);
+    }
+  };
+
+  const patch = async (tabDePces) => {
+    let endpointPcesToPatch =
+      "https://back-xxx.monkey-soft.fr:54443/bcweb/pcestopatch/";
+    await axios.patch(
+      endpointPcesToPatch,
+      tabDePces,
+      {
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+          Authorization: token,
+          appliname: appliname,
+          fingerprint: fingerprint,
+        },
+      }
+    );
   };
 
   return (

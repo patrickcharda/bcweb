@@ -5,6 +5,7 @@ import {
   PURGE_PCES_ACCS,
   API_PENDING_PCES_ACCS,
   CHANGE_PCE_LOADED_STATUS,
+  CHANGE_PCE_DATE,
 } from "./actions";
 
 const initialState = {
@@ -84,6 +85,35 @@ const pcesAccsReducer = (state = initialState, action) => {
           }
         }
       };
+      
+    case CHANGE_PCE_DATE:
+      let newTabPcesLoaded = cloneDeep(state.pcesLoaded);
+      // avant de faire les appels API pr enregistrer les pièces chargées, on modifie la date de chq pièce grâce à cette action
+      // récupérer la date du jour
+      let dateMajBLModifie = new Date();
+      //formater la date pr la persister
+      let formatedDate =
+        dateMajBLModifie.getFullYear() +
+        "-" +
+        (dateMajBLModifie.getMonth() + 1) +
+        "-" +
+        dateMajBLModifie.getDate();
+      formatedDate +=
+        "T" +
+        dateMajBLModifie.getHours() +
+        ":" +
+        dateMajBLModifie.getMinutes() +
+        ":" +
+        dateMajBLModifie.getSeconds();
+      console.log(formatedDate);
+      let indexPce = newTabPcesLoaded.findIndex(pce => pce.id === action.payload.id);
+      console.log("index tableau "+indexPce);
+      newTabPcesLoaded[indexPce].pce_date_web = formatedDate; // on change la date de la pce ds la liste des pces
+      console.log(newTabPcesLoaded[indexPce]);
+      return {
+        ...state, 
+        pcesLoaded: newTabPcesLoaded,
+      }  
     case FETCH_PCE_SUCCESS:
       if (action.payload && action.payload.pce_charge) {
         return {

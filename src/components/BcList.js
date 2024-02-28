@@ -31,8 +31,8 @@ const BcList = () => {
   const username = useSelector((state) => state.tokenReducer.username);
 
 
-  const NB_ITER = 4;
-  const DELAY_N_SECONDS = 5000;
+  const NB_ITER = 5;
+  const DELAY_N_SECONDS = 2000;
 
   const endpointCheckok = "https://back-xxx.monkey-soft.fr:54443/bcweb/checkok/";
   
