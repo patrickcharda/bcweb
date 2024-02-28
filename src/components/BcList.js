@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import apiCall from "../redux/apiCall";
 import axios from 'axios';
-import { recordSelectedBc, purgePcesAccs } from "../redux/actions";
+import { recordSelectedBc, purgePcesAccs, fetchPceSuccess } from "../redux/actions";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Message from "./Message";
@@ -66,6 +66,23 @@ const BcList = () => {
   
   let bc = undefined;
 
+  /* const defineBc = async (selectedBc) => {
+    bc = selectedBc;
+    console.log(
+      "THIS IS THE BC " +
+        bc.url +
+        " pces : " +
+        bc.pieces[0] +
+        " pdts : " +
+        bc.produits[0]
+    );
+    dispatch(recordSelectedBc(bc));
+    dispatch(purgePcesAccs());
+    await ouvrir(token, username, bc.bc_num);
+    await checkok(token, username, bc.bc_num);
+    getPieces(bc.pieces);
+  }; */
+
   const defineBc = async (selectedBc) => {
     bc = selectedBc;
     console.log(
@@ -79,8 +96,12 @@ const BcList = () => {
     dispatch(recordSelectedBc(bc));
     dispatch(purgePcesAccs());
     await ouvrir(token, username, bc.bc_num);
-    await checkok(token, username);
-    getPieces(bc.pieces);
+    let tabPces = await checkok(token, username, bc.bc_num);
+    console.log("TABLEAU DE PCES "+JSON.stringify(tabPces));
+    if (tabPces != "") {
+      getPieces(tabPces);
+    } 
+    
   };
   
   const ouvrir = async (token, username, bc_num ) => {
@@ -132,10 +153,9 @@ const BcList = () => {
     return ("");
   } */
 
-  const checkok = async (token, username) => {
+  const checkok = async (token, username, bc_number) => {
     let tabl = [];
     tabl.push(username);
-    
     try {
       //si un bl est sélectionné ds la liste déroulante, mettre en pause pour pouvoir charger les données
 
@@ -166,11 +186,47 @@ const BcList = () => {
         }
         i++;
       }
+      let pcesDuBc="test";
       if (signalToGo === true) {
-        /* let pcesDuBc = await axios.get(
-          "https://back-xxx.monkey-soft.fr:54443/bcweb/pcesdubc/" 
-        )*/
+        pcesDuBc = await axios.get(
+          "https://back-xxx.monkey-soft.fr:54443/bcweb/pcesdubc/"+bc_number,
+          {
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8",
+              "Authorization": token,
+              "appliname": appliname,
+              "fingerprint": fingerprint,
+              },
+            }
+        );
+        console.log(bc_number);
+        //console.log("COUNT COUNT "+JSON.stringify(pcesDuBc));
+        console.log("COUNT COUNT "+JSON.stringify(pcesDuBc.data));
 
+        let pceLignes = [];
+        pcesDuBc.data.results.forEach((element, index, array) => {
+          pceLignes.push(element);
+        });
+        console.log("NEXT NEXT "+pcesDuBc.data.next);
+        while (pcesDuBc.data.next !== null) {
+          pcesDuBc = await axios.get(
+            pcesDuBc.data.next,
+            {
+              headers: {
+                "Content-Type": "application/json;charset=UTF-8",
+                "Authorization": token,
+                "appliname": appliname,
+                "fingerprint": fingerprint,
+                },
+              }
+          );
+          pcesDuBc.data.results.forEach((element, index, array) => {
+            pceLignes.push(element);
+          });
+        }
+      console.log("RESULTAT "+pcesDuBc.data.results);
+      console.log("PCElIGNES "+JSON.stringify(pceLignes));
+      return pceLignes;
       }
 
 
@@ -182,12 +238,22 @@ const BcList = () => {
     return ("");
   }
 
-  const getPieces = (tabPces) => {
+  /* const getPieces = (tabPces) => {
     pcesList = tabPces;
     pcesList.forEach((pce) => {
       console.log(pce.slice(48,pce.length)); //=> récupération du numéro de pce
       //appel API pr récupérer toutes les infos de la pièce
       dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/pce/"+pce.slice(48,pce.length), token));
+    });
+    //appeler écran BCScreen
+  
+    navigation.navigate('Bc');
+  }; */
+
+  const getPieces = (tabPces) => {
+    let pcesList = tabPces;
+    pcesList.forEach((pce) => {
+      dispatch(fetchPceSuccess(pce));
     });
     //appeler écran BCScreen
   
