@@ -2,27 +2,85 @@ import {
   ScrollView,
   SafeAreaView,
   Text,
+  TextInput,
+  Modal,
   StyleSheet,
   Button,
   Alert,
+  View,
 } from "react-native";
-
-import { useDispatch } from "react-redux";
-import { changePceLoadedStatus } from "../redux/actions";
+import { useSelector, useDispatch } from "react-redux";
+import { changePceLoadedStatus, changePceObservBc } from "../redux/actions";
 import * as React from "react";
 
 
 const BcPce = ( {piece, loaded} ) => {
 
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [text, setText] = React.useState(piece.pce_observ_bc);
+
+  const handleConfirm = () => {
+    // Handle the confirm action here
+    console.log('Confirmed:', text);
+    let data = {
+      "piece": piece,
+      "texte": text,
+    }
+    dispatch(changePceObservBc(data));
+    setModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    // Handle the cancel action here
+    console.log('Cancelled');
+    setModalVisible(false);
+  };
+
   const pieceJson = JSON.stringify(piece)
-  const pce = piece;
+  let pce = piece;
   const dispatch = useDispatch();
+
+  const archive = "<TextInput placeholder={pce.pce_observ_bc}></TextInput>";
 
   return (
     <ScrollView style={styles.container}>
+        <View></View>
         <SafeAreaView>
           <Text>{piece.id}</Text>
           <Text>{pieceJson}</Text>
+          <SafeAreaView>
+            <Text>{pce.pce_observ_bc}</Text>
+            <View style={styles.centeredView}>
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={handleCancel}
+              >
+                <View style={styles.centeredView}>
+                  <View style={styles.modalView}>
+                    <ScrollView>
+                      <TextInput
+                        style={{ height: 120, borderColor: 'gray', borderWidth: 1, textAlignVertical: 'top', textAlign: 'left' }}
+                        onChangeText={setText}
+                        value={text}
+                        placeholder='Saisissez le texte ici'
+                        multiline
+                      />
+                      <Button title="Confirm" onPress={handleConfirm} />
+                      <Button title="Cancel" onPress={handleCancel} />
+                    </ScrollView>
+                  </View>
+                </View>
+              </Modal>
+              <Button
+                title="Show Modal - Edition"
+                onPress={() => {
+                  setModalVisible(true);
+                }}
+              />
+            </View>
+          </SafeAreaView>
           <Button
           title={loaded ? "Unload" : "Load"}
           onPress={() => dispatch(changePceLoadedStatus(pce))}></Button>
@@ -67,6 +125,27 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 3,
     marginBottom: 30,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
 

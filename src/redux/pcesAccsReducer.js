@@ -9,6 +9,7 @@ import {
   CHANGE_PCE_LOADED_DATE,
   CHANGE_PCE_PROP_DATE,
   CHANGE_PCE_OTHER_DATE,
+  CHANGE_PCE_OBSERV_BC,
 } from "./actions";
 
 const initialState = {
@@ -22,6 +23,41 @@ const initialState = {
 
 const pcesAccsReducer = (state = initialState, action) => {
   switch (action.type) {
+    case CHANGE_PCE_OBSERV_BC:
+      let modifiedElement = Object.assign({},action.payload.piece);
+      let observ= action.payload.texte;
+      console.log("MODIFIED ELEMENT "+JSON.stringify(modifiedElement));
+      console.log("OBSERVATIONS "+observ);
+      const new_ArrayPces = cloneDeep(state.pces);//JSON.parse(JSON.stringify(state.pces)); //[...state.pces];
+      const new_ArrayPcesLoaded = cloneDeep(state.pcesLoaded);
+      const new_ArrayPcesProp = cloneDeep(state.pcesProp);
+      const new_ArrayPcesOther = cloneDeep(state.pcesOther);
+      // on prépare tout de suite le changement de la valeur du champ d'observations pce_observ_bc dans la liste pces
+      const index_Pces = new_ArrayPces.findIndex(pce => pce.id === modifiedElement.id);
+      console.log(new_ArrayPces[index_Pces].pce_observ_bc);
+      new_ArrayPces[index_Pces].pce_observ_bc = observ; 
+      // si c'est une pièce chargée
+      if (modifiedElement.pce_charge) {
+        const index_PcesLoaded = new_ArrayPcesLoaded.findIndex(pce => pce.id === modifiedElement.id);
+        new_ArrayPcesLoaded[index_PcesLoaded].pce_observ_bc = observ; 
+      } else if (modifiedElement.pce_prop_charge) {
+        // sinon si c'est une pièce proposée
+        const index_PcesProp = new_ArrayPcesProp.findIndex(pce => pce.id === modifiedElement.id);
+        new_ArrayPcesProp[index_PcesProp].pce_observ_bc = observ; 
+      } else {
+        // sinon c'est une pièce autre
+        const index_PcesOther = new_ArrayPcesOther.findIndex(pce => pce.id === modifiedElement.id);
+        new_ArrayPcesOther[index_PcesOther].pce_observ_bc = observ; 
+      }
+      return {
+        ...state, 
+        pcesLoaded: new_ArrayPcesLoaded,
+        pcesProp: new_ArrayPcesProp,
+        pcesOther: new_ArrayPcesOther,
+        pces: new_ArrayPces,
+      }
+      
+        
     case API_PENDING_PCES_ACCS:
       return {
         ...state,

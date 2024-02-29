@@ -27,8 +27,15 @@ export const CHANGE_PCE_DATE = "CHANGE_PCE_DATE";
 export const CHANGE_PCE_LOADED_DATE = "CHANGE_PCE_LOADED_DATE";
 export const CHANGE_PCE_PROP_DATE = "CHANGE_PCE_PROP_DATE";
 export const CHANGE_PCE_OTHER_DATE = "CHANGE_PCE_OTHER_DATE";
+export const CHANGE_PCE_OBSERV_BC = "CHANGE_PCE_OBSERV_BC";
 
 //action creators for API to get pces and accs
+export const changePceObservBc = (data) => {
+  return {
+    type: CHANGE_PCE_OBSERV_BC,
+    payload: data,
+  };
+};
 export const changePceDate = (pce) => {
   return {
     type: CHANGE_PCE_DATE,
