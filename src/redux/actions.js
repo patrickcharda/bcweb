@@ -24,11 +24,32 @@ export const FETCH_ACC_SUCCESS = "FETCH_ACC_SUCCESS"
 export const PURGE_PCES_ACCS = "PURGE_PCES_ACCS"
 export const CHANGE_PCE_LOADED_STATUS = "CHANGE_PCE_LOADED_STATUS";
 export const CHANGE_PCE_DATE = "CHANGE_PCE_DATE";
+export const CHANGE_PCE_LOADED_DATE = "CHANGE_PCE_LOADED_DATE";
+export const CHANGE_PCE_PROP_DATE = "CHANGE_PCE_PROP_DATE";
+export const CHANGE_PCE_OTHER_DATE = "CHANGE_PCE_OTHER_DATE";
 
 //action creators for API to get pces and accs
 export const changePceDate = (pce) => {
   return {
     type: CHANGE_PCE_DATE,
+    payload: pce,
+  };
+};
+export const changePceLoadedDate = (pce) => {
+  return {
+    type: CHANGE_PCE_LOADED_DATE,
+    payload: pce,
+  };
+};
+export const changePcePropDate = (pce) => {
+  return {
+    type: CHANGE_PCE_PROP_DATE,
+    payload: pce,
+  };
+};
+export const changePceOtherDate = (pce) => {
+  return {
+    type: CHANGE_PCE_OTHER_DATE,
     payload: pce,
   };
 };

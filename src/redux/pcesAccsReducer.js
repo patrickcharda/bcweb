@@ -6,6 +6,9 @@ import {
   API_PENDING_PCES_ACCS,
   CHANGE_PCE_LOADED_STATUS,
   CHANGE_PCE_DATE,
+  CHANGE_PCE_LOADED_DATE,
+  CHANGE_PCE_PROP_DATE,
+  CHANGE_PCE_OTHER_DATE,
 } from "./actions";
 
 const initialState = {
@@ -87,8 +90,6 @@ const pcesAccsReducer = (state = initialState, action) => {
       };
       
     case CHANGE_PCE_DATE:
-      let newTabPcesLoaded = cloneDeep(state.pcesLoaded);
-      // avant de faire les appels API pr enregistrer les pièces chargées, on modifie la date de chq pièce grâce à cette action
       // récupérer la date du jour
       let dateMajBLModifie = new Date();
       //formater la date pr la persister
@@ -106,14 +107,100 @@ const pcesAccsReducer = (state = initialState, action) => {
         ":" +
         dateMajBLModifie.getSeconds();
       console.log(formatedDate);
-      let indexPce = newTabPcesLoaded.findIndex(pce => pce.id === action.payload.id);
+      // Modifier date ds liste pces
+      let newTabPces = cloneDeep(state.pces);
+      let indexPce = newTabPces.findIndex(pce => pce.id === action.payload.id);
       console.log("index tableau "+indexPce);
-      newTabPcesLoaded[indexPce].pce_date_web = formatedDate; // on change la date de la pce ds la liste des pces
-      console.log(newTabPcesLoaded[indexPce]);
+      newTabPces[indexPce].pce_date_web = formatedDate; // on change la date de la pce ds la liste des pces
+      console.log(newTabPces[indexPce]);
+      return {
+        ...state, 
+        pces: newTabPces,
+      }  
+    case CHANGE_PCE_LOADED_DATE:
+      // récupérer la date du jour
+      let dateMajBLModif = new Date();
+      //formater la date pr la persister
+      let formatedDat =
+        dateMajBLModif.getFullYear() +
+        "-" +
+        (dateMajBLModif.getMonth() + 1) +
+        "-" +
+        dateMajBLModif.getDate();
+      formatedDat +=
+        "T" +
+        dateMajBLModif.getHours() +
+        ":" +
+        dateMajBLModif.getMinutes() +
+        ":" +
+        dateMajBLModif.getSeconds();
+      console.log(formatedDat);
+      // Modifier date ds liste pces chargées
+      let newTabPcesLoaded = cloneDeep(state.pcesLoaded);
+      let indexPceLoaded = newTabPcesLoaded.findIndex(pce => pce.id === action.payload.id);
+      console.log("index tableau "+indexPceLoaded);
+      newTabPcesLoaded[indexPceLoaded].pce_date_web = formatedDat; // on change la date de la pce ds la liste des pces chargées
+      console.log(newTabPcesLoaded[indexPceLoaded]);
       return {
         ...state, 
         pcesLoaded: newTabPcesLoaded,
+      }
+    case CHANGE_PCE_PROP_DATE:
+      // récupérer la date du jour
+      let dateMajBLChanged = new Date();
+      //formater la date pr la persister
+      let formatDate =
+        dateMajBLChanged.getFullYear() +
+        "-" +
+        (dateMajBLChanged.getMonth() + 1) +
+        "-" +
+        dateMajBLChanged.getDate();
+      formatDate +=
+        "T" +
+        dateMajBLChanged.getHours() +
+        ":" +
+        dateMajBLChanged.getMinutes() +
+        ":" +
+        dateMajBLChanged.getSeconds();
+      console.log(formatDate);
+      // Modifier date ds liste pces proposées
+      let newTabPcesProp = cloneDeep(state.pcesProp);
+      let indexPceProp = newTabPcesProp.findIndex(pce => pce.id === action.payload.id);
+      console.log("index tableau "+indexPceProp);
+      newTabPcesProp[indexPceProp].pce_date_web = formatDate; // on change la date de la pce ds la liste des pces proposées
+      console.log(newTabPcesProp[indexPceProp]);
+      return {
+        ...state, 
+        pcesProp: newTabPcesProp,
       }  
+    case CHANGE_PCE_OTHER_DATE:
+      // récupérer la date du jour
+      let dateMajBLChange = new Date();
+      //formater la date pr la persister
+      let formDate =
+        dateMajBLChange.getFullYear() +
+        "-" +
+        (dateMajBLChange.getMonth() + 1) +
+        "-" +
+        dateMajBLChange.getDate();
+      formDate +=
+        "T" +
+        dateMajBLChange.getHours() +
+        ":" +
+        dateMajBLChange.getMinutes() +
+        ":" +
+        dateMajBLChange.getSeconds();
+      console.log(formDate);
+      // Modifier date ds liste pces proposées
+      let newTabPcesOther = cloneDeep(state.pcesOther);
+      let indexPceOther = newTabPcesOther.findIndex(pce => pce.id === action.payload.id);
+      console.log("index tableau "+indexPceOther);
+      newTabPcesOther[indexPceOther].pce_date_web = formDate; // on change la date de la pce ds la liste des pces proposées
+      console.log(newTabPcesOther[indexPceOther]);
+      return {
+        ...state, 
+        pcesOther: newTabPcesOther,
+      } 
     case FETCH_PCE_SUCCESS:
       if (action.payload && action.payload.pce_charge) {
         return {

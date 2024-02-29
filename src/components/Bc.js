@@ -4,7 +4,7 @@ import BcPce from "./BcPce";
 //import BcFooter from ".BcFooter";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { changePceDate } from "../redux/actions";
+import { changePceDate, changePceLoadedDate, changePcePropDate, changePceOtherDate } from "../redux/actions";
 import {
   ScrollView,
   SafeAreaView,
@@ -30,7 +30,7 @@ const Bc = () => {
   const [isOpened, setIsOpened] = React.useState(false);
 
   const bonChargement = useSelector((state) => state.bcReducer.bc);
-  //const pces = useSelector((state) => state.pcesAccsReducer.pces);
+  const pces = useSelector((state) => state.pcesAccsReducer.pces);
   const pcesLoaded = useSelector((state) => state.pcesAccsReducer.pcesLoaded);
   const pcesProp = useSelector((state) => state.pcesAccsReducer.pcesProp);
   const pcesOther = useSelector((state) => state.pcesAccsReducer.pcesOther);
@@ -46,22 +46,25 @@ const Bc = () => {
     */
 
     /* mise à jour du champ date pour horodater l'enreg ds la bdd (champs pce_date_web) */
-    //console.log(pcesLoaded);
-    pcesLoaded.map(pce => dispatch(changePceDate(pce)));
-    console.log(pcesLoaded);
+    console.log("TOUTES PIECES "+pces);
+    pces.map(pce => dispatch(changePceDate(pce)));
+    console.log("PIECES CHARGEES "+pcesLoaded);
+    pcesLoaded.map(pce => dispatch(changePceLoadedDate(pce)));
+    pcesProp.map(pce => dispatch(changePcePropDate(pce)));
+    pcesOther.map(pce => dispatch(changePceOtherDate(pce)));
 
     // Tronçonner le tableau des pièces
     let sliced_tab = []; // tableau de tableaux tronçons
-    for (let i = 0; i < pcesLoaded.length; i += 50) {
-      let chunk = pcesLoaded.slice(i, i + 50);
+    for (let i = 0; i < pces.length; i += 50) {
+      let chunk = pces.slice(i, i + 50);
       sliced_tab.push(chunk);
     }
 
     //màj les pces ds la bdd
-    for (let i = 0; i < sliced_tab.length; i++) {
-      console.log(JSON.stringify(sliced_tab[i]));
-      console.log(sliced_tab[i]);
-      patch(sliced_tab[i]);
+    for (let j = 0; j < sliced_tab.length; j++) {
+      console.log(JSON.stringify(sliced_tab[j]));
+      console.log("SLICED TAB "+sliced_tab[j]);
+      patch(sliced_tab[j]);
     }
   };
 
