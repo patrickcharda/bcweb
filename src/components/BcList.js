@@ -9,13 +9,14 @@ import {
 } from "react-native";
 import apiCall from "../redux/apiCall";
 import axios from 'axios';
-import { recordSelectedBc, purgePcesAccs, fetchPceSuccess } from "../redux/actions";
+import { recordSelectedBc, purgePcesAccs, fetchPceSuccess, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab } from "../redux/actions";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Message from "./Message";
 import { useNavigation } from '@react-navigation/native';
 import * as Device from 'expo-device';
 import * as Application from 'expo-application';
+import { cloneDeep } from 'lodash';
 
 const appliname = "bcweb";
 const fingerprint = Application.getAndroidId().toString()+Application.nativeBuildVersion+Device.deviceYearClass.toString();
@@ -97,11 +98,14 @@ const BcList = () => {
     dispatch(purgePcesAccs());
     await ouvrir(token, username, bc.bc_num);
     let tabPces = await checkok(token, username, bc.bc_num);
-    console.log("TABLEAU DE PCES "+JSON.stringify(tabPces));
-    if (tabPces != "") {
-      getPieces(tabPces);
+    console.log("type of tabPces : "+typeof(tabPces));
+    //console.log("TABLEAU DE PCES "+JSON.stringify(tabPces));
+    if (tabPces != "" && tabPces != undefined && tabPces != null) {
+      console.log("Hey");
+      await getPieces(tabPces);
     } 
-    
+    //appeler écran BCScreen
+    navigation.navigate('Bc');
   };
   
   const ouvrir = async (token, username, bc_num ) => {
@@ -156,6 +160,7 @@ const BcList = () => {
   const checkok = async (token, username, bc_number) => {
     let tabl = [];
     tabl.push(username);
+    let pceLignes = [];
     try {
       //si un bl est sélectionné ds la liste déroulante, mettre en pause pour pouvoir charger les données
 
@@ -179,10 +184,10 @@ const BcList = () => {
             }
           );
         
-        console.log("REPONSE DATA CHECKOK "+ response.data.message);
+        //console.log("REPONSE DATA CHECKOK "+ response.data.message);
         if (response.data.message === "> ok") {
           signalToGo = true;
-          console.log("SIGNALTOGO "+signalToGo);
+          //console.log("SIGNALTOGO "+signalToGo);
         }
         i++;
       }
@@ -201,13 +206,13 @@ const BcList = () => {
         );
         console.log(bc_number);
         //console.log("COUNT COUNT "+JSON.stringify(pcesDuBc));
-        console.log("COUNT COUNT "+JSON.stringify(pcesDuBc.data));
+        //console.log("COUNT COUNT "+JSON.stringify(pcesDuBc.data));
 
-        let pceLignes = [];
+        //let pceLignes = [];
         pcesDuBc.data.results.forEach((element, index, array) => {
           pceLignes.push(element);
         });
-        console.log("NEXT NEXT "+pcesDuBc.data.next);
+        //console.log("NEXT NEXT "+pcesDuBc.data.next);
         while (pcesDuBc.data.next !== null) {
           pcesDuBc = await axios.get(
             pcesDuBc.data.next,
@@ -224,8 +229,8 @@ const BcList = () => {
             pceLignes.push(element);
           });
         }
-      console.log("RESULTAT "+pcesDuBc.data.results);
-      console.log("PCElIGNES "+JSON.stringify(pceLignes));
+      //console.log("RESULTAT "+pcesDuBc.data.results);
+      console.log("PCElIGNES "+JSON.stringify(pceLignes)+"COCO");
       return pceLignes;
       }
 
@@ -233,7 +238,7 @@ const BcList = () => {
     } catch (error) {
       console.log('error : '+error);
     }
-    console.log('data : '+JSON.stringify(data));
+    //console.log('data : '+JSON.stringify(data));
     console.log('error : '+error);
     return ("");
   }
@@ -250,7 +255,7 @@ const BcList = () => {
     navigation.navigate('Bc');
   }; */
 
-  const getPieces = (tabPces) => {
+  /* const getPieces = (tabPces) => {
     let pcesList = tabPces;
     pcesList.forEach((pce) => {
       dispatch(fetchPceSuccess(pce));
@@ -258,7 +263,54 @@ const BcList = () => {
     //appeler écran BCScreen
   
     navigation.navigate('Bc');
-  };
+  }; */
+
+/*   const getPieces = (tabPces) => async (dispatch) => {
+    console.log('type tableau de pièces '+ typeof tabPces)
+    let tabPcesLoaded = cloneDeep(tabPces);
+    let tabPcesProp = cloneDeep(tabPces);
+    let tabPcesOther = cloneDeep(tabPces);
+    if (tabPces !== null && tabPces.length > 0) {
+      dispatch(loadFullPcesTab(tabPces));
+      let pcesLoadedTab = tabPcesLoaded.filter(pce => pce.pce_charge === true);
+      if (pcesLoadedTab !== null && pcesLoadedTab.length > O) {
+        dispatch(loadLoadedPcesTab(pcesLoadedTab));
+      }
+      let pcesPropTab = tabPcesProp.filter(pce => pce.pce_charge === false && pce.pce_prop_charge === true);
+      if (pcesPropTab !== null && pcesPropTab.length > 0) {
+        dispatch(loadPropPcesTab(pcesPropTab));
+      }
+      let pcesOtherTab = tabPcesOther.filter(pce = pce.pce_charge === false && pce.pce_prop_charge === false);
+      if (pcesOtherTab !== null && pcesOtherTab.length > 0) {
+        dispatch(loadOtherPcesTab(pcesOtherTab));
+      }
+    }
+    
+    
+  }; */
+
+  const getPieces = async (tabPces) =>  {
+    //console.log('type tableau de pièces '+ typeof tabPces)
+    let tabPcesLines = tabPces;
+    //let tabPcesLoaded = cloneDeep(tabPces);
+    //let tabPcesProp = cloneDeep(tabPces);
+    //let tabPcesOther = cloneDeep(tabPces);
+    if (tabPces !== null && tabPces.length > 0) {
+      dispatch(loadFullPcesTab(tabPces));
+      let pcesLoadedTab = tabPcesLines.filter(pce => pce.pce_charge === true);
+      if (pcesLoadedTab !== null && pcesLoadedTab.length > 0) {
+        dispatch(loadLoadedPcesTab(pcesLoadedTab));
+      }
+      let pcesPropTab = tabPcesLines.filter(pce => pce.pce_charge === false && pce.pce_prop_charge === true);
+      if (pcesPropTab !== null && pcesPropTab.length > 0) {
+        dispatch(loadPropPcesTab(pcesPropTab));
+      }
+      let pcesOtherTab = tabPcesLines.filter(pce => pce.pce_charge === false && pce.pce_prop_charge === false);
+      if (pcesOtherTab !== null && pcesOtherTab.length > 0) {
+        dispatch(loadOtherPcesTab(pcesOtherTab));
+      }
+    }
+  }
 
   return (
     <ScrollView>

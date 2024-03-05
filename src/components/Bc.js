@@ -37,8 +37,9 @@ const Bc = () => {
 
   let nbPcesChargees = pcesLoaded.length;
   let poids = 0;
-  pcesLoaded.map((pce) => (poids += parseFloat(pce.pce_poids)));
-
+  if (pcesLoaded.length > 0) {
+    pcesLoaded.map((pce) => (poids += parseFloat(pce.pce_poids)));
+  }
   const recordBc = () => {
     /*
     Pour économiser de la bande passante et de la charge, on ne se base que sur le tableau pces chargées du state pour executer les appels api de mise à jour de la base de données 
@@ -46,9 +47,9 @@ const Bc = () => {
     */
 
     /* mise à jour du champ date pour horodater l'enreg ds la bdd (champs pce_date_web) */
-    console.log("TOUTES PIECES "+pces);
+    //console.log("TOUTES PIECES "+pces);
     pces.map(pce => dispatch(changePceDate(pce)));
-    console.log("PIECES CHARGEES "+pcesLoaded);
+    //console.log("PIECES CHARGEES "+pcesLoaded);
     pcesLoaded.map(pce => dispatch(changePceLoadedDate(pce)));
     pcesProp.map(pce => dispatch(changePcePropDate(pce)));
     pcesOther.map(pce => dispatch(changePceOtherDate(pce)));
@@ -62,8 +63,8 @@ const Bc = () => {
 
     //màj les pces ds la bdd
     for (let j = 0; j < sliced_tab.length; j++) {
-      console.log(JSON.stringify(sliced_tab[j]));
-      console.log("SLICED TAB "+sliced_tab[j]);
+      //console.log(JSON.stringify(sliced_tab[j]));
+      //console.log("SLICED TAB "+sliced_tab[j]);
       patch(sliced_tab[j]);
     }
   };

@@ -20,6 +20,10 @@ export const RECORD_SELECTED_BC = "RECORD_SELECTED_BC";
 export const PURGE_BC = "PURGE_BC";
 //action's type for pces and accs (pièces et accessoires)
 export const FETCH_PCE_SUCCESS = "FETCH_PCE_SUCCESS"
+export const LOAD_FULL_PCES_TAB = "LOAD_FULL_PCES_TAB"
+export const LOAD_LOADED_PCES_TAB = "LOAD_LOADED_PCES_TAB"
+export const LOAD_PROP_PCES_TAB = "LOAD_PROP_PCES_TAB"
+export const LOAD_OTHER_PCES_TAB = "LOAD_OTHER_PCES_TAB"
 export const FETCH_ACC_SUCCESS = "FETCH_ACC_SUCCESS"
 export const PURGE_PCES_ACCS = "PURGE_PCES_ACCS"
 export const CHANGE_PCE_LOADED_STATUS = "CHANGE_PCE_LOADED_STATUS";
@@ -74,13 +78,36 @@ export const fetchPceSuccess = (pce) => {
   };
 };
 
+export const loadFullPcesTab = (tabPces) => {
+  return {
+    type: LOAD_FULL_PCES_TAB,
+    payload: tabPces,
+  }
+} 
+export const loadLoadedPcesTab = (tabPcesLoaded) => {
+  return {
+    type: LOAD_LOADED_PCES_TAB,
+    payload: tabPcesLoaded,
+  }
+} 
+export const loadPropPcesTab = (tabPcesProp) => {
+  return {
+    type: LOAD_PROP_PCES_TAB,
+    payload: tabPcesProp,
+  }
+} 
+export const loadOtherPcesTab = (tabPcesOther) => {
+  return {
+    type: LOAD_OTHER_PCES_TAB,
+    payload: tabPcesOther,
+  }
+}
 export const fetchAccSuccess = (acc) => {
   return {
     type: FETCH_ACC_SUCCESS,
     payload: acc,
   }
 }
-
 export const purgePcesAccs = () => {
   return {
     type: PURGE_PCES_ACCS,
@@ -148,7 +175,7 @@ export const fetchDataPcesAccs = () => ({
 });
 
 export const fetchSuccess = (data) => (
-  console.log("the data : "+JSON.stringify(data)),
+  //console.log("the data : "+JSON.stringify(data)),
   {
   type: API_SUCCESS,
   payload: data,

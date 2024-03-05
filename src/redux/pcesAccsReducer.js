@@ -2,6 +2,10 @@ import { cloneDeep } from 'lodash';
 import {
   FETCH_ACC_SUCCESS,
   FETCH_PCE_SUCCESS,
+  LOAD_FULL_PCES_TAB,
+  LOAD_LOADED_PCES_TAB,
+  LOAD_PROP_PCES_TAB,
+  LOAD_OTHER_PCES_TAB,
   PURGE_PCES_ACCS,
   API_PENDING_PCES_ACCS,
   CHANGE_PCE_LOADED_STATUS,
@@ -26,15 +30,15 @@ const pcesAccsReducer = (state = initialState, action) => {
     case CHANGE_PCE_OBSERV_BC:
       let modifiedElement = Object.assign({},action.payload.piece);
       let observ= action.payload.texte;
-      console.log("MODIFIED ELEMENT "+JSON.stringify(modifiedElement));
-      console.log("OBSERVATIONS "+observ);
+      //console.log("MODIFIED ELEMENT "+JSON.stringify(modifiedElement));
+      //console.log("OBSERVATIONS "+observ);
       const new_ArrayPces = cloneDeep(state.pces);//JSON.parse(JSON.stringify(state.pces)); //[...state.pces];
       const new_ArrayPcesLoaded = cloneDeep(state.pcesLoaded);
       const new_ArrayPcesProp = cloneDeep(state.pcesProp);
       const new_ArrayPcesOther = cloneDeep(state.pcesOther);
       // on prépare tout de suite le changement de la valeur du champ d'observations pce_observ_bc dans la liste pces
       const index_Pces = new_ArrayPces.findIndex(pce => pce.id === modifiedElement.id);
-      console.log(new_ArrayPces[index_Pces].pce_observ_bc);
+      //console.log(new_ArrayPces[index_Pces].pce_observ_bc);
       new_ArrayPces[index_Pces].pce_observ_bc = observ; 
       // si c'est une pièce chargée
       if (modifiedElement.pce_charge) {
@@ -142,13 +146,13 @@ const pcesAccsReducer = (state = initialState, action) => {
         dateMajBLModifie.getMinutes() +
         ":" +
         dateMajBLModifie.getSeconds();
-      console.log(formatedDate);
+      //console.log(formatedDate);
       // Modifier date ds liste pces
       let newTabPces = cloneDeep(state.pces);
       let indexPce = newTabPces.findIndex(pce => pce.id === action.payload.id);
-      console.log("index tableau "+indexPce);
+      //console.log("index tableau "+indexPce);
       newTabPces[indexPce].pce_date_web = formatedDate; // on change la date de la pce ds la liste des pces
-      console.log(newTabPces[indexPce]);
+      //console.log(newTabPces[indexPce]);
       return {
         ...state, 
         pces: newTabPces,
@@ -170,13 +174,13 @@ const pcesAccsReducer = (state = initialState, action) => {
         dateMajBLModif.getMinutes() +
         ":" +
         dateMajBLModif.getSeconds();
-      console.log(formatedDat);
+      //console.log(formatedDat);
       // Modifier date ds liste pces chargées
       let newTabPcesLoaded = cloneDeep(state.pcesLoaded);
       let indexPceLoaded = newTabPcesLoaded.findIndex(pce => pce.id === action.payload.id);
-      console.log("index tableau "+indexPceLoaded);
+      //console.log("index tableau "+indexPceLoaded);
       newTabPcesLoaded[indexPceLoaded].pce_date_web = formatedDat; // on change la date de la pce ds la liste des pces chargées
-      console.log(newTabPcesLoaded[indexPceLoaded]);
+      //console.log(newTabPcesLoaded[indexPceLoaded]);
       return {
         ...state, 
         pcesLoaded: newTabPcesLoaded,
@@ -198,13 +202,13 @@ const pcesAccsReducer = (state = initialState, action) => {
         dateMajBLChanged.getMinutes() +
         ":" +
         dateMajBLChanged.getSeconds();
-      console.log(formatDate);
+      //console.log(formatDate);
       // Modifier date ds liste pces proposées
       let newTabPcesProp = cloneDeep(state.pcesProp);
       let indexPceProp = newTabPcesProp.findIndex(pce => pce.id === action.payload.id);
-      console.log("index tableau "+indexPceProp);
+      //console.log("index tableau "+indexPceProp);
       newTabPcesProp[indexPceProp].pce_date_web = formatDate; // on change la date de la pce ds la liste des pces proposées
-      console.log(newTabPcesProp[indexPceProp]);
+      //console.log(newTabPcesProp[indexPceProp]);
       return {
         ...state, 
         pcesProp: newTabPcesProp,
@@ -226,13 +230,13 @@ const pcesAccsReducer = (state = initialState, action) => {
         dateMajBLChange.getMinutes() +
         ":" +
         dateMajBLChange.getSeconds();
-      console.log(formDate);
+      //console.log(formDate);
       // Modifier date ds liste pces proposées
       let newTabPcesOther = cloneDeep(state.pcesOther);
       let indexPceOther = newTabPcesOther.findIndex(pce => pce.id === action.payload.id);
-      console.log("index tableau "+indexPceOther);
+      //console.log("index tableau "+indexPceOther);
       newTabPcesOther[indexPceOther].pce_date_web = formDate; // on change la date de la pce ds la liste des pces proposées
-      console.log(newTabPcesOther[indexPceOther]);
+      //console.log(newTabPcesOther[indexPceOther]);
       return {
         ...state, 
         pcesOther: newTabPcesOther,
@@ -259,6 +263,26 @@ const pcesAccsReducer = (state = initialState, action) => {
           pcesOther: [...state.pcesOther, action.payload],
           loading: false,
         }
+      }
+    case LOAD_FULL_PCES_TAB:
+      return {
+        ...state,
+        pces: action.payload,
+      }
+    case LOAD_LOADED_PCES_TAB:
+      return {
+        ...state,
+        pcesLoaded: action.payload,
+      }
+    case LOAD_PROP_PCES_TAB:
+      return {
+        ...state,
+        pcesProp: action.payload,
+      }
+    case LOAD_OTHER_PCES_TAB:
+      return {
+        ...state,
+        pcesOther: action.payload,
       }
     case FETCH_ACC_SUCCESS:
       return {
