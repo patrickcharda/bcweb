@@ -133,20 +133,20 @@ const Bc = ({ tabPces }) => {
   const [isOpened, setIsOpened] = React.useState(false);
 
   const bonChargement = useSelector((state) => state.bcReducer.bc);
-  /* const pces = useSelector((state) => state.pcesAccsReducer.pces);
+  const pces = useSelector((state) => state.pcesAccsReducer.pces);
   const pcesLoaded = useSelector((state) => state.pcesAccsReducer.pcesLoaded);
   const pcesProp = useSelector((state) => state.pcesAccsReducer.pcesProp);
-  const pcesOther = useSelector((state) => state.pcesAccsReducer.pcesOther); */
+  const pcesOther = useSelector((state) => state.pcesAccsReducer.pcesOther);
 
-  //let pces;
-  let pcesLoaded = [];
-  let pcesProp = [];
-  let pcesOther = [];;
+
+  let piecesLoaded = [];
+  let piecesProp = [];
+  let piecesOther = [];;
 
   if (tabPces != undefined && Array.isArray(tabPces) && tabPces.length > 0) {
-    pcesLoaded = tabPces[0];
-    pcesProp = tabPces[1];
-    pcesOther = tabPces[2];
+    piecesLoaded = tabPces[0];
+    piecesProp = tabPces[1];
+    piecesOther = tabPces[2];
     /* for (let i = 0; i < pces.length; i++) {
       console.log("CHARGEE OU PAS ? "+pces[i].pce_charge);
       if (pces[i].pce_charge === true) {
