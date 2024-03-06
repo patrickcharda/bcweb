@@ -3,11 +3,12 @@ import Bc from '../Bc';
 import LogoutButton from "../LogoutButton";
 import { SafeAreaView, StyleSheet, BackHandler, Button } from "react-native";
 
-const BcScreen = ({ navigation}) => {
+const BcScreen = ({ route }) => {
+  const { tabPces } = route.params;
   return (
     <SafeAreaView style={styles.container}>
       <LogoutButton />
-      <Bc/>
+      <Bc tabPces={ tabPces } />
       <Button title="Quitter BCWeb" onPress={() => BackHandler.exitApp()} />
     </SafeAreaView>
   );

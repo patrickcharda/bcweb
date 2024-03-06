@@ -16,7 +16,7 @@ import Message from "./Message";
 import { useNavigation } from '@react-navigation/native';
 import * as Device from 'expo-device';
 import * as Application from 'expo-application';
-import { cloneDeep } from 'lodash';
+
 
 const appliname = "bcweb";
 const fingerprint = Application.getAndroidId().toString()+Application.nativeBuildVersion+Device.deviceYearClass.toString();
@@ -84,7 +84,7 @@ const BcList = () => {
     getPieces(bc.pieces);
   }; */
 
-  const defineBc = async (selectedBc) => {
+  /* const defineBc = async (selectedBc) => {
     bc = selectedBc;
     console.log(
       "THIS IS THE BC " +
@@ -106,6 +106,32 @@ const BcList = () => {
     } 
     //appeler écran BCScreen
     navigation.navigate('Bc');
+  }; */
+
+  const defineBc = async (selectedBc) => {
+    bc = selectedBc;
+    console.log(
+      "THIS IS THE BC " +
+        bc.url +
+        " pces : " +
+        bc.pieces[0] +
+        " pdts : " +
+        bc.produits[0]
+    );
+    dispatch(recordSelectedBc(bc));
+    dispatch(purgePcesAccs());
+    await ouvrir(token, username, bc.bc_num);
+
+    let tabPces = await checkok(token, username, bc.bc_num); // récupère le tableau de tableaux des pièces chargées, proposées et autres
+    //console.log("type of tabPces : "+typeof(tabPces));
+    //console.log("TABLEAU DE PCES "+JSON.stringify(tabPces));
+    if (tabPces != "" && tabPces != undefined && tabPces != null) {
+      console.log("Hey");
+      //await getPieces(tabPces);
+      //appeler écran BCScreen
+      navigation.navigate('Bc', { tabPces });
+    } 
+    
   };
   
   const ouvrir = async (token, username, bc_num ) => {
@@ -157,7 +183,7 @@ const BcList = () => {
     return ("");
   } */
 
-  const checkok = async (token, username, bc_number) => {
+  /* const checkok = async (token, username, bc_number) => {
     let tabl = [];
     tabl.push(username);
     let pceLignes = [];
@@ -191,7 +217,7 @@ const BcList = () => {
         }
         i++;
       }
-      let pcesDuBc="test";
+      let pcesDuBc;
       if (signalToGo === true) {
         pcesDuBc = await axios.get(
           "https://back-xxx.monkey-soft.fr:54443/bcweb/pcesdubc/"+bc_number,
@@ -230,7 +256,112 @@ const BcList = () => {
           });
         }
       //console.log("RESULTAT "+pcesDuBc.data.results);
-      console.log("PCElIGNES "+JSON.stringify(pceLignes)+"COCO");
+      //console.log("PCElIGNES "+JSON.stringify(pceLignes)+"COCO");
+      return pceLignes;
+      }
+
+
+    } catch (error) {
+      console.log('error : '+error);
+    }
+    //console.log('data : '+JSON.stringify(data));
+    console.log('error : '+error);
+    return ("");
+  } */
+
+  const checkok = async (token, username, bc_number) => {
+    let tabl = [];
+    tabl.push(username);
+    let pceLignes = []; // tableau de tableaux qui va contenir les tableaux suivants, les listes de pièces chargées, proposées et autres
+    let pcesLoaded =[];
+    let pcesProp = [];
+    let pcesOther = [];
+    try {
+      //si un bl est sélectionné ds la liste déroulante, mettre en pause pour pouvoir charger les données
+
+      let i = 0;
+      let signalToGo = false;
+      let response ="";
+      while ((i < NB_ITER) && (signalToGo==false)) {
+        await new Promise(resolve => setTimeout(resolve,DELAY_N_SECONDS));
+          response = await axios.post(
+          endpointCheckok,
+          JSON.stringify({
+            username: username,
+            }),
+            {
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8",
+              "Authorization": token,
+              "appliname": appliname,
+              "fingerprint": fingerprint,
+              },
+            }
+          );
+        
+        //console.log("REPONSE DATA CHECKOK "+ response.data.message);
+        if (response.data.message === "> ok") {
+          signalToGo = true;
+          //console.log("SIGNALTOGO "+signalToGo);
+        }
+        i++;
+      }
+      let pcesDuBc;
+      if (signalToGo === true) {
+        pcesDuBc = await axios.get(
+          "https://back-xxx.monkey-soft.fr:54443/bcweb/pcesdubc/"+bc_number,
+          {
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8",
+              "Authorization": token,
+              "appliname": appliname,
+              "fingerprint": fingerprint,
+              },
+            }
+        );
+        console.log(bc_number);
+        //console.log("COUNT COUNT "+JSON.stringify(pcesDuBc));
+        //console.log("COUNT COUNT "+JSON.stringify(pcesDuBc.data));
+
+        pcesDuBc.data.results.forEach((element, index, array) => {
+          //pceLignes.push(element);
+          if (element.pce_charge === true) {
+            pcesLoaded.push(element);
+          } else if (element.pce_prop_charge === true) {
+            pcesProp.push(element);
+          } else {
+            pcesOther.push(element);
+          }
+        });
+        //console.log("NEXT NEXT "+pcesDuBc.data.next);
+        while (pcesDuBc.data.next !== null) {
+          pcesDuBc = await axios.get(
+            pcesDuBc.data.next,
+            {
+              headers: {
+                "Content-Type": "application/json;charset=UTF-8",
+                "Authorization": token,
+                "appliname": appliname,
+                "fingerprint": fingerprint,
+                },
+              }
+          );
+          pcesDuBc.data.results.forEach((element, index, array) => {
+            //pceLignes.push(element);
+            if (element.pce_charge === true) {
+              pcesLoaded.push(element);
+            } else if (element.pce_prop_charge === true) {
+              pcesProp.push(element);
+            } else {
+              pcesOther.push(element);
+            }
+          });
+        }
+      //console.log("RESULTAT "+pcesDuBc.data.results);
+      //console.log("PCElIGNES "+JSON.stringify(pceLignes)+"COCO");
+      pceLignes.push(pcesLoaded);
+      pceLignes.push(pcesProp);
+      pceLignes.push(pcesOther);
       return pceLignes;
       }
 
@@ -242,7 +373,6 @@ const BcList = () => {
     console.log('error : '+error);
     return ("");
   }
-
   /* const getPieces = (tabPces) => {
     pcesList = tabPces;
     pcesList.forEach((pce) => {
