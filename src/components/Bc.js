@@ -133,6 +133,7 @@ const Bc = ({ tabPces }) => {
   const [isOpened, setIsOpened] = React.useState(false);
 
   const bonChargement = useSelector((state) => state.bcReducer.bc);
+  // recupération des listes de pièces du state
   const pces = useSelector((state) => state.pcesAccsReducer.pces);
   const pcesLoaded = useSelector((state) => state.pcesAccsReducer.pcesLoaded);
   const pcesProp = useSelector((state) => state.pcesAccsReducer.pcesProp);
@@ -143,20 +144,12 @@ const Bc = ({ tabPces }) => {
   let piecesProp = [];
   let piecesOther = [];;
 
+  /* tabPces est le tableau de tableaux des différentes catégories de pièces (loaded, prop, other); ce tableau est en RAM;
+     il va servir à afficher les pièces immédiatement (donc le BC), avant que les pièces soient stockées dans le state, en ROM donc */
   if (tabPces != undefined && Array.isArray(tabPces) && tabPces.length > 0) {
     piecesLoaded = tabPces[0];
     piecesProp = tabPces[1];
     piecesOther = tabPces[2];
-    /* for (let i = 0; i < pces.length; i++) {
-      console.log("CHARGEE OU PAS ? "+pces[i].pce_charge);
-      if (pces[i].pce_charge === true) {
-        pcesLoaded.push(pces[i]);
-      } else if (pces[i].pce_prop_charge === true) {
-        pcesProp.push(pces[i]);
-      } else {
-        pcesOther.push(pces[i]);
-      }
-    } */
   }
 
   let nbPcesChargees = pcesLoaded.length;
@@ -165,14 +158,16 @@ const Bc = ({ tabPces }) => {
     pcesLoaded.map((pce) => (poids += parseFloat(pce.pce_poids)));
   }
 
+  // on stocke une référence au tableau de tableaux des pièces pour pouvoir l'appeler via useEffect une fois le composant rendered
   let refTabPces = React.useRef(newTabPces);
 
+  /* ce hook se charge à partir de la référence au tableau de tableaux de pièces d'alimenter le state;
+     il intervient après le rendu du composant */
   React.useEffect(() => {
     let newPcesLoaded = [];
     let newPcesProp = [];
     let newPcesOther = [];
     newPcesLoaded = refTabPces.current[0];
-    //console.log(refTabPces[0]);
     newPcesProp = refTabPces.current[1];
     newPcesOther = refTabPces.current[2];
     dispatch(loadLoadedPcesTab(newPcesLoaded));
@@ -182,6 +177,7 @@ const Bc = ({ tabPces }) => {
     dispatch(loadFullPcesTab(fullPcesTab));
   }, []);
 
+  /* enregistrement d'un bon de chargement   */
   const recordBc = () => {
     /*
     Pour économiser de la bande passante et de la charge, on ne se base que sur le tableau pces chargées du state pour executer les appels api de mise à jour de la base de données 
@@ -196,21 +192,20 @@ const Bc = ({ tabPces }) => {
     pcesProp.map(pce => dispatch(changePcePropDate(pce)));
     pcesOther.map(pce => dispatch(changePceOtherDate(pce)));
 
-    // Tronçonner le tableau des pièces
-    let sliced_tab = []; // tableau de tableaux tronçons
-    for (let i = 0; i < pces.length; i += 50) {
-      let chunk = pces.slice(i, i + 50);
-      sliced_tab.push(chunk);
+    // Tronçonner le tableau des pièces en tableaux de 500 pièces
+    let sliced_tabs = []; // tableau de tableaux tronçons de 500 pièces
+    for (let i = 0; i < pces.length; i += 500) {
+      let chunk = pces.slice(i, i + 500);
+      sliced_tabs.push(chunk);
     }
 
-    //màj les pces ds la bdd
-    for (let j = 0; j < sliced_tab.length; j++) {
-      //console.log(JSON.stringify(sliced_tab[j]));
-      //console.log("SLICED TAB "+sliced_tab[j]);
-      patch(sliced_tab[j]);
+    //màj les pces ds la bdd, tronçon de 500 par tronçon de 500
+    for (let j = 0; j < sliced_tabs.length; j++) {
+      patch(sliced_tabs[j]);
     }
   };
 
+  /* enregistrement d'un ensemble/lot/bloc/tableau/tronçon de pièces   */
   const patch = async (tabDePces) => {
     let endpointPcesToPatch =
       "https://back-xxx.monkey-soft.fr:54443/bcweb/pcestopatch/";

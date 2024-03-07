@@ -7,14 +7,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { recordSelectedBc, purgePcesAccs } from "../redux/actions";
 import * as React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import Message from "./Message";
+import { useSelector } from "react-redux";
+//import Message from "./Message";
 import { useNavigation } from '@react-navigation/native';
 
 
-// composant récupérant dans le state le dernier composant utilisé
+// Composant récupérant dans le state le dernier bon de chargement utilisé
 
 const BcLast = () => {
   
@@ -22,12 +21,14 @@ const BcLast = () => {
   const navigation = useNavigation();
   const isBcEmpty = Object.keys(lastEditedBc).length === 0;
 
+  /* le composant Bc attend un tableau de tableaux de pièces qui lui est passé à travers le composant BcScreen;
+     il faut donc préparer ce tableau à partir du state */
   const pcesLoaded = useSelector((state) => state.pcesAccsReducer.pcesLoaded);
   const pcesProp = useSelector((state) => state.pcesAccsReducer.pcesProp);
   const pcesOther = useSelector((state) => state.pcesAccsReducer.pcesOther);
   const tabPces = [];
   tabPces.push(pcesLoaded, pcesProp, pcesOther);
-  
+
   const openBc = (tabPces) => {
     navigation.navigate('Bc', { tabPces });
   };

@@ -37,23 +37,11 @@ const BcList = () => {
 
   const endpointCheckok = "https://back-xxx.monkey-soft.fr:54443/bcweb/checkok/";
   
-  // au chargement uniquement
-  /* React.useEffect(() => {
-    dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/bcx/", token));
-  }, []);
-  React.useEffect(() => {
-    let tab = [];
-    tab.push(username);
-    console.log("the username is "+tab[0]);
-    dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/reprise/", token, tab));
-  }, []); */
-
   React.useEffect(() => {
     dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/bcx/", token))
       .then(() => {
         let tab = [];
         tab.push(username);
-        //console.log("the username is "+tab[0]);
         return dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/reprise/", token, tab));
       })
       .catch((error) => {
@@ -123,29 +111,23 @@ const BcList = () => {
     await ouvrir(token, username, bc.bc_num);
 
     let tabPces = await checkok(token, username, bc.bc_num); // récupère le tableau de tableaux des pièces chargées, proposées et autres
-    //console.log("type of tabPces : "+typeof(tabPces));
-    //console.log("TABLEAU DE PCES "+JSON.stringify(tabPces));
+
     if (tabPces != "" && tabPces != undefined && tabPces != null) {
       console.log("Hey");
-      //await getPieces(tabPces);
-      //appeler écran BCScreen
       navigation.navigate('Bc', { tabPces });
     } 
     
   };
   
-  const ouvrir = async (token, username, bc_num ) => {
-    
+  const ouvrir = async (token, username, bc_num ) => {   
     let tab = [];
     tab.push(username);
     tab.push(bc_num);
     
     try {
-      //si un bl est sélectionné ds la liste déroulante, mettre en pause pour pouvoir charger les données
+      /* qd  un bl est sélectionné ds la liste déroulante, envoi cmde ouvrir pour mettre en pause pdt chargement des données */
       if (bc_num != "") {
-          //let openBL = await Model.ouvrir(BASE_URL + "/bcweb/ouvrir/", token, username, this.args[0]);
           dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/ouvrir/", token, tab));
-
       }
     } catch (error) {
     //
@@ -272,13 +254,11 @@ const BcList = () => {
   const checkok = async (token, username, bc_number) => {
     let tabl = [];
     tabl.push(username);
-    let pceLignes = []; // tableau de tableaux qui va contenir les tableaux suivants, les listes de pièces chargées, proposées et autres
+    let pceLignes = []; // tableau de tableaux qui va contenir les tableaux suivants, càd les listes de pièces chargées, proposées et autres
     let pcesLoaded =[];
     let pcesProp = [];
     let pcesOther = [];
     try {
-      //si un bl est sélectionné ds la liste déroulante, mettre en pause pour pouvoir charger les données
-
       let i = 0;
       let signalToGo = false;
       let response ="";
@@ -299,10 +279,8 @@ const BcList = () => {
             }
           );
         
-        //console.log("REPONSE DATA CHECKOK "+ response.data.message);
         if (response.data.message === "> ok") {
           signalToGo = true;
-          //console.log("SIGNALTOGO "+signalToGo);
         }
         i++;
       }
@@ -319,12 +297,8 @@ const BcList = () => {
               },
             }
         );
-        console.log(bc_number);
-        //console.log("COUNT COUNT "+JSON.stringify(pcesDuBc));
-        //console.log("COUNT COUNT "+JSON.stringify(pcesDuBc.data));
 
         pcesDuBc.data.results.forEach((element, index, array) => {
-          //pceLignes.push(element);
           if (element.pce_charge === true) {
             pcesLoaded.push(element);
           } else if (element.pce_prop_charge === true) {
@@ -333,7 +307,7 @@ const BcList = () => {
             pcesOther.push(element);
           }
         });
-        //console.log("NEXT NEXT "+pcesDuBc.data.next);
+
         while (pcesDuBc.data.next !== null) {
           pcesDuBc = await axios.get(
             pcesDuBc.data.next,
@@ -347,7 +321,6 @@ const BcList = () => {
               }
           );
           pcesDuBc.data.results.forEach((element, index, array) => {
-            //pceLignes.push(element);
             if (element.pce_charge === true) {
               pcesLoaded.push(element);
             } else if (element.pce_prop_charge === true) {
@@ -357,8 +330,7 @@ const BcList = () => {
             }
           });
         }
-      //console.log("RESULTAT "+pcesDuBc.data.results);
-      //console.log("PCElIGNES "+JSON.stringify(pceLignes)+"COCO");
+      /* on pousse chaque tableau dans le tableau collecteur pceLignes */
       pceLignes.push(pcesLoaded);
       pceLignes.push(pcesProp);
       pceLignes.push(pcesOther);
@@ -419,7 +391,7 @@ const BcList = () => {
     
   }; */
 
-  const getPieces = async (tabPces) =>  {
+  /* const getPieces = async (tabPces) =>  {
     //console.log('type tableau de pièces '+ typeof tabPces)
     let tabPcesLines = tabPces;
     //let tabPcesLoaded = cloneDeep(tabPces);
@@ -440,7 +412,7 @@ const BcList = () => {
         dispatch(loadOtherPcesTab(pcesOtherTab));
       }
     }
-  }
+  } */
 
   return (
     <ScrollView>
