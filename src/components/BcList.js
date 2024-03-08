@@ -345,75 +345,7 @@ const BcList = () => {
     console.log('error : '+error);
     return ("");
   }
-  /* const getPieces = (tabPces) => {
-    pcesList = tabPces;
-    pcesList.forEach((pce) => {
-      console.log(pce.slice(48,pce.length)); //=> récupération du numéro de pce
-      //appel API pr récupérer toutes les infos de la pièce
-      dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/pce/"+pce.slice(48,pce.length), token));
-    });
-    //appeler écran BCScreen
-  
-    navigation.navigate('Bc');
-  }; */
-
-  /* const getPieces = (tabPces) => {
-    let pcesList = tabPces;
-    pcesList.forEach((pce) => {
-      dispatch(fetchPceSuccess(pce));
-    });
-    //appeler écran BCScreen
-  
-    navigation.navigate('Bc');
-  }; */
-
-/*   const getPieces = (tabPces) => async (dispatch) => {
-    console.log('type tableau de pièces '+ typeof tabPces)
-    let tabPcesLoaded = cloneDeep(tabPces);
-    let tabPcesProp = cloneDeep(tabPces);
-    let tabPcesOther = cloneDeep(tabPces);
-    if (tabPces !== null && tabPces.length > 0) {
-      dispatch(loadFullPcesTab(tabPces));
-      let pcesLoadedTab = tabPcesLoaded.filter(pce => pce.pce_charge === true);
-      if (pcesLoadedTab !== null && pcesLoadedTab.length > O) {
-        dispatch(loadLoadedPcesTab(pcesLoadedTab));
-      }
-      let pcesPropTab = tabPcesProp.filter(pce => pce.pce_charge === false && pce.pce_prop_charge === true);
-      if (pcesPropTab !== null && pcesPropTab.length > 0) {
-        dispatch(loadPropPcesTab(pcesPropTab));
-      }
-      let pcesOtherTab = tabPcesOther.filter(pce = pce.pce_charge === false && pce.pce_prop_charge === false);
-      if (pcesOtherTab !== null && pcesOtherTab.length > 0) {
-        dispatch(loadOtherPcesTab(pcesOtherTab));
-      }
-    }
-    
-    
-  }; */
-
-  /* const getPieces = async (tabPces) =>  {
-    //console.log('type tableau de pièces '+ typeof tabPces)
-    let tabPcesLines = tabPces;
-    //let tabPcesLoaded = cloneDeep(tabPces);
-    //let tabPcesProp = cloneDeep(tabPces);
-    //let tabPcesOther = cloneDeep(tabPces);
-    if (tabPces !== null && tabPces.length > 0) {
-      dispatch(loadFullPcesTab(tabPces));
-      let pcesLoadedTab = tabPcesLines.filter(pce => pce.pce_charge === true);
-      if (pcesLoadedTab !== null && pcesLoadedTab.length > 0) {
-        dispatch(loadLoadedPcesTab(pcesLoadedTab));
-      }
-      let pcesPropTab = tabPcesLines.filter(pce => pce.pce_charge === false && pce.pce_prop_charge === true);
-      if (pcesPropTab !== null && pcesPropTab.length > 0) {
-        dispatch(loadPropPcesTab(pcesPropTab));
-      }
-      let pcesOtherTab = tabPcesLines.filter(pce => pce.pce_charge === false && pce.pce_prop_charge === false);
-      if (pcesOtherTab !== null && pcesOtherTab.length > 0) {
-        dispatch(loadOtherPcesTab(pcesOtherTab));
-      }
-    }
-  } */
-
+ 
   return (
     <ScrollView>
       <Message />

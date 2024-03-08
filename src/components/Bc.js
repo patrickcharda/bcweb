@@ -24,113 +24,15 @@ const fingerprint =
   Application.nativeBuildVersion +
   Device.deviceYearClass.toString();
 
-/* const Bc = () => {
-  const token = useSelector((state) => state.tokenReducer.token);
-  const dispatch = useDispatch();
-  const [isOpened, setIsOpened] = React.useState(false);
-
-  const bonChargement = useSelector((state) => state.bcReducer.bc);
-  const pces = useSelector((state) => state.pcesAccsReducer.pces);
-  const pcesLoaded = useSelector((state) => state.pcesAccsReducer.pcesLoaded);
-  const pcesProp = useSelector((state) => state.pcesAccsReducer.pcesProp);
-  const pcesOther = useSelector((state) => state.pcesAccsReducer.pcesOther);
-
-  let nbPcesChargees = pcesLoaded.length;
-  let poids = 0;
-  if (pcesLoaded.length > 0) {
-    pcesLoaded.map((pce) => (poids += parseFloat(pce.pce_poids)));
-  }
-  const recordBc = () => {
-    /*
-    Pour économiser de la bande passante et de la charge, on ne se base que sur le tableau pces chargées du state pour executer les appels api de mise à jour de la base de données 
-    Le traitement se fait toujours par lots, mais il y a moins de données (pièces) à traiter
-    */
-
-    /* //mise à jour du champ date pour horodater l'enreg ds la bdd (champs pce_date_web) 
-    //console.log("TOUTES PIECES "+pces);
-    pces.map(pce => dispatch(changePceDate(pce)));
-    //console.log("PIECES CHARGEES "+pcesLoaded);
-    pcesLoaded.map(pce => dispatch(changePceLoadedDate(pce)));
-    pcesProp.map(pce => dispatch(changePcePropDate(pce)));
-    pcesOther.map(pce => dispatch(changePceOtherDate(pce)));
-
-    // Tronçonner le tableau des pièces
-    let sliced_tab = []; // tableau de tableaux tronçons
-    for (let i = 0; i < pces.length; i += 50) {
-      let chunk = pces.slice(i, i + 50);
-      sliced_tab.push(chunk);
-    }
-
-    //màj les pces ds la bdd
-    for (let j = 0; j < sliced_tab.length; j++) {
-      //console.log(JSON.stringify(sliced_tab[j]));
-      //console.log("SLICED TAB "+sliced_tab[j]);
-      patch(sliced_tab[j]);
-    }
-  };
-
-  const patch = async (tabDePces) => {
-    let endpointPcesToPatch =
-      "https://back-xxx.monkey-soft.fr:54443/bcweb/pcestopatch/";
-    await axios.patch(
-      endpointPcesToPatch,
-      tabDePces,
-      {
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8",
-          Authorization: token,
-          appliname: appliname,
-          fingerprint: fingerprint,
-        },
-      }
-    );
-  };
-
-  return (
-    <View style={styles.container}>
-      <ScrollView style={styles.scrollable_View}>
-        <TouchableOpacity onPress={() => setIsOpened(!isOpened)}>
-          <Text>
-            {isOpened
-              ? "Masquer détails BC n° " + bonChargement.bc_num
-              : "Voir détails BC n° " + bonChargement.bc_num}
-          </Text>
-          <Text>
-            {nbPcesChargees == 0
-              ? "aucune pièce chargée"
-              : nbPcesChargees === 1
-              ? nbPcesChargees + " pièce chargée"
-              : nbPcesChargees + " pièces chargées "}
-          </Text>
-          <Text>{poids + " T"}</Text>
-        </TouchableOpacity>
-        {isOpened && <BcHeader bc={bonChargement} />}
-      </ScrollView>
-      <ScrollView styles={styles.scrollableView2}>
-        <Text style={styles.text1}>Pièces Chargées</Text>
-        {pcesLoaded.map((piece) => (
-          <BcPce key={piece.id} piece={piece} loaded={true} />
-        ))}
-        <Text style={styles.text2}>Pièces Proposées</Text>
-        {pcesProp.map((piece) => (
-          <BcPce key={piece.id} piece={piece} loaded={false} />
-        ))}
-        <Text style={styles.text3}>Pièces Autres</Text>
-        {pcesOther.map((piece) => (
-          <BcPce key={piece.id} piece={piece} loaded={false} />
-        ))}
-        <Text>{"\n\n"}</Text>
-        <Button onPress={() => recordBc()} title="Enregistrer"></Button>
-      </ScrollView>
-    </View>
-  );
-}; */
 
 const Bc = ({ tabPces }) => {
-  let newTabPces = tabPces;
+  //let newTabPces = tabPces;
   const token = useSelector((state) => state.tokenReducer.token);
   const dispatch = useDispatch();
-  const [isOpened, setIsOpened] = React.useState(false);
+  const [isOpened, setIsOpened] = React.useState(false); //booleen pr affichage/masquage entête BC
+  const [isLoadListOpen, setIsLoadListOpen] = React.useState(true);
+  const [isPropListOpen, setIsPropListOpen] = React.useState(false);
+  const [isOtherListOpen, setIsOtherListOpen] = React.useState(false);
 
   const bonChargement = useSelector((state) => state.bcReducer.bc);
   // recupération des listes de pièces du state
@@ -146,12 +48,18 @@ const Bc = ({ tabPces }) => {
 
   /* tabPces est le tableau de tableaux des différentes catégories de pièces (loaded, prop, other); ce tableau est en RAM;
      il va servir à afficher les pièces immédiatement (donc le BC), avant que les pièces soient stockées dans le state, en ROM donc */
-  if (tabPces != undefined && Array.isArray(tabPces) && tabPces.length > 0) {
+  if (pces.length === 0 && tabPces != undefined && Array.isArray(tabPces) && tabPces.length > 0) {
     piecesLoaded = tabPces[0];
     piecesProp = tabPces[1];
     piecesOther = tabPces[2];
+  } else if (tabPces != undefined && Array.isArray(tabPces) && tabPces.length > 0) { // le state pces n'est pas vide, on va l'utiliser
+    piecesLoaded = pcesLoaded;
+    piecesProp = pcesProp;
+    piecesOther = pcesOther;
   }
 
+  /*  pour optimiser l'affichage le calcul du poids et du nombre de pièces chargées sera fait une fois les listes affichées, le state étant alors seulement mis à jour à ce moment là;
+      ce calcul se base sur le state et non les listes en RAM */
   let nbPcesChargees = pcesLoaded.length;
   let poids = 0;
   if (pcesLoaded.length > 0) {
@@ -159,10 +67,10 @@ const Bc = ({ tabPces }) => {
   }
 
   // on stocke une référence au tableau de tableaux des pièces pour pouvoir l'appeler via useEffect une fois le composant rendered
-  let refTabPces = React.useRef(newTabPces);
+  let refTabPces = React.useRef(tabPces);
 
-  /* ce hook se charge à partir de la référence au tableau de tableaux de pièces d'alimenter le state;
-     il intervient après le rendu du composant */
+  /* ce hook se charge avec la référence au tableau de tableaux de pièces pour alimenter le state;
+     le hook intervient après le rendu du composant */
   React.useEffect(() => {
     let newPcesLoaded = [];
     let newPcesProp = [];
@@ -244,16 +152,25 @@ const Bc = ({ tabPces }) => {
         {isOpened && <BcHeader bc={bonChargement} />}
       </ScrollView>
       <ScrollView styles={styles.scrollableView2}>
-        <Text style={styles.text1}>Pièces Chargées</Text>
-        {pcesLoaded.map((piece) => (
+        <TouchableOpacity onPress = {()=>{setIsLoadListOpen(!isLoadListOpen)}}>
+          <Text style={styles.text1}> {isLoadListOpen?"Masquer Pièces Chargées":"Voir Pièces chargées"} </Text>
+        </TouchableOpacity>
+        {isLoadListOpen &&
+           piecesLoaded.map((piece) => (
           <BcPce key={piece.id} piece={piece} loaded={true} />
         ))}
-        <Text style={styles.text2}>Pièces Proposées</Text>
-        {pcesProp.map((piece) => (
+        <TouchableOpacity onPress = {()=>{setIsPropListOpen(!isPropListOpen)}}>
+          <Text style={styles.text2}> {isPropListOpen?"Masquer Pièces Proposées":"Voir Pièces Proposées"} </Text>
+        </TouchableOpacity>
+        {isPropListOpen &&
+           piecesProp.map((piece) => (
           <BcPce key={piece.id} piece={piece} loaded={false} />
         ))}
-        <Text style={styles.text3}>Pièces Autres</Text>
-        {pcesOther.map((piece) => (
+        <TouchableOpacity onPress = {()=>{setIsOtherListOpen(!isOtherListOpen)}}>
+        <Text style={styles.text3}> {isOtherListOpen?"Masquer Pièces Autres":"Voir Pièces Autres"} </Text>
+        </TouchableOpacity>
+        {isOtherListOpen && 
+           piecesOther.map((piece) => (
           <BcPce key={piece.id} piece={piece} loaded={false} />
         ))}
         <Text>{"\n\n"}</Text>
