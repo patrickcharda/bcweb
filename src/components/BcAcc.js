@@ -2,90 +2,93 @@ import {
   ScrollView,
   SafeAreaView,
   Text,
-  ActivityIndicator,
+  TextInput,
+  Modal,
   StyleSheet,
-  TouchableOpacity,
+  Button,
+  Alert,
   View,
 } from "react-native";
-import apiCall from "../redux/apiCall";
-import { recordSelectedBc, purgePcesAccs } from "../redux/actions";
-import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import Message from "./Message";
-import { useNavigation } from '@react-navigation/native';
+import { changePceLoadedStatus, changePceObservBc } from "../redux/actions";
+import * as React from "react";
 
-const BcList = () => {
+
+const BcAcc = ( {accessoire, loaded} ) => {
+
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [text, setText] = React.useState("toto");
+
+  const handleConfirm = () => {
+    // Handle the confirm action here
+    console.log('Confirmed:', text);
+    /* let data = {
+      "piece": piece,
+      "texte": text,
+    }
+    dispatch(changePceObservBc(data)); */
+    setModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    // Handle the cancel action here
+    console.log('Cancelled');
+    setModalVisible(false);
+  };
+
+  /* const pieceJson = JSON.stringify(piece)
+  let pce = piece; */
+
+  const accJson = JSON.stringify(acc);
+  let acc = accessoire;
   const dispatch = useDispatch();
 
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  const navigation = useNavigation();
-
-  // au chargement uniquement
-  React.useEffect(() => {
-    dispatch(apiCall("https://demo-btw.monkey-soft.fr/bcweb/bcx/", token));
-  }, []);
-
-  const data = useSelector((state) => state.apiReducer.data.results);
-
-  //const error = JSON.stringify(useSelector((state) => state.apiReducer.error));
-  const loading = useSelector((state) => state.apiReducer.loading);
-  const token = useSelector((state) => state.tokenReducer.token);
-  let bc = undefined;
-
-  const defineBc = (selectedBc) => {
-    bc = selectedBc;
-    console.log(
-      "THIS IS THE BC " +
-        bc.url +
-        " pces : " +
-        bc.pieces[0] +
-        " pdts : " +
-        bc.produits[0]
-    );
-    dispatch(recordSelectedBc(bc));
-    dispatch(purgePcesAccs());
-    getPieces(bc.pieces);
-    getProduits(bc.produits);
-    //charger ecran bcScreen
-    navigation.push("Bc");
-  };
-
-  const getPieces = (tabPces) => {
-    pcesList = tabPces;
-    pcesList.forEach((pce) => {
-      console.log(pce.slice(42,pce.length)); //=> récupération du numéro de pce
-      //appel API pr récupérer toutes les infos de la pièce
-      dispatch(apiCall("https://demo-btw.monkey-soft.fr/bcweb/pce/"+pce.slice(42,pce.length), token));
-    });
-  };
-
-  const getProduits = (tabAccs) => {
-    accsList = tabAccs;
-    accsList.forEach((acc) => {
-      console.log(" ECHO ACC " +(acc.slice(42,acc.length)));
-      dispatch(apiCall("https://demo-btw.monkey-soft.fr/bcweb/pdt/"+acc.slice(42,acc.length), token));
-    });
-  };
+  //const archive = "<TextInput placeholder={pce.pce_observ_bc}></TextInput>";
 
   return (
-    <ScrollView>
-      <Message />
-      {loading ? (
-        <ActivityIndicator size="large" color="red" />
-      ) : (
+    <ScrollView style={styles.container}>
+        <View></View>
         <SafeAreaView>
-          <TouchableOpacity onPress={() => setIsOpen(!isOpen)}>
-            <Text>{isOpen ? "Close Dropdown" : "Open Dropdown"}</Text>
-          </TouchableOpacity>
-          {isOpen &&
-            data.map((bc, index) => (
-              <TouchableOpacity onPress={() => defineBc(bc)} key={index}>
-                <Text>{bc.url}</Text>
-              </TouchableOpacity>
-            ))}
+          <Text>{acc.id}</Text>
+          <Text>{accJson}</Text>
+          <SafeAreaView>
+            <Text>{acc.pdt_libel}</Text>
+            <View style={styles.centeredView}>
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={handleCancel}
+              >
+                <View style={styles.centeredView}>
+                  <View style={styles.modalView}>
+                    <ScrollView>
+                      <TextInput
+                        style={{ height: 120, borderColor: 'gray', borderWidth: 1, textAlignVertical: 'top', textAlign: 'left' }}
+                        onChangeText={setText}
+                        value={text}
+                        placeholder='Saisissez le texte ici'
+                        multiline
+                      />
+                      <Button title="Confirm" onPress={handleConfirm} />
+                      <Button title="Cancel" onPress={handleCancel} />
+                    </ScrollView>
+                  </View>
+                </View>
+              </Modal>
+              <Button
+                title="Show Modal - Edition"
+                onPress={() => {
+                  setModalVisible(true);
+                }}
+              />
+            </View>
+          </SafeAreaView>
+          <Button
+          title={loaded ? "Unload" : "Load"}
+          ></Button>
+          <Text></Text>
         </SafeAreaView>
-      )}
     </ScrollView>
   );
 };
@@ -126,6 +129,27 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginBottom: 30,
   },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
 });
 
-export default BcList;
+export default BcAcc;

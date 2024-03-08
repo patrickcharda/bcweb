@@ -1,6 +1,6 @@
 import BcHeader from "./BcHeader";
 import BcPce from "./BcPce";
-//import BcAcc from "./BcAcc";
+import BcAcc from "./BcAcc";
 //import BcFooter from ".BcFooter";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -32,6 +32,8 @@ const Bc = ({ tabPces }) => {
   const [isLoadListOpen, setIsLoadListOpen] = React.useState(true);
   const [isPropListOpen, setIsPropListOpen] = React.useState(true);
   const [isOtherListOpen, setIsOtherListOpen] = React.useState(true);
+  const [isLoadAccsOpen, setIsLoadAccsOpen] = React.useState(true);
+  const [isPropAccsOpen, setIsPropAccsOpen] = React.useState(true);
 
   const bonChargement = useSelector((state) => state.bcReducer.bc);
 
@@ -42,8 +44,6 @@ const Bc = ({ tabPces }) => {
   const pcesOther = useSelector((state) => state.pcesAccsReducer.pcesOther);
 
   /* récupération des produits du state */
-  //console.log("PDTS BON DE CHARGEMENT :"+bonChargement.produits[0]);
-  //console.log("PDTS BON DE CHARGEMENT LENGTH:"+bonChargement.produits.length);
   const accs = useSelector((state) => state.pcesAccsReducer.accs);
   const accsLoaded = useSelector((state) => state.pcesAccsReducer.accsLoaded);
   const accsProp = useSelector((state) => state.pcesAccsReducer.accsProp);
@@ -79,7 +79,7 @@ const Bc = ({ tabPces }) => {
   let refTabPces = React.useRef(tabPces);
 
   /* ce hook se charge avec la référence au tableau de tableaux de pièces pour alimenter le state;
-     le hook intervient après le rendu du composant */
+  le hook intervient après le rendu du composant */
   React.useEffect(() => {
     let newPcesLoaded = [];
     let newPcesProp = [];
@@ -95,7 +95,6 @@ const Bc = ({ tabPces }) => {
   }, []);
 
   
-
   /* ce hook permet de récupérer les éventuels accessoires*/
   React.useEffect(() => {
     const getAcc = async (acc_id) => {
@@ -121,7 +120,6 @@ const Bc = ({ tabPces }) => {
         console.error("Error fetching data: ", error);
         // handle error appropriately
       }
-      console.log(produit);
       return produit.data;
     }
     const fetchAccessories = async () => {
@@ -243,7 +241,22 @@ const Bc = ({ tabPces }) => {
           <BcPce key={piece.id} piece={piece} loaded={false} />
         ))}
         <Text>{"\n\n"}</Text>
+        <TouchableOpacity onPress = {()=>{setIsLoadAccsOpen(!isLoadAccsOpen)}}>
+        <Text style={styles.text1}> {isLoadAccsOpen?"Masquer Accessoires chargés":"Voir Accessoires chargés"} </Text>
+        </TouchableOpacity>
+        {isLoadAccsOpen && 
+          accsLoaded.map((acc) => (
+          <BcAcc key={acc.id} accessoire={acc} loaded={true} />
+        ))}
+        <TouchableOpacity onPress = {()=>{setIsPropAccsOpen(!isPropAccsOpen)}}>
+        <Text style={styles.text2}> {isPropAccsOpen?"Masquer Accessoires proposés":"Voir Accessoires proposés"} </Text>
+        </TouchableOpacity>
+        {isPropAccsOpen && 
+          accsProp.map((acc) => (
+          <BcAcc key={acc.id} accessoire={acc} loaded={false} />
+        ))}
         <Button onPress={() => recordBc()} title="Enregistrer"></Button>
+        <Text>{"\n\n"}</Text>
       </ScrollView>
     </View>
   );
