@@ -32,6 +32,8 @@ export const CHANGE_PCE_LOADED_DATE = "CHANGE_PCE_LOADED_DATE";
 export const CHANGE_PCE_PROP_DATE = "CHANGE_PCE_PROP_DATE";
 export const CHANGE_PCE_OTHER_DATE = "CHANGE_PCE_OTHER_DATE";
 export const CHANGE_PCE_OBSERV_BC = "CHANGE_PCE_OBSERV_BC";
+export const LOAD_LOADED_ACCS = "LOAD_LOADED_ACCS";
+export const LOAD_PROP_ACCS = "LOAD_PROP_ACCS";
 
 //action creators for API to get pces and accs
 export const changePceObservBc = (data) => {
@@ -113,8 +115,18 @@ export const purgePcesAccs = () => {
     type: PURGE_PCES_ACCS,
   }
 }
-
-
+export const loadLoadedAccs = (accsTab) => {
+  return {
+    type: LOAD_LOADED_ACCS,
+    payload: accsTab,
+  }
+}
+export const loadPropAccs = (accsTab) => {
+  return {
+    type: LOAD_PROP_ACCS,
+    payload: accsTab,
+  }
+}
 //action creators for bc
 export const recordSelectedBc = (bc) => {
   return {

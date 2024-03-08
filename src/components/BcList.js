@@ -49,6 +49,7 @@ const BcList = () => {
       });
   }, []);
 
+
   const data = useSelector((state) => state.apiReducer.data.results);
 
   const error = JSON.stringify(useSelector((state) => state.apiReducer.error));
@@ -294,8 +295,8 @@ const BcList = () => {
               "Authorization": token,
               "appliname": appliname,
               "fingerprint": fingerprint,
-              },
-            }
+            },
+          }
         );
 
         pcesDuBc.data.results.forEach((element, index, array) => {

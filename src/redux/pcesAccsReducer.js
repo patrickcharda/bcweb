@@ -14,15 +14,19 @@ import {
   CHANGE_PCE_PROP_DATE,
   CHANGE_PCE_OTHER_DATE,
   CHANGE_PCE_OBSERV_BC,
+  LOAD_LOADED_ACCS,
+  LOAD_PROP_ACCS,
 } from "./actions";
 
 const initialState = {
-  pces: [],
-  accs: [],
   loading: false,
+  pces: [],
   pcesLoaded:[],
   pcesProp:[],
   pcesOther:[],
+  accs: [],
+  accsLoaded:[],
+  accsProp:[],
 };
 
 const pcesAccsReducer = (state = initialState, action) => {
@@ -298,7 +302,17 @@ const pcesAccsReducer = (state = initialState, action) => {
         pcesLoaded: [],
         pcesProp: [],
         pcesOther: [],
-      };
+      }
+    case LOAD_LOADED_ACCS:
+      return {
+        ...state,
+        accsLoaded: action.payload,
+      }
+    case LOAD_PROP_ACCS:
+      return {
+        ...state,
+        accsProp: action.payload,
+      }
     default:
       return state;
   }

@@ -4,7 +4,7 @@ import BcPce from "./BcPce";
 //import BcFooter from ".BcFooter";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { changePceDate, changePceLoadedDate, changePcePropDate, changePceOtherDate, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab } from "../redux/actions";
+import { changePceDate, changePceLoadedDate, changePcePropDate, changePceOtherDate, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab, loadLoadedAccs, loadPropAccs } from "../redux/actions";
 import {
   ScrollView,
   SafeAreaView,
@@ -26,29 +26,38 @@ const fingerprint =
 
 
 const Bc = ({ tabPces }) => {
-  //let newTabPces = tabPces;
   const token = useSelector((state) => state.tokenReducer.token);
   const dispatch = useDispatch();
   const [isOpened, setIsOpened] = React.useState(false); //booleen pr affichage/masquage entête BC
   const [isLoadListOpen, setIsLoadListOpen] = React.useState(true);
-  const [isPropListOpen, setIsPropListOpen] = React.useState(false);
-  const [isOtherListOpen, setIsOtherListOpen] = React.useState(false);
+  const [isPropListOpen, setIsPropListOpen] = React.useState(true);
+  const [isOtherListOpen, setIsOtherListOpen] = React.useState(true);
 
   const bonChargement = useSelector((state) => state.bcReducer.bc);
-  // recupération des listes de pièces du state
+
+  /* recupération des listes de pièces du state */
   const pces = useSelector((state) => state.pcesAccsReducer.pces);
   const pcesLoaded = useSelector((state) => state.pcesAccsReducer.pcesLoaded);
   const pcesProp = useSelector((state) => state.pcesAccsReducer.pcesProp);
   const pcesOther = useSelector((state) => state.pcesAccsReducer.pcesOther);
 
+  /* récupération des produits du state */
+  //console.log("PDTS BON DE CHARGEMENT :"+bonChargement.produits[0]);
+  //console.log("PDTS BON DE CHARGEMENT LENGTH:"+bonChargement.produits.length);
+  const accs = useSelector((state) => state.pcesAccsReducer.accs);
+  const accsLoaded = useSelector((state) => state.pcesAccsReducer.accsLoaded);
+  const accsProp = useSelector((state) => state.pcesAccsReducer.accsProp);
+
+  const BASE_URL = "https://back-xxx.monkey-soft.fr:54443";
+  const URL_SLICER_NB_CHAR = BASE_URL.length + 11;
 
   let piecesLoaded = [];
   let piecesProp = [];
   let piecesOther = [];;
 
   /* tabPces est le tableau de tableaux des différentes catégories de pièces (loaded, prop, other); ce tableau est en RAM;
-     il va servir à afficher les pièces immédiatement (donc le BC), avant que les pièces soient stockées dans le state, en ROM donc */
-  if (pces.length === 0 && tabPces != undefined && Array.isArray(tabPces) && tabPces.length > 0) {
+  il va servir à afficher les pièces immédiatement (donc le BC), avant que les pièces soient stockées dans le state, en ROM donc */
+  if (pces.length === 0 && tabPces != undefined && Array.isArray(tabPces) && tabPces.length > 0) { // au 1er chargement du Bc, lorsqu'il n'est pas déjà ds le state
     piecesLoaded = tabPces[0];
     piecesProp = tabPces[1];
     piecesOther = tabPces[2];
@@ -59,7 +68,7 @@ const Bc = ({ tabPces }) => {
   }
 
   /*  pour optimiser l'affichage le calcul du poids et du nombre de pièces chargées sera fait une fois les listes affichées, le state étant alors seulement mis à jour à ce moment là;
-      ce calcul se base sur le state et non les listes en RAM */
+  ce calcul se base sur le state et non les listes en RAM */
   let nbPcesChargees = pcesLoaded.length;
   let poids = 0;
   if (pcesLoaded.length > 0) {
@@ -80,12 +89,72 @@ const Bc = ({ tabPces }) => {
     newPcesOther = refTabPces.current[2];
     dispatch(loadLoadedPcesTab(newPcesLoaded));
     dispatch(loadPropPcesTab(newPcesProp));
-    dispatch(loadOtherPcesTab(pcesOther));
+    dispatch(loadOtherPcesTab(newPcesOther));
     let fullPcesTab = newPcesLoaded.concat(newPcesProp, newPcesOther);
     dispatch(loadFullPcesTab(fullPcesTab));
   }, []);
 
-  /* enregistrement d'un bon de chargement   */
+  
+
+  /* ce hook permet de récupérer les éventuels accessoires*/
+  React.useEffect(() => {
+    const getAcc = async (acc_id) => {
+      console.log(acc_id);
+      console.log(token);
+      console.log(fingerprint);
+      console.log(appliname);
+      let produit;
+      try {
+        produit = await axios.get(
+          "https://back-xxx.monkey-soft.fr:54443/bcweb/pdt/"+acc_id,
+          {
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8",
+              "Authorization": "Bearer " + token,
+              "fingerprint": fingerprint,
+              "appliname": appliname,
+            },
+          }
+        );
+        
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        // handle error appropriately
+      }
+      console.log(produit);
+      return produit.data;
+    }
+    const fetchAccessories = async () => {
+      
+      if (bonChargement.produits !== undefined && bonChargement.produits.length > 0) {
+        let pdtsLoaded = [];
+        let pdtsProp = [];
+        let acc_id;
+        //let endPointAcc;
+        let accessoire;
+        for (let i = 0; i < bonChargement.produits.length; i++) {
+          acc_id = bonChargement.produits[i];
+          acc_id = acc_id.slice(URL_SLICER_NB_CHAR, acc_id.length);
+          console.log("accessoire id : " + acc_id);
+          //endPointAcc = "https://back-xxx.monkey-soft.fr:54443/bcweb/pdt/"+acc_id;
+          accessoire = await getAcc(acc_id);
+          console.log(accessoire);
+          if (accessoire.pdt_charge) {
+            pdtsLoaded.push(accessoire);
+          } else {
+            pdtsProp.push(accessoire);
+          }
+        }
+        /* passer les accessoires dans le state */
+        dispatch(loadLoadedAccs(pdtsLoaded));
+        dispatch(loadPropAccs(pdtsProp));
+      }
+    };
+    fetchAccessories();
+  }, []);
+
+
+  /* fct enregistrement d'un bon de chargement   */
   const recordBc = () => {
     /*
     Pour économiser de la bande passante et de la charge, on ne se base que sur le tableau pces chargées du state pour executer les appels api de mise à jour de la base de données 
@@ -113,7 +182,7 @@ const Bc = ({ tabPces }) => {
     }
   };
 
-  /* enregistrement d'un ensemble/lot/bloc/tableau/tronçon de pièces   */
+  /* fct enregistrement d'un ensemble/lot/bloc/tableau/tronçon de pièces   */
   const patch = async (tabDePces) => {
     let endpointPcesToPatch =
       "https://back-xxx.monkey-soft.fr:54443/bcweb/pcestopatch/";
