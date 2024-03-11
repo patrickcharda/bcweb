@@ -4,7 +4,7 @@ import BcAcc from "./BcAcc";
 //import BcFooter from ".BcFooter";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { changePceDate, changePceLoadedDate, changePcePropDate, changePceOtherDate, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab, loadLoadedAccs, loadPropAccs } from "../redux/actions";
+import { changePceDate, changePceLoadedDate, changePcePropDate, changePceOtherDate, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab, loadLoadedAccs, loadPropAccs, loadAccs } from "../redux/actions";
 import {
   ScrollView,
   SafeAreaView,
@@ -95,7 +95,7 @@ const Bc = ({ tabPces }) => {
   }, []);
 
   
-  /* ce hook permet de récupérer les éventuels accessoires*/
+  /* ce hook permet de récupérer les éventuels accessoires;*/
   React.useEffect(() => {
     const getAcc = async (acc_id) => {
       console.log(acc_id);
@@ -123,10 +123,10 @@ const Bc = ({ tabPces }) => {
       return produit.data;
     }
     const fetchAccessories = async () => {
-      
       if (bonChargement.produits !== undefined && bonChargement.produits.length > 0) {
         let pdtsLoaded = [];
         let pdtsProp = [];
+        let pdts = [];
         let acc_id;
         //let endPointAcc;
         let accessoire;
@@ -142,13 +142,19 @@ const Bc = ({ tabPces }) => {
           } else {
             pdtsProp.push(accessoire);
           }
+          pdts.push(accessoire);
         }
         /* passer les accessoires dans le state */
         dispatch(loadLoadedAccs(pdtsLoaded));
         dispatch(loadPropAccs(pdtsProp));
+        dispatch(loadAccs(pdts));
       }
     };
-    fetchAccessories();
+    /* si le state accs est à 0, on veut voir s'il y a des accessoires à charger;
+    sinon cela signifie qu'il y a des accessoires ds le state (en cache donc) et qu'on cherche à charger depuis le cache un BC en cours */
+    if (accs.length === 0 ) {
+      fetchAccessories();
+    }
   }, []);
 
 

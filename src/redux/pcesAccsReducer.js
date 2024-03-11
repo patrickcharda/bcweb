@@ -16,6 +16,8 @@ import {
   CHANGE_PCE_OBSERV_BC,
   LOAD_LOADED_ACCS,
   LOAD_PROP_ACCS,
+  LOAD_ACCS,
+  CHANGE_ACC_QTE,
 } from "./actions";
 
 const initialState = {
@@ -31,6 +33,33 @@ const initialState = {
 
 const pcesAccsReducer = (state = initialState, action) => {
   switch (action.type) {
+    case CHANGE_ACC_QTE:
+      let obj = action.payload;
+      console.log("OBJ OBJ OBJ "+obj.id)
+      let qte = obj.qte;
+      let id = obj.id;
+      let charge = obj.charge;
+      let newArrayAccs = cloneDeep(state.accs);
+      let newArrayLoadedAccs = cloneDeep(state.accsLoaded);
+      let newArrayPropAccs = cloneDeep(state.accsProp);
+      const indexAccs = newArrayAccs.findIndex(acc => acc.id === id);
+      newArrayAccs[indexAccs].pdt_qte = qte;
+      if (charge) {
+        const indexLoadedAccs = newArrayLoadedAccs.findIndex(acc => acc.id === id);
+        newArrayLoadedAccs[indexLoadedAccs].pdt_qte = qte;
+      } else {
+        const indexPropAccs = newArrayPropAccs.findIndex(acc => acc.id === id);
+        newArrayPropAccs[indexPropAccs].pdt_qte = qte;
+      }
+      return {
+        ...state, 
+        accsLoaded: newArrayLoadedAccs,
+        accsProp: newArrayPropAccs,
+        accs: newArrayAccs,
+      } 
+      /* return {
+        ...state,
+      } */
     case CHANGE_PCE_OBSERV_BC:
       let modifiedElement = Object.assign({},action.payload.piece);
       let observ= action.payload.texte;
@@ -299,6 +328,8 @@ const pcesAccsReducer = (state = initialState, action) => {
         ...state,
         pces: [],
         accs: [],
+        accsLoaded: [],
+        accsProp: [],
         pcesLoaded: [],
         pcesProp: [],
         pcesOther: [],
@@ -312,6 +343,11 @@ const pcesAccsReducer = (state = initialState, action) => {
       return {
         ...state,
         accsProp: action.payload,
+      }
+    case LOAD_ACCS:
+      return {
+        ...state,
+        accs: action.payload,
       }
     default:
       return state;

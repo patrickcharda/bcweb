@@ -10,14 +10,20 @@ import {
   View,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import { changePceLoadedStatus, changePceObservBc } from "../redux/actions";
+import { changeAccQte } from "../redux/actions";
 import * as React from "react";
+
 
 
 const BcAcc = ( {accessoire, loaded} ) => {
 
+  let acc = accessoire;
+  let accJson = JSON.stringify(acc);
+  const dispatch = useDispatch();
+
   const [modalVisible, setModalVisible] = React.useState(false);
   const [text, setText] = React.useState("toto");
+  const [qte, setQte] = React.useState(acc.pdt_qte);
 
   const handleConfirm = () => {
     // Handle the confirm action here
@@ -36,14 +42,21 @@ const BcAcc = ( {accessoire, loaded} ) => {
     setModalVisible(false);
   };
 
-  /* const pieceJson = JSON.stringify(piece)
-  let pce = piece; */
+  const increment = (id, charge) => {
+    let newQte = qte + 1;
+    setQte(newQte);
+    let obj = {'id':id,'charge':charge,'qte':newQte};
+    dispatch(changeAccQte(obj));
+  }
 
-  const accJson = JSON.stringify(acc);
-  let acc = accessoire;
-  const dispatch = useDispatch();
-
-  //const archive = "<TextInput placeholder={pce.pce_observ_bc}></TextInput>";
+  const decrement = (id, charge) => {
+    if (qte >= 1) {
+    let newQte = qte - 1;
+    setQte(newQte);
+    let obj = {'id':id,'charge':charge,'qte':newQte};
+    dispatch(changeAccQte(obj));
+    }
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -82,6 +95,9 @@ const BcAcc = ( {accessoire, loaded} ) => {
                   setModalVisible(true);
                 }}
               />
+            </View>
+            <View>
+              <Button title="+" onPress={() => increment(acc.id, acc.pdt_charge)} /><Text>{qte}</Text><Button title="-" onPress={() => decrement(acc.id, acc.pdt_charge)} />
             </View>
           </SafeAreaView>
           <Button
