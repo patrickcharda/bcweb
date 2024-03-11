@@ -26,6 +26,7 @@ const fingerprint =
 
 const Bc = ({ tabPces }) => {
   const token = useSelector((state) => state.tokenReducer.token);
+  const username = useSelector((state) => state.tokenReducer.username);
   const dispatch = useDispatch();
   const [isOpened, setIsOpened] = React.useState(false); //booleen pr affichage/masquage entête BC
   const [isLoadListOpen, setIsLoadListOpen] = React.useState(true);
@@ -154,6 +155,7 @@ const Bc = ({ tabPces }) => {
     if (accs.length === 0 ) {
       fetchAccessories();
     }
+    postReprise();
   }, []);
 
 
@@ -240,8 +242,7 @@ const Bc = ({ tabPces }) => {
 
 
   const patchAcc = async (access) => {
-    let endpointAccToPatch =
-      "https://back-xxx.monkey-soft.fr:54443/bcweb/pdt/"+access.id;
+    let endpointAccToPatch = "https://back-xxx.monkey-soft.fr:54443/bcweb/pdt/"+access.id;
     await axios.patch(
       endpointAccToPatch,
       access,
@@ -255,6 +256,24 @@ const Bc = ({ tabPces }) => {
       }
     );
   };
+
+  const postReprise = async() => {
+    let endpointReprise = "https://back-xxx.monkey-soft.fr:54443/bcweb/reprise/";
+    await axios.post(
+      endpointReprise,
+      JSON.stringify({
+        username: username,
+      }),
+      {
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+          Authorization: token,
+          appliname: appliname,
+          fingerprint: fingerprint,
+        },
+      }
+    );
+  }
 
   return (
     <View style={styles.container}>

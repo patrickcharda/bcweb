@@ -178,17 +178,17 @@ const pcesAccsReducer = (state = initialState, action) => {
       };
     case CHANGE_ACC_DATE:
       let currentDate = getFormatedDate();
-      console.log("DATE HEURE "+currentDate);
+      //console.log("DATE HEURE "+currentDate);
       let newTabAccs = cloneDeep(state.accs);
       let newTabAccsLoaded = cloneDeep(state.accsLoaded);
       let newTabAccsProp = cloneDeep(state.accsProp);
       let indexAcc = newTabAccs.findIndex(acc => acc.id === action.payload.id);
       
-      console.log('action.payload.id '+ action.payload.id);
+      //console.log('action.payload.id '+ action.payload.id);
       let indexAccLoaded = newTabAccsLoaded.findIndex(acc => acc.id === action.payload.id);
-      console.log("INDEX ACCS LOADED "+indexAccLoaded);
+      //console.log("INDEX ACCS LOADED "+indexAccLoaded);
       let indexAccProp = newTabAccsProp.findIndex(acc => acc.id === action.payload.id);
-      console.log("INDEX ACCS PROP "+indexAccProp);
+      //console.log("INDEX ACCS PROP "+indexAccProp);
       newTabAccs[indexAcc].pdt_date_web = currentDate;
       if (indexAccLoaded !== -1) {newTabAccsLoaded[indexAccLoaded].pdt_date_web = currentDate;}
       if (indexAccProp !== -1) {newTabAccsProp[indexAccProp].pdt_date_web = currentDate;}
