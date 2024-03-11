@@ -232,7 +232,7 @@ const Bc = ({ tabPces }) => {
       {
         headers: {
           "Content-Type": "application/json;charset=UTF-8",
-          Authorization: token,
+          Authorization: "Bearer "+token,
           appliname: appliname,
           fingerprint: fingerprint,
         },
@@ -249,7 +249,7 @@ const Bc = ({ tabPces }) => {
       {
         headers: {
           "Content-Type": "application/json;charset=UTF-8",
-          Authorization: token,
+          Authorization: "Bearer "+token,
           appliname: appliname,
           fingerprint: fingerprint,
         },
@@ -267,7 +267,7 @@ const Bc = ({ tabPces }) => {
       {
         headers: {
           "Content-Type": "application/json;charset=UTF-8",
-          Authorization: token,
+          Authorization: "Bearer "+token,
           appliname: appliname,
           fingerprint: fingerprint,
         },

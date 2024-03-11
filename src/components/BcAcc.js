@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import { changeAccQte } from "../redux/actions";
+import { changeAccQte, changeAccObservBc } from "../redux/actions";
 import * as React from "react";
 
 
@@ -20,19 +20,18 @@ const BcAcc = ( {accessoire, loaded} ) => {
   let acc = accessoire;
   let accJson = JSON.stringify(acc);
   const dispatch = useDispatch();
+  let observ = acc.pdt_observ_bc;
+
 
   const [modalVisible, setModalVisible] = React.useState(false);
-  const [text, setText] = React.useState("toto");
+  const [text, setText] = React.useState(observ);
   const [qte, setQte] = React.useState(acc.pdt_qte);
 
-  const handleConfirm = () => {
+  const handleConfirm = (id) => {
     // Handle the confirm action here
     console.log('Confirmed:', text);
-    /* let data = {
-      "piece": piece,
-      "texte": text,
-    }
-    dispatch(changePceObservBc(data)); */
+    let obj = {'id': id, 'observ': text}
+    dispatch(changeAccObservBc(obj));
     setModalVisible(false);
   };
 
@@ -83,7 +82,7 @@ const BcAcc = ( {accessoire, loaded} ) => {
                         placeholder='Saisissez le texte ici'
                         multiline
                       />
-                      <Button title="Confirm" onPress={handleConfirm} />
+                      <Button title="Confirm" onPress={() => handleConfirm(acc.id)} />
                       <Button title="Cancel" onPress={handleCancel} />
                     </ScrollView>
                   </View>

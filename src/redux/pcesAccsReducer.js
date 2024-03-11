@@ -19,6 +19,7 @@ import {
   LOAD_ACCS,
   CHANGE_ACC_QTE,
   CHANGE_ACC_DATE,
+  CHANGE_ACC_OBSERV_BC,
 } from "./actions";
 
 const initialState = {
@@ -55,7 +56,6 @@ const pcesAccsReducer = (state = initialState, action) => {
   switch (action.type) {
     case CHANGE_ACC_QTE:
       let obj = action.payload;
-      console.log("OBJ OBJ OBJ "+obj.id)
       let qte = obj.qte;
       let id = obj.id;
       let charge = obj.charge;
@@ -109,6 +109,31 @@ const pcesAccsReducer = (state = initialState, action) => {
         pcesProp: new_ArrayPcesProp,
         pcesOther: new_ArrayPcesOther,
         pces: new_ArrayPces,
+      }
+    case CHANGE_ACC_OBSERV_BC:
+      let obje = action.payload;
+      //console.log("OBJ OBJ OBJ "+obj.id)
+      let accObserv = obje.observ;
+      let accId = obje.id;
+
+      let newArrAccs = cloneDeep(state.accs);
+      let newArrLoadedAccs = cloneDeep(state.accsLoaded);
+      let newArrPropAccs = cloneDeep(state.accsProp);
+      const idxAccs = newArrAccs.findIndex(acc => acc.id === accId);
+      newArrAccs[idxAccs].pdt_observ_bc = accObserv;
+
+      const idxLoadedAccs = newArrLoadedAccs.findIndex(acc => acc.id === accId);
+      if (idxLoadedAccs !== -1) {
+        newArrLoadedAccs[idxLoadedAccs].pdt_observ_bc = accObserv;
+      } else {
+        const idxPropAccs = newArrPropAccs.findIndex(acc => acc.id === accId);
+        newArrPropAccs[idxPropAccs].pdt_observ_bc = accObserv;
+      }
+      return {
+        ...state, 
+        accsLoaded: newArrLoadedAccs,
+        accsProp: newArrPropAccs,
+        accs: newArrAccs,
       }
     case API_PENDING_PCES_ACCS:
       return {
