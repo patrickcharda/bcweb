@@ -18,6 +18,7 @@ import {
   LOAD_PROP_ACCS,
   LOAD_ACCS,
   CHANGE_ACC_QTE,
+  CHANGE_ACC_DATE,
 } from "./actions";
 
 const initialState = {
@@ -30,6 +31,25 @@ const initialState = {
   accsLoaded:[],
   accsProp:[],
 };
+
+const getFormatedDate = () => {
+  let dateMajBLModifie = new Date();
+  //formater la date pr la persister
+  let formatedDate =
+    dateMajBLModifie.getFullYear() +
+    "-" +
+    (dateMajBLModifie.getMonth() + 1) +
+    "-" +
+    dateMajBLModifie.getDate();
+  formatedDate +=
+    "T" +
+    dateMajBLModifie.getHours() +
+    ":" +
+    dateMajBLModifie.getMinutes() +
+    ":" +
+    dateMajBLModifie.getSeconds();
+  return formatedDate;
+}
 
 const pcesAccsReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -57,9 +77,6 @@ const pcesAccsReducer = (state = initialState, action) => {
         accsProp: newArrayPropAccs,
         accs: newArrayAccs,
       } 
-      /* return {
-        ...state,
-      } */
     case CHANGE_PCE_OBSERV_BC:
       let modifiedElement = Object.assign({},action.payload.piece);
       let observ= action.payload.texte;
@@ -93,8 +110,6 @@ const pcesAccsReducer = (state = initialState, action) => {
         pcesOther: new_ArrayPcesOther,
         pces: new_ArrayPces,
       }
-      
-        
     case API_PENDING_PCES_ACCS:
       return {
         ...state,
@@ -161,7 +176,28 @@ const pcesAccsReducer = (state = initialState, action) => {
           }
         }
       };
+    case CHANGE_ACC_DATE:
+      let currentDate = getFormatedDate();
+      console.log("DATE HEURE "+currentDate);
+      let newTabAccs = cloneDeep(state.accs);
+      let newTabAccsLoaded = cloneDeep(state.accsLoaded);
+      let newTabAccsProp = cloneDeep(state.accsProp);
+      let indexAcc = newTabAccs.findIndex(acc => acc.id === action.payload.id);
       
+      console.log('action.payload.id '+ action.payload.id);
+      let indexAccLoaded = newTabAccsLoaded.findIndex(acc => acc.id === action.payload.id);
+      console.log("INDEX ACCS LOADED "+indexAccLoaded);
+      let indexAccProp = newTabAccsProp.findIndex(acc => acc.id === action.payload.id);
+      console.log("INDEX ACCS PROP "+indexAccProp);
+      newTabAccs[indexAcc].pdt_date_web = currentDate;
+      if (indexAccLoaded !== -1) {newTabAccsLoaded[indexAccLoaded].pdt_date_web = currentDate;}
+      if (indexAccProp !== -1) {newTabAccsProp[indexAccProp].pdt_date_web = currentDate;}
+      return {
+        ...state,
+        accs: newTabAccs,
+        accsLoaded: newTabAccsLoaded,
+        accsProp: newTabAccsProp,
+      }
     case CHANGE_PCE_DATE:
       // récupérer la date du jour
       let dateMajBLModifie = new Date();

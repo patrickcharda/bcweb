@@ -4,10 +4,9 @@ import BcAcc from "./BcAcc";
 //import BcFooter from ".BcFooter";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { changePceDate, changePceLoadedDate, changePcePropDate, changePceOtherDate, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab, loadLoadedAccs, loadPropAccs, loadAccs } from "../redux/actions";
+import { changePceDate, changePceLoadedDate, changePcePropDate, changePceOtherDate, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab, loadLoadedAccs, loadPropAccs, loadAccs, changeAccDate } from "../redux/actions";
 import {
   ScrollView,
-  SafeAreaView,
   View,
   Text,
   StyleSheet,
@@ -172,6 +171,7 @@ const Bc = ({ tabPces }) => {
     pcesLoaded.map(pce => dispatch(changePceLoadedDate(pce)));
     pcesProp.map(pce => dispatch(changePcePropDate(pce)));
     pcesOther.map(pce => dispatch(changePceOtherDate(pce)));
+    
 
     // Tronçonner le tableau des pièces en tableaux de 500 pièces
     let sliced_tabs = []; // tableau de tableaux tronçons de 500 pièces
@@ -182,17 +182,69 @@ const Bc = ({ tabPces }) => {
 
     //màj les pces ds la bdd, tronçon de 500 par tronçon de 500
     for (let j = 0; j < sliced_tabs.length; j++) {
-      patch(sliced_tabs[j]);
+      patchBlocPces(sliced_tabs[j]);
+    }
+
+    if (accs.length > 0) {
+      accs.map(access => dispatch(changeAccDate(access)));
+      for (let access of accs) {
+        patchAcc(access);
+      }
     }
   };
+  
+  //const recordBc_11032024 = () => {
+    /*
+    Pour économiser de la bande passante et de la charge, on ne se base que sur le tableau pces chargées du state pour executer les appels api de mise à jour de la base de données 
+    Le traitement se fait toujours par lots, mais il y a moins de données (pièces) à traiter
+    */
+
+    /* mise à jour du champ date pour horodater l'enreg ds la bdd (champs pce_date_web) */
+
+    //pces.map(pce => dispatch(changePceDate(pce)));
+    //pcesLoaded.map(pce => dispatch(changePceLoadedDate(pce)));
+    //pcesProp.map(pce => dispatch(changePcePropDate(pce)));
+    //pcesOther.map(pce => dispatch(changePceOtherDate(pce)));
+    //accs.map(access => dispatch(changeAccDate(access)));
+
+    // Tronçonner le tableau des pièces en tableaux de 500 pièces
+    //let sliced_tabs = []; // tableau de tableaux tronçons de 500 pièces
+    //for (let i = 0; i < pces.length; i += 500) {
+    //  let chunk = pces.slice(i, i + 500);
+    //  sliced_tabs.push(chunk);
+    //}
+
+    //màj les pces ds la bdd, tronçon de 500 par tronçon de 500
+    //for (let j = 0; j < sliced_tabs.length; j++) {
+    //  patch(sliced_tabs[j]);
+    //}
+  //};
 
   /* fct enregistrement d'un ensemble/lot/bloc/tableau/tronçon de pièces   */
-  const patch = async (tabDePces) => {
+  const patchBlocPces = async (tabDePces) => {
     let endpointPcesToPatch =
       "https://back-xxx.monkey-soft.fr:54443/bcweb/pcestopatch/";
     await axios.patch(
       endpointPcesToPatch,
       tabDePces,
+      {
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+          Authorization: token,
+          appliname: appliname,
+          fingerprint: fingerprint,
+        },
+      }
+    );
+  };
+
+
+  const patchAcc = async (access) => {
+    let endpointAccToPatch =
+      "https://back-xxx.monkey-soft.fr:54443/bcweb/pdt/"+access.id;
+    await axios.patch(
+      endpointAccToPatch,
+      access,
       {
         headers: {
           "Content-Type": "application/json;charset=UTF-8",
