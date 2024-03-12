@@ -14,6 +14,7 @@ export const API_SUCCESS = "API_SUCCESS";
 export const API_ERROR = "API_ERROR";
 export const API_EMPTY_DATA = "API_EMPTY_DATA"
 export const API_PENDING_PCES_ACCS = "API_PENDING_PCES_ACCS"
+export const DEFINE_MESSAGE = "DEFINE_MESSAGE"
 
 //action's type for bc
 export const RECORD_SELECTED_BC = "RECORD_SELECTED_BC";
@@ -229,3 +230,8 @@ export const fetchError = (error) => ({
 export const apiEmptyData = () => ({
   type: API_EMPTY_DATA
 });
+
+export const defineMessage = (msg) => ({
+  type: DEFINE_MESSAGE,
+  payload: msg,
+})

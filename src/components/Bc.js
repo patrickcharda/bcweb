@@ -37,6 +37,25 @@ const Bc = ({ tabPces }) => {
 
   const bonChargement = useSelector((state) => state.bcReducer.bc);
 
+  const getFormatedDate = () => {
+    let dateMajBLModifie = new Date();
+    //formater la date pr la persister
+    let formatedDate =
+      dateMajBLModifie.getFullYear() +
+      "-" +
+      (dateMajBLModifie.getMonth() + 1) +
+      "-" +
+      dateMajBLModifie.getDate();
+    formatedDate +=
+      "T" +
+      dateMajBLModifie.getHours() +
+      ":" +
+      dateMajBLModifie.getMinutes() +
+      ":" +
+      dateMajBLModifie.getSeconds();
+    return formatedDate;
+  }
+
   /* recupération des listes de pièces du state */
   const pces = useSelector((state) => state.pcesAccsReducer.pces);
   const pcesLoaded = useSelector((state) => state.pcesAccsReducer.pcesLoaded);
@@ -160,7 +179,7 @@ const Bc = ({ tabPces }) => {
 
 
   /* fct enregistrement d'un bon de chargement   */
-  const recordBc = () => {
+  const recordBc = async() => {
     /*
     Pour économiser de la bande passante et de la charge, on ne se base que sur le tableau pces chargées du state pour executer les appels api de mise à jour de la base de données 
     Le traitement se fait toujours par lots, mais il y a moins de données (pièces) à traiter
@@ -186,13 +205,34 @@ const Bc = ({ tabPces }) => {
     for (let j = 0; j < sliced_tabs.length; j++) {
       patchBlocPces(sliced_tabs[j]);
     }
-
+    //màj les accessoires s'il y en a
     if (accs.length > 0) {
       accs.map(access => dispatch(changeAccDate(access)));
       for (let access of accs) {
         patchAcc(access);
       }
     }
+    //màj les observations du BC
+    let recordDate = getFormatedDate();
+    let reqBody = {
+      "bc_observ": bonChargement.bc_observ,
+      "bc_date_web": recordDate,
+      "bc_webuser": username,
+    }
+    await axios.patch(
+      "https://back-xxx.monkey-soft.fr:54443/bcweb/bc/"+bonChargement.bc_num,
+      JSON.stringify(reqBody),
+      {
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+          Authorization: "Bearer "+token,
+          appliname: appliname,
+          fingerprint: fingerprint,
+        },
+      }
+    );
+
+
   };
   
   //const recordBc_11032024 = () => {
@@ -293,7 +333,7 @@ const Bc = ({ tabPces }) => {
           </Text>
           <Text>{poids + " T"}</Text>
         </TouchableOpacity>
-        {isOpened && <BcHeader bc={bonChargement} />}
+        {isOpened && <BcHeader currentBc={bonChargement} />}
       </ScrollView>
       <ScrollView styles={styles.scrollableView2}>
         <TouchableOpacity onPress = {()=>{setIsLoadListOpen(!isLoadListOpen)}}>

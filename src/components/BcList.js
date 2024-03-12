@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import apiCall from "../redux/apiCall";
 import axios from 'axios';
-import { recordSelectedBc, purgePcesAccs, fetchPceSuccess, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab } from "../redux/actions";
+import { recordSelectedBc, purgePcesAccs, fetchPceSuccess, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab, defineMessage, apiEmptyData } from "../redux/actions";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Message from "./Message";
@@ -20,12 +20,14 @@ import * as Application from 'expo-application';
 
 const appliname = "bcweb";
 const fingerprint = Application.getAndroidId().toString()+Application.nativeBuildVersion+Device.deviceYearClass.toString();
-
+const DELAY_N_SECONDS = 2000;
+const NB_ITER = 5;
 
 const BcList = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [isOpen, setIsOpen] = React.useState(false);
+  const [refresh, setRefresh] = React.useState(0);
 
   const loading = useSelector((state) => state.apiReducer.loading);
   const token = useSelector((state) => state.tokenReducer.token);
@@ -47,14 +49,15 @@ const BcList = () => {
       .catch((error) => {
         console.error(error);
       });
-  }, []);
+  }, [refresh]);
 
 
-  const data = useSelector((state) => state.apiReducer.data.results);
+  let data = useSelector((state) => state.apiReducer.data.results);
 
   const error = JSON.stringify(useSelector((state) => state.apiReducer.error));
   
-  let bc = undefined;
+  //let bc = undefined;
+  let bc;
 
   /* const defineBc = async (selectedBc) => {
     bc = selectedBc;
@@ -99,14 +102,14 @@ const BcList = () => {
 
   const defineBc = async (selectedBc) => {
     bc = selectedBc;
-    console.log(
+    /* console.log(
       "THIS IS THE BC " +
         bc.url +
         " pces : " +
         bc.pieces[0] +
         " pdts : " +
         bc.produits[0]
-    );
+    ); */
     dispatch(recordSelectedBc(bc));
     dispatch(purgePcesAccs());
     await ouvrir(token, username, bc.bc_num);
@@ -114,11 +117,46 @@ const BcList = () => {
     let tabPces = await checkok(token, username, bc.bc_num); // récupère le tableau de tableaux des pièces chargées, proposées et autres
 
     if (tabPces != "" && tabPces != undefined && tabPces != null) {
-      console.log("Hey");
       navigation.navigate('Bc', { tabPces });
     } 
-    
   };
+
+  const reinit = async (selectedBC) => {
+    let bc_num = selectedBC.bc_num;
+    let msg = "bc_num to reinit "+bc_num;
+    dispatch(defineMessage(msg));
+    let body = {"username":username, "bc_num": bc_num};
+    let fermer = await reinitialiser(token, appliname, fingerprint, body);
+    let signalToGo = false;
+    if (fermer.data.message === "fermer") {
+      signalToGo = await checkOK();
+    }
+    if (signalToGo) {
+      msg = "La réinitialisation s'est bien déroulée";
+      dispatch(defineMessage(msg));
+      setRefresh(refresh + 1);
+    } else {
+      msg = "La réinitialisation ne s'est pas bien déroulée, merci de réessayer ultérieurement";
+      dispatch(defineMessage(msg));
+    }
+  }
+
+  const reinitialiser = async(token, appliname, fingerprint, body) => {
+    let fermer = await axios.post(
+      "https://back-xxx.monkey-soft.fr:54443/bcweb/fermer/",
+      JSON.stringify(body),
+      {
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+          "Authorization": "Bearer "+token,
+          "appliname": appliname,
+          "fingerprint": fingerprint,
+        },
+      }
+    );
+    console.log("fermer :" + JSON.stringify(fermer));
+    return fermer
+  }
   
   const ouvrir = async (token, username, bc_num ) => {   
     let tab = [];
@@ -273,7 +311,7 @@ const BcList = () => {
             {
             headers: {
               "Content-Type": "application/json;charset=UTF-8",
-              "Authorization": token,
+              "Authorization": 'Bearer '+token,
               "appliname": appliname,
               "fingerprint": fingerprint,
               },
@@ -347,6 +385,44 @@ const BcList = () => {
     return ("");
   }
  
+  const checkOK = async () => {
+    try {
+      let i = 0;
+      let signalToGo = false;
+      let response ="";
+      while ((i < NB_ITER) && (signalToGo==false)) {
+        await new Promise(resolve => setTimeout(resolve,DELAY_N_SECONDS));
+          response = await axios.post(
+          endpointCheckok,
+          JSON.stringify({
+            "username": username,
+            }),
+            {
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8",
+              "Authorization": 'Bearer '+token,
+              "appliname": appliname,
+              "fingerprint": fingerprint,
+              },
+            }
+          );
+        
+        if (response.data.message === "> ok") {
+          signalToGo = true;
+        }
+        i++;
+      }
+      if (signalToGo === true) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.log('error : '+error);
+      return false
+    }
+  }
+ 
   return (
     <ScrollView>
       <Message />
@@ -360,11 +436,25 @@ const BcList = () => {
           {isOpen &&
             data.map((bc, index) => (
               <TouchableOpacity onPress={() => defineBc(bc)} key={index}>
-                <Text>{bc.bc_num}</Text>
+                <Text>{bc.bc_num} | {bc.bc_statut}</Text>
               </TouchableOpacity>
             ))}
         </SafeAreaView>
       )}
+      <Text>--------</Text>
+      {loading ? (
+        <ActivityIndicator size="large" color="blue" />
+      ) : (
+        <SafeAreaView>
+          <Text>Réinitialiser un BC</Text>
+          {isOpen &&
+            data.map((BC, idx) => (
+              <TouchableOpacity onPress={() => reinit(BC)} key={idx}>
+                <Text>{BC.bc_num}</Text>
+              </TouchableOpacity>
+            ))}
+        </SafeAreaView>
+      )}        
     </ScrollView>
   );
 };

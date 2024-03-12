@@ -3,13 +3,38 @@ import {
   SafeAreaView,
   Text,
   StyleSheet,
+  Modal,
+  Button,
+  TextInput,
+  ScrollView,
 } from "react-native";
 import * as React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { recordSelectedBc } from "../redux/actions";
 
-const BcHeader = ({ bc }) => {
+const BcHeader = ({ currentBc }) => {
 
-  //const bcJSON = JSON.stringify(useSelector((state) => state.bcReducer.bc));
+  let bc = currentBc;
+  const dispatch = useDispatch();
+
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [text, setText] = React.useState(bc.bc_observ);
+
+  const handleConfirm = (bc) => {
+    // Handle the confirm action here
+    console.log('OBSERVATIONS BC ', text);
+    const updatedBc = { ...bc, bc_observ: text };
+    dispatch(recordSelectedBc(updatedBc));
+    setModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    // Handle the cancel action here
+    console.log('Cancelled');
+    setModalVisible(false);
+  };
+
+
   return (
 
         <SafeAreaView>
@@ -21,7 +46,36 @@ const BcHeader = ({ bc }) => {
             <Text>{"Date Chargt prev: "+bc.bc_date_chargement_prev}</Text>
             <Text>{"Date Livr prev: "+bc.bc_date_livraison_prev}</Text>
             <Text>{"Transporteur: "+bc.bc_transporteur}</Text>
+            <Text>{"Statut: "+bc.bc_statut}</Text>
             <Text>{"Observations: "+bc.bc_observ}</Text>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={handleCancel}
+              >
+                <View style={styles.centeredView}>
+                  <View style={styles.modalView}>
+                    <ScrollView>
+                      <TextInput
+                        style={{ height: 120, borderColor: 'gray', borderWidth: 1, textAlignVertical: 'top', textAlign: 'left' }}
+                        onChangeText={setText}
+                        value={text}
+                        placeholder='Saisissez le texte ici'
+                        multiline
+                      />
+                      <Button title="Confirm" onPress={() => {handleConfirm(bc)}} />
+                      <Button title="Cancel" onPress={() => handleCancel()} />
+                    </ScrollView>
+                  </View>
+                </View>
+              </Modal>
+              <Button
+                title="Show Modal - Edition"
+                onPress={() => {
+                  setModalVisible(true);
+                }}
+              />
             <Text></Text>
         </SafeAreaView>
     
@@ -31,7 +85,7 @@ const BcHeader = ({ bc }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#e88",
+    backgroundColor: "#aaa",
     color: "#bdc3c7",
   },
   toolbar: {
@@ -63,6 +117,27 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 3,
     marginBottom: 30,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
 

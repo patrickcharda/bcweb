@@ -1,4 +1,4 @@
-import { API_PENDING, API_SUCCESS, API_ERROR, API_EMPTY_DATA } from "./actions";
+import { API_PENDING, API_SUCCESS, API_ERROR, API_EMPTY_DATA, DEFINE_MESSAGE } from "./actions";
 
 const initialState = { 
     loading: false,
@@ -31,6 +31,11 @@ const apiReducer = (state=initialState, action) => {
             return {
                 ...state,
                 data:'',
+            }
+        case DEFINE_MESSAGE:
+            return {
+                ...state,
+                message: action.payload,
             }
         default:
             return state;
