@@ -55,8 +55,7 @@ const BcList = () => {
       .catch((error) => {
         console.error(error);
       });
-  }, [refresh]);
-
+  }, [refresh, lastEditedBc]);
 
   let data = useSelector((state) => state.apiReducer.data.results);
 
@@ -65,46 +64,7 @@ const BcList = () => {
   //let bc = undefined;
   let bc;
 
-  /* const defineBc = async (selectedBc) => {
-    bc = selectedBc;
-    console.log(
-      "THIS IS THE BC " +
-        bc.url +
-        " pces : " +
-        bc.pieces[0] +
-        " pdts : " +
-        bc.produits[0]
-    );
-    dispatch(recordSelectedBc(bc));
-    dispatch(purgePcesAccs());
-    await ouvrir(token, username, bc.bc_num);
-    await checkok(token, username, bc.bc_num);
-    getPieces(bc.pieces);
-  }; */
 
-  /* const defineBc = async (selectedBc) => {
-    bc = selectedBc;
-    console.log(
-      "THIS IS THE BC " +
-        bc.url +
-        " pces : " +
-        bc.pieces[0] +
-        " pdts : " +
-        bc.produits[0]
-    );
-    dispatch(recordSelectedBc(bc));
-    dispatch(purgePcesAccs());
-    await ouvrir(token, username, bc.bc_num);
-    let tabPces = await checkok(token, username, bc.bc_num);
-    console.log("type of tabPces : "+typeof(tabPces));
-    //console.log("TABLEAU DE PCES "+JSON.stringify(tabPces));
-    if (tabPces != "" && tabPces != undefined && tabPces != null) {
-      console.log("Hey");
-      await getPieces(tabPces);
-    } 
-    //appeler écran BCScreen
-    navigation.navigate('Bc');
-  }; */
 
   const defineBc = async (selectedBc) => {
     bc = selectedBc;
@@ -453,6 +413,7 @@ const BcList = () => {
               </View>
             </Modal>
       }
+      <Button title="refresh" onPress={() => {setRefresh(refresh +1)}} />
     </ScrollView>
   );
 };

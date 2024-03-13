@@ -2,9 +2,9 @@ import BcList from '../BcList';
 //import { CommonActions } from '@react-navigation/native';
 import LogoutButton from '../LogoutButton';
 import BcLast from '../BcLast';
-import { SafeAreaView, BackHandler, Button, View } from 'react-native';
+import { BackHandler, Button, View } from 'react-native';
 
-const BcListScreen = ({ navigation }) => {
+const BcListScreen = () => {
     return (
         <>
             <View>

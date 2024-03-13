@@ -17,6 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 
 const BcLast = () => {
   
+  //const lastEditedBc = useSelector((state) => state.bcReducer.bc);
   const lastEditedBc = useSelector((state) => state.bcReducer.bc);
   const navigation = useNavigation();
   const isBcEmpty = Object.keys(lastEditedBc).length === 0;

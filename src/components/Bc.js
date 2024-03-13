@@ -4,7 +4,7 @@ import BcAcc from "./BcAcc";
 //import BcFooter from ".BcFooter";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { changePceDate, changePceLoadedDate, changePcePropDate, changePceOtherDate, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab, loadLoadedAccs, loadPropAccs, loadAccs, changeAccDate } from "../redux/actions";
+import { defineMessage, changePceDate, changePceLoadedDate, changePcePropDate, changePceOtherDate, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab, loadLoadedAccs, loadPropAccs, loadAccs, changeAccDate, purgeBc, purgePcesAccs } from "../redux/actions";
 import {
   ScrollView,
   View,
@@ -12,7 +12,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   Button,
+  Modal,
+  SafeAreaView,
 } from "react-native";
+import { useNavigation } from '@react-navigation/native';
 import * as Device from "expo-device";
 import * as Application from "expo-application";
 import axios from "axios";
@@ -34,7 +37,8 @@ const Bc = ({ tabPces }) => {
   const [isOtherListOpen, setIsOtherListOpen] = React.useState(true);
   const [isLoadAccsOpen, setIsLoadAccsOpen] = React.useState(true);
   const [isPropAccsOpen, setIsPropAccsOpen] = React.useState(true);
-
+  const [modalReinitVisible, setModalReinitVisible] = React.useState(false);
+  const navigation = useNavigation();
   const bonChargement = useSelector((state) => state.bcReducer.bc);
 
   const getFormatedDate = () => {
@@ -235,33 +239,6 @@ const Bc = ({ tabPces }) => {
 
   };
   
-  //const recordBc_11032024 = () => {
-    /*
-    Pour économiser de la bande passante et de la charge, on ne se base que sur le tableau pces chargées du state pour executer les appels api de mise à jour de la base de données 
-    Le traitement se fait toujours par lots, mais il y a moins de données (pièces) à traiter
-    */
-
-    /* mise à jour du champ date pour horodater l'enreg ds la bdd (champs pce_date_web) */
-
-    //pces.map(pce => dispatch(changePceDate(pce)));
-    //pcesLoaded.map(pce => dispatch(changePceLoadedDate(pce)));
-    //pcesProp.map(pce => dispatch(changePcePropDate(pce)));
-    //pcesOther.map(pce => dispatch(changePceOtherDate(pce)));
-    //accs.map(access => dispatch(changeAccDate(access)));
-
-    // Tronçonner le tableau des pièces en tableaux de 500 pièces
-    //let sliced_tabs = []; // tableau de tableaux tronçons de 500 pièces
-    //for (let i = 0; i < pces.length; i += 500) {
-    //  let chunk = pces.slice(i, i + 500);
-    //  sliced_tabs.push(chunk);
-    //}
-
-    //màj les pces ds la bdd, tronçon de 500 par tronçon de 500
-    //for (let j = 0; j < sliced_tabs.length; j++) {
-    //  patch(sliced_tabs[j]);
-    //}
-  //};
-
   /* fct enregistrement d'un ensemble/lot/bloc/tableau/tronçon de pièces   */
   const patchBlocPces = async (tabDePces) => {
     let endpointPcesToPatch =
@@ -313,6 +290,98 @@ const Bc = ({ tabPces }) => {
         },
       }
     );
+  }
+
+  const reinit = async (bonChargement) => {
+    let bc_num = bonChargement.bc_num;
+    let msg = "bc_num to reinit "+bc_num;
+    dispatch(defineMessage(msg));
+    let body = {"username":username, "bc_num": bc_num};
+    let fermer = await reinitialiser(token, appliname, fingerprint, body);
+    let signalToGo = false;
+    if (fermer.data.message === "fermer") {
+      signalToGo = await checkOK();
+    }
+    if (signalToGo) {
+      msg = "La réinitialisation s'est bien déroulée";
+      dispatch(defineMessage(msg));
+      setRefresh(refresh + 1);
+    } else {
+      msg = "La réinitialisation ne s'est pas bien déroulée, merci de réessayer ultérieurement";
+      dispatch(defineMessage(msg));
+    }
+  }
+
+  const reinitialiser = async(token, appliname, fingerprint, body) => {
+    let fermer = await axios.post(
+      "https://back-xxx.monkey-soft.fr:54443/bcweb/fermer/",
+      JSON.stringify(body),
+      {
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+          "Authorization": "Bearer "+token,
+          "appliname": appliname,
+          "fingerprint": fingerprint,
+        },
+      }
+    );
+    console.log("fermer :" + JSON.stringify(fermer));
+    return fermer
+  }
+
+  const checkOK = async () => {
+    try {
+      let i = 0;
+      let signalToGo = false;
+      let response ="";
+      while ((i < NB_ITER) && (signalToGo==false)) {
+        await new Promise(resolve => setTimeout(resolve,DELAY_N_SECONDS));
+          response = await axios.post(
+          endpointCheckok,
+          JSON.stringify({
+            "username": username,
+            }),
+            {
+            headers: {
+              "Content-Type": "application/json;charset=UTF-8",
+              "Authorization": 'Bearer '+token,
+              "appliname": appliname,
+              "fingerprint": fingerprint,
+              },
+            }
+          );
+        
+        if (response.data.message === "> ok") {
+          signalToGo = true;
+        }
+        i++;
+      }
+      if (signalToGo === true) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.log('error : '+error);
+      return false
+    }
+  };
+
+  const handleReinitCancel = () => {
+    // Handle the cancel action here
+    setModalReinitVisible(false);
+  };
+
+  const handleReinitConfirm = (bonChargement) => {
+    // Handle the confirm action here
+    console.log("CURRENT BC "+JSON.stringify(bonChargement));
+    reinit(bonChargement);
+    // si le bc reinitialisé est celui sur lequel on travaillait on réinitialise le state
+
+    dispatch(purgeBc());
+    dispatch(purgePcesAccs());
+    setModalReinitVisible(false);
+    navigation.navigate('BcList', { key: Math.random() });
   }
 
   return (
@@ -374,6 +443,26 @@ const Bc = ({ tabPces }) => {
         ))}
         <Button onPress={() => recordBc()} title="Enregistrer"></Button>
         <Text>{"\n\n"}</Text>
+        <Button title="Réinitialiser" onPress={() => {setModalReinitVisible(true);}} />
+      { modalReinitVisible &&
+              <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalReinitVisible}
+              onRequestClose={handleReinitCancel}
+            >
+              <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                      <Text>REINITIALISER</Text>
+                      <Text>ATTENTION, en réinitialisant le BC, vous perdrez toutes les données non validées.
+                        Réinitialiser un BC revient à le récupérer tel qu'il se trouve actuellement dans l'application BTSystem - BTLivraison.
+                      </Text>
+                      <Button title="Confirm" onPress={() => {handleReinitConfirm(bonChargement)}} />
+                      <Button title="Cancel" onPress={handleReinitCancel}/>
+                </View>
+              </View>
+            </Modal>
+      }
       </ScrollView>
     </View>
   );
