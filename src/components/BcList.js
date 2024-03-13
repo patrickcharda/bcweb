@@ -32,6 +32,7 @@ const BcList = () => {
   const [isReinitOpen, setIsReinitOpen] = React.useState(false);
   const [refresh, setRefresh] = React.useState(0);
   const [modalVisible, setModalVisible] = React.useState(false);
+  const [modalActualiserVisible, setModalActualiserVisible] = React.useState(false);
   const [currentBC, setCurrentBC] = React.useState(null);
 
   const loading = useSelector((state) => state.apiReducer.loading);
@@ -192,7 +193,6 @@ const BcList = () => {
 
   const handleCancel = () => {
     // Handle the cancel action here
-    console.log('Cancelled');
     setModalVisible(false);
   };
   /* cette version de checkok n'attend pas que le ok de l'automate wib, elle récupère aussi ttes les pièces du Bc et les retourne ds un tableau*/
@@ -289,7 +289,7 @@ const BcList = () => {
     //console.log('data : '+JSON.stringify(data));
     console.log('error : '+error);
     return ("");
-  }
+  };
  
   /* version atomique de la fonction qui permet de checker une commande > ok en provenance de wib*/
   const checkOK = async () => {
@@ -328,8 +328,47 @@ const BcList = () => {
       console.log('error : '+error);
       return false
     }
-  }
+  };
+
+  const handleActuConfirm = async () => {
+    console.log("Updated");
+
+    let body = {"username":username};
+    let result = await axios.post(
+      "https://back-xxx.monkey-soft.fr:54443/bcweb/actualiser/",
+      JSON.stringify(body),
+      {
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+          "Authorization": "Bearer "+token,
+          "appliname": appliname,
+          "fingerprint": fingerprint,
+        },
+      }
+    );
+    console.log("RESULTAT ACTUALISER "+JSON.stringify(result));
+    let acquittement;
+    if (result.data.message === "ok") {
+      //console.log("pioupiou");
+      acquittement = await checkOK();
+    }
+    let msg;
+    if (acquittement) {
+      msg = "L'actualisation des BC s'est bien déroulée"
+    } else {
+      msg = "L'actualisation des BC ne s'est pas déroulée normalement. Veuillez réessayer ultérieurement"
+    }
+    dispatch(defineMessage(msg));
+    setModalActualiserVisible(false);
+    setRefresh(refresh + 1);
+  };
  
+  const handleActuCancel = () => {
+    // Handle the cancel action here
+    console.log('Cancelled');
+    setModalActualiserVisible(false);
+  };
+
   return (
     <ScrollView>
       <Message />
@@ -394,7 +433,26 @@ const BcList = () => {
         </SafeAreaView>
         
       )} 
-             
+      <Button title="Actualiser" onPress={() => {setModalActualiserVisible(true);}} />
+      { modalActualiserVisible &&
+              <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalActualiserVisible}
+              onRequestClose={handleActuCancel}
+            >
+              <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                      <Text>ACTUALISER</Text>
+                      <Text>Voulez-vous actualiser la liste des bons de chargement dont le statut n'est pas "en cours" ? 
+                        (pour retirer le statut en cours d'un bon de chargement vous devez le réinitialiser - vous perdrez alors les modifications éventuelles le concernant - ou le valider)
+                      </Text>
+                      <Button title="Confirm" onPress={handleActuConfirm} />
+                      <Button title="Cancel" onPress={handleActuCancel}/>
+                </View>
+              </View>
+            </Modal>
+      }
     </ScrollView>
   );
 };
