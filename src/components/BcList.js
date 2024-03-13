@@ -27,6 +27,7 @@ const BcList = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const [isOpen, setIsOpen] = React.useState(false);
+  const [isReinitOpen, setIsReinitOpen] = React.useState(false);
   const [refresh, setRefresh] = React.useState(0);
 
   const loading = useSelector((state) => state.apiReducer.loading);
@@ -290,6 +291,7 @@ const BcList = () => {
     return ("");
   } */
 
+  /* cette version de checkok n'attend pas que le ok de l'automate wib, elle récupère aussi ttes les pièces du Bc et les retourne ds un tableau*/
   const checkok = async (token, username, bc_number) => {
     let tabl = [];
     tabl.push(username);
@@ -385,6 +387,7 @@ const BcList = () => {
     return ("");
   }
  
+  /* version atomique de la fonction qui permet de checker une commande > ok en provenance de wib*/
   const checkOK = async () => {
     try {
       let i = 0;
@@ -426,12 +429,14 @@ const BcList = () => {
   return (
     <ScrollView>
       <Message />
+      <Text>--------</Text>
+      <Text>Sélectionner un BC</Text>
       {loading ? (
         <ActivityIndicator size="large" color="red" />
       ) : (
         <SafeAreaView>
           <TouchableOpacity onPress={() => setIsOpen(!isOpen)}>
-            <Text>{isOpen ? "Close Dropdown" : "Open Dropdown"}</Text>
+            <Text>{isOpen ? "Fermer la liste" : "Ouvrir la liste"}</Text>
           </TouchableOpacity>
           {isOpen &&
             data.map((bc, index) => (
@@ -442,15 +447,20 @@ const BcList = () => {
         </SafeAreaView>
       )}
       <Text>--------</Text>
+      <Text>--------</Text>
+      <Text>Réinitialiser un BC</Text>
+      
       {loading ? (
         <ActivityIndicator size="large" color="blue" />
       ) : (
-        <SafeAreaView>
-          <Text>Réinitialiser un BC</Text>
-          {isOpen &&
+        <SafeAreaView> 
+          <TouchableOpacity onPress={() => setIsReinitOpen(!isReinitOpen)}>
+            <Text>{isReinitOpen ? "Fermer la liste" : "Ouvrir la liste"}</Text>
+          </TouchableOpacity>
+          {isReinitOpen &&
             data.map((BC, idx) => (
               <TouchableOpacity onPress={() => reinit(BC)} key={idx}>
-                <Text>{BC.bc_num}</Text>
+                <Text>{BC.bc_num} | {BC.bc_statut}</Text>
               </TouchableOpacity>
             ))}
         </SafeAreaView>
