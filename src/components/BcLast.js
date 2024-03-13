@@ -26,10 +26,14 @@ const BcLast = () => {
   const pcesLoaded = useSelector((state) => state.pcesAccsReducer.pcesLoaded);
   const pcesProp = useSelector((state) => state.pcesAccsReducer.pcesProp);
   const pcesOther = useSelector((state) => state.pcesAccsReducer.pcesOther);
-  const tabPces = [];
-  tabPces.push(pcesLoaded, pcesProp, pcesOther);
+  /* const tabPces = [];
+  tabPces.push(pcesLoaded, pcesProp, pcesOther); */
+  const tabPces = React.useMemo(() => [pcesLoaded, pcesProp, pcesOther], [pcesLoaded, pcesProp, pcesOther]);
 
-  const openBc = (tabPces) => {
+  /* const openBc = (tabPces) => {
+    navigation.navigate('Bc', { tabPces });
+  }; */
+  const openBc = () => {
     navigation.navigate('Bc', { tabPces });
   };
 

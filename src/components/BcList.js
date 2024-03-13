@@ -6,10 +6,12 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  Modal,
+  Button,
 } from "react-native";
 import apiCall from "../redux/apiCall";
 import axios from 'axios';
-import { recordSelectedBc, purgePcesAccs, fetchPceSuccess, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab, defineMessage, apiEmptyData } from "../redux/actions";
+import { recordSelectedBc, purgePcesAccs, fetchPceSuccess, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab, defineMessage, apiEmptyData, purgeBc } from "../redux/actions";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Message from "./Message";
@@ -29,11 +31,13 @@ const BcList = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isReinitOpen, setIsReinitOpen] = React.useState(false);
   const [refresh, setRefresh] = React.useState(0);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [currentBC, setCurrentBC] = React.useState(null);
 
   const loading = useSelector((state) => state.apiReducer.loading);
   const token = useSelector((state) => state.tokenReducer.token);
   const username = useSelector((state) => state.tokenReducer.username);
-
+  const lastEditedBc = useSelector((state) => state.bcReducer.bc);
 
   const NB_ITER = 5;
   const DELAY_N_SECONDS = 2000;
@@ -174,123 +178,23 @@ const BcList = () => {
     }
   }
 
-  /* const checkok = async (token, username) => {
-    let tabl = [];
-    tabl.push(username);
-    
-    try {
-      //si un bl est sélectionné ds la liste déroulante, mettre en pause pour pouvoir charger les données
-
-      let i = 0;
-      let signalToGo = false;
-      let result_checkok ="";
-      while ((i < NB_ITER) && (signalToGo==false)) {
-        await new Promise(resolve => setTimeout(resolve,DELAY_N_SECONDS));
-        dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/checkok/", token, tabl));
-        //const dataResponse = useSelector((state) => state.apiReducer.data);
-        console.log("command checkok ... ...");
-        console.log('data : '+JSON.stringify(data));
-        console.log('error : '+error);
-        /* if (data.count > 0) {
-          signalToGo = true;
-          console.log('it is true');
-        } 
-        i++;
-      }
-    } catch (error) {
-      console.log('error : '+error);
+  const handleConfirm = (currentBC) => {
+    // Handle the confirm action here
+    console.log("CURRENT BC "+currentBC);
+    reinit(currentBC);
+    // si le bc reinitialisé est celui sur lequel on travaillait on réinitialise le state
+    if (lastEditedBc !== undefined && lastEditedBc.bc_num == currentBC.bc_num) {
+      dispatch(purgeBc());
+      dispatch(purgePcesAccs());
     }
-    console.log('data : '+JSON.stringify(data));
-    console.log('error : '+error);
-    return ("");
-  } */
+    setModalVisible(false);
+  };
 
-  /* const checkok = async (token, username, bc_number) => {
-    let tabl = [];
-    tabl.push(username);
-    let pceLignes = [];
-    try {
-      //si un bl est sélectionné ds la liste déroulante, mettre en pause pour pouvoir charger les données
-
-      let i = 0;
-      let signalToGo = false;
-      let response ="";
-      while ((i < NB_ITER) && (signalToGo==false)) {
-        await new Promise(resolve => setTimeout(resolve,DELAY_N_SECONDS));
-          response = await axios.post(
-          endpointCheckok,
-          JSON.stringify({
-            username: username,
-            }),
-            {
-            headers: {
-              "Content-Type": "application/json;charset=UTF-8",
-              "Authorization": token,
-              "appliname": appliname,
-              "fingerprint": fingerprint,
-              },
-            }
-          );
-        
-        //console.log("REPONSE DATA CHECKOK "+ response.data.message);
-        if (response.data.message === "> ok") {
-          signalToGo = true;
-          //console.log("SIGNALTOGO "+signalToGo);
-        }
-        i++;
-      }
-      let pcesDuBc;
-      if (signalToGo === true) {
-        pcesDuBc = await axios.get(
-          "https://back-xxx.monkey-soft.fr:54443/bcweb/pcesdubc/"+bc_number,
-          {
-            headers: {
-              "Content-Type": "application/json;charset=UTF-8",
-              "Authorization": token,
-              "appliname": appliname,
-              "fingerprint": fingerprint,
-              },
-            }
-        );
-        console.log(bc_number);
-        //console.log("COUNT COUNT "+JSON.stringify(pcesDuBc));
-        //console.log("COUNT COUNT "+JSON.stringify(pcesDuBc.data));
-
-        //let pceLignes = [];
-        pcesDuBc.data.results.forEach((element, index, array) => {
-          pceLignes.push(element);
-        });
-        //console.log("NEXT NEXT "+pcesDuBc.data.next);
-        while (pcesDuBc.data.next !== null) {
-          pcesDuBc = await axios.get(
-            pcesDuBc.data.next,
-            {
-              headers: {
-                "Content-Type": "application/json;charset=UTF-8",
-                "Authorization": token,
-                "appliname": appliname,
-                "fingerprint": fingerprint,
-                },
-              }
-          );
-          pcesDuBc.data.results.forEach((element, index, array) => {
-            pceLignes.push(element);
-          });
-        }
-      //console.log("RESULTAT "+pcesDuBc.data.results);
-      //console.log("PCElIGNES "+JSON.stringify(pceLignes)+"COCO");
-      return pceLignes;
-      }
-
-
-    } catch (error) {
-      console.log('error : '+error);
-    }
-    //console.log('data : '+JSON.stringify(data));
-    console.log('error : '+error);
-    return ("");
-  } */
-
+  const handleCancel = () => {
+    // Handle the cancel action here
+    console.log('Cancelled');
+    setModalVisible(false);
+  };
   /* cette version de checkok n'attend pas que le ok de l'automate wib, elle récupère aussi ttes les pièces du Bc et les retourne ds un tableau*/
   const checkok = async (token, username, bc_number) => {
     let tabl = [];
@@ -446,10 +350,11 @@ const BcList = () => {
             ))}
         </SafeAreaView>
       )}
+
       <Text>--------</Text>
       <Text>--------</Text>
-      <Text>Réinitialiser un BC</Text>
-      
+
+      <Text>Réinitialiser un BC</Text>  
       {loading ? (
         <ActivityIndicator size="large" color="blue" />
       ) : (
@@ -457,17 +362,80 @@ const BcList = () => {
           <TouchableOpacity onPress={() => setIsReinitOpen(!isReinitOpen)}>
             <Text>{isReinitOpen ? "Fermer la liste" : "Ouvrir la liste"}</Text>
           </TouchableOpacity>
-          {isReinitOpen &&
+          { isReinitOpen &&
             data.map((BC, idx) => (
-              <TouchableOpacity onPress={() => reinit(BC)} key={idx}>
+              <SafeAreaView>
+                <TouchableOpacity onPress={() => {setModalVisible(true); setCurrentBC(BC);}} key={idx}>
                 <Text>{BC.bc_num} | {BC.bc_statut}</Text>
-              </TouchableOpacity>
-            ))}
+                </TouchableOpacity>
+              </SafeAreaView>
+            ))
+          }
+          { modalVisible &&
+              <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalVisible}
+              onRequestClose={handleCancel}
+            >
+              <View style={styles.centeredView}>
+                <View style={styles.modalView}>
+                      <Text>{currentBC.bc_num}</Text>
+                      <Text>ATTENTION, en réinitialisant le BC, vous perdrez toutes les données non validées.
+                        Réinitialiser un BC revient à le récupérer tel qu'il se trouve actuellement dans l'application BTSystem - BTLivraison.
+                      </Text>
+                      <Button title="Confirm" onPress={() => {handleConfirm(currentBC)}} />
+                      <Button title="Cancel" onPress={handleCancel}/>
+                </View>
+              </View>
+            </Modal>
+          }
+            
         </SafeAreaView>
-      )}        
+        
+      )} 
+             
     </ScrollView>
   );
 };
+
+/* const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#aaa",
+    color: "#bdc3c7",
+  },
+  toolbar: {
+    backgroundColor: "#3498db",
+    color: "#fff",
+    textAlign: "center",
+    padding: 25,
+    fontSize: 20,
+  },
+  content: {
+    flex: 1,
+    padding: 10,
+  },
+  preview: {
+    backgroundColor: "#bdc3c7",
+    flex: 1,
+    height: 500,
+  },
+  input: {
+    backgroundColor: "#ecf0f1",
+    borderRadius: 3,
+    height: 40,
+    padding: 5,
+    marginBottom: 10,
+    flex: 1,
+  },
+  button: {
+    backgroundColor: "#3498db",
+    padding: 10,
+    borderRadius: 3,
+    marginBottom: 30,
+  },
+}); */
 
 const styles = StyleSheet.create({
   container: {
@@ -504,6 +472,27 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 3,
     marginBottom: 30,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
 
