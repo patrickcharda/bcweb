@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-import { changeAccQte, changeAccObservBc } from "../redux/actions";
+import { changeAccQte, changeAccObservBc, changeLoadAcc } from "../redux/actions";
 import * as React from "react";
 
 
@@ -21,7 +21,6 @@ const BcAcc = ( {accessoire, loaded} ) => {
   let accJson = JSON.stringify(acc);
   const dispatch = useDispatch();
   let observ = acc.pdt_observ_bc;
-
 
   const [modalVisible, setModalVisible] = React.useState(false);
   const [text, setText] = React.useState(observ);
@@ -100,7 +99,7 @@ const BcAcc = ( {accessoire, loaded} ) => {
             </View>
           </SafeAreaView>
           <Button
-          title={loaded ? "Unload" : "Load"}
+          title={loaded ? "Unload" : "Load"} onPress={() => dispatch(changeLoadAcc(acc.id))}
           ></Button>
           <Text></Text>
         </SafeAreaView>

@@ -20,6 +20,7 @@ import {
   CHANGE_ACC_QTE,
   CHANGE_ACC_DATE,
   CHANGE_ACC_OBSERV_BC,
+  CHANGE_LOAD_ACC,
 } from "./actions";
 
 const initialState = {
@@ -76,6 +77,31 @@ const pcesAccsReducer = (state = initialState, action) => {
         accsLoaded: newArrayLoadedAccs,
         accsProp: newArrayPropAccs,
         accs: newArrayAccs,
+      } 
+    case CHANGE_LOAD_ACC:
+      let acc_id = action.payload;
+      let aNewArrayAccs = cloneDeep(state.accs);
+      let aNewArrayLoadedAccs = cloneDeep(state.accsLoaded);
+      let aNewArrayPropAccs = cloneDeep(state.accsProp);
+      const idexAccs = aNewArrayAccs.findIndex(acc => acc.id == acc_id);
+      let pdtCharge = aNewArrayAccs[idexAccs].pdt_charge; // reference ancien etat
+      aNewArrayAccs[idexAccs].pdt_charge = !pdtCharge; // etat modifié
+      let updatedPdt = aNewArrayAccs[idexAccs]; // pdt actualisé
+      if (pdtCharge) {
+        const idexLoadedAcc = aNewArrayLoadedAccs.findIndex(acc => acc.id == acc_id);
+        aNewArrayLoadedAccs[idexLoadedAcc].pdt_charge = !pdtCharge;
+        aNewArrayLoadedAccs.splice(idexLoadedAcc,1); // on retire l'ancien élément
+        aNewArrayPropAccs.push(updatedPdt); // on rajoute le nouveau
+      } else {
+        const idexPropAcc = aNewArrayPropAccs.findIndex(acc => acc.id == acc_id);
+        aNewArrayPropAccs.splice(idexPropAcc,1); // on retire l'ancien élément
+        aNewArrayLoadedAccs.push(updatedPdt); // on rajoute le nouveau
+      }
+      return {
+        ...state, 
+        accsLoaded: aNewArrayLoadedAccs,
+        accsProp: aNewArrayPropAccs,
+        accs: aNewArrayAccs,
       } 
     case CHANGE_PCE_OBSERV_BC:
       let modifiedElement = Object.assign({},action.payload.piece);

@@ -39,8 +39,16 @@ export const LOAD_ACCS = "LOAD_ACCS";
 export const CHANGE_ACC_QTE = "CHANGE_ACC_QTE";
 export const CHANGE_ACC_DATE = "CHANGE_ACC_DATE";
 export const CHANGE_ACC_OBSERV_BC = "CHANGE_ACC_OBSERV_BC";
+export const CHANGE_LOAD_ACC = "CHANGE_LOAD_ACC";
 
 //action creators for API to get pces and accs
+export const changeLoadAcc = (id) => {
+  return { 
+    type: CHANGE_LOAD_ACC,
+    payload: id,
+  }
+}
+
 export const changeAccQte = (obj) => {
   return {
     type: CHANGE_ACC_QTE,

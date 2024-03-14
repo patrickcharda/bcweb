@@ -442,10 +442,12 @@ const Bc = ({ tabPces }) => {
           accsProp.map((acc) => (
           <BcAcc key={acc.id} accessoire={acc} loaded={false} />
         ))}
+      </ScrollView>
+      <View>
         <Button onPress={() => recordBc()} title="Enregistrer"></Button>
         <Text>{"\n\n"}</Text>
         <Button title="Réinitialiser" onPress={() => {setModalReinitVisible(true);}} />
-      { modalReinitVisible &&
+        { modalReinitVisible &&
               <Modal
               animationType="slide"
               transparent={true}
@@ -463,8 +465,8 @@ const Bc = ({ tabPces }) => {
                 </View>
               </View>
             </Modal>
-      }
-      </ScrollView>
+        }
+      </View>
     </View>
   );
 };
