@@ -238,6 +238,32 @@ const Bc = ({ tabPces }) => {
 
 
   };
+
+  const valideBc = async() => {
+    await recordBc();
+    await valider();
+    await checkOK();
+    navigation.goBack();
+  }
+
+  const valider = async() => {
+    let endpointValider = "https://back-xxx.monkey-soft.fr:54443/bcweb/valider/";
+    await axios.post(
+      endpointValider,
+      JSON.stringify({
+        "username": username,
+        "bc_num": bonChargement.bc_num,
+      }),
+      {
+        headers: {
+          "Content-Type": "application/json;charset=UTF-8",
+          Authorization: "Bearer "+token,
+          appliname: appliname,
+          fingerprint: fingerprint,
+        },
+      }
+    );
+  }
   
   /* fct enregistrement d'un ensemble/lot/bloc/tableau/tronçon de pièces   */
   const patchBlocPces = async (tabDePces) => {
@@ -279,7 +305,7 @@ const Bc = ({ tabPces }) => {
     await axios.post(
       endpointReprise,
       JSON.stringify({
-        username: username,
+        "username": username,
       }),
       {
         headers: {
@@ -305,7 +331,6 @@ const Bc = ({ tabPces }) => {
     if (signalToGo) {
       msg = "La réinitialisation s'est bien déroulée";
       dispatch(defineMessage(msg));
-      setRefresh(refresh + 1);
     } else {
       msg = "La réinitialisation ne s'est pas bien déroulée, merci de réessayer ultérieurement";
       dispatch(defineMessage(msg));
@@ -445,6 +470,8 @@ const Bc = ({ tabPces }) => {
       </ScrollView>
       <View>
         <Button onPress={() => recordBc()} title="Enregistrer"></Button>
+        <Text>{"\n\n"}</Text>
+        <Button onPress={() => valideBc()} title="Valider"></Button>
         <Text>{"\n\n"}</Text>
         <Button title="Réinitialiser" onPress={() => {setModalReinitVisible(true);}} />
         { modalReinitVisible &&
