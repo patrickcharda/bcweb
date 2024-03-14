@@ -381,7 +381,8 @@ const Bc = ({ tabPces }) => {
     dispatch(purgeBc());
     dispatch(purgePcesAccs());
     setModalReinitVisible(false);
-    navigation.navigate('BcList', { key: Math.random() });
+    /* navigation.navigate('BcList'); */
+    navigation.goBack();
   }
 
   return (

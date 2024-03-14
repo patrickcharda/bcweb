@@ -306,10 +306,8 @@ const BcList = () => {
         },
       }
     );
-    console.log("RESULTAT ACTUALISER "+JSON.stringify(result));
     let acquittement;
     if (result.data.message === "ok") {
-      //console.log("pioupiou");
       acquittement = await checkOK();
     }
     let msg;
@@ -404,8 +402,8 @@ const BcList = () => {
               <View style={styles.centeredView}>
                 <View style={styles.modalView}>
                       <Text>ACTUALISER</Text>
-                      <Text>Voulez-vous actualiser la liste des bons de chargement dont le statut n'est pas "en cours" ? 
-                        (pour retirer le statut en cours d'un bon de chargement vous devez le réinitialiser - vous perdrez alors les modifications éventuelles le concernant - ou le valider)
+                      <Text>Voulez-vous actualiser la liste de tous les bons de chargement dont le statut n'est pas "en cours" ? 
+                         NB : pour retirer le statut "en cours" d'un bon de chargement vous devez le réinitialiser ou le valider.
                       </Text>
                       <Button title="Confirm" onPress={handleActuConfirm} />
                       <Button title="Cancel" onPress={handleActuCancel}/>
@@ -417,44 +415,6 @@ const BcList = () => {
     </ScrollView>
   );
 };
-
-/* const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#aaa",
-    color: "#bdc3c7",
-  },
-  toolbar: {
-    backgroundColor: "#3498db",
-    color: "#fff",
-    textAlign: "center",
-    padding: 25,
-    fontSize: 20,
-  },
-  content: {
-    flex: 1,
-    padding: 10,
-  },
-  preview: {
-    backgroundColor: "#bdc3c7",
-    flex: 1,
-    height: 500,
-  },
-  input: {
-    backgroundColor: "#ecf0f1",
-    borderRadius: 3,
-    height: 40,
-    padding: 5,
-    marginBottom: 10,
-    flex: 1,
-  },
-  button: {
-    backgroundColor: "#3498db",
-    padding: 10,
-    borderRadius: 3,
-    marginBottom: 30,
-  },
-}); */
 
 const styles = StyleSheet.create({
   container: {
