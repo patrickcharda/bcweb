@@ -18,32 +18,12 @@ import { useNavigation } from '@react-navigation/native';
 
 const Login = () => {
 
-  /* React.useEffect(() => {
-    console.log('Device manufacturer: ' + Device.manufacturer);
-    console.log(Device.brand);
-    console.log(Device.designName);
-    console.log(Device.deviceName);
-    console.log(Device.deviceType);
-    console.log(Device.deviceYearClass);
-    console.log(Device.modelId);
-    console.log('Application ID: ' + Application.applicationId);
-    console.log(Application.applicationName);
-    console.log(Application.nativeApplicationVersion);
-    console.log(Application.nativeBuildVersion);
-    console.log(Application.getAndroidId());
-    fingerprint = Application.getAndroidId().toString()+Application.nativeBuildVersion+Device.deviceYearClass.toString();
-    console.log("fingerprint: "+fingerprint);
-  }, []); */
-
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
   var logged = useSelector((state) => state.tokenReducer.isLogged);
-  console.log("first logged "+logged);
   var refreshToken = useSelector((state) => state.tokenReducer.refreshToken);
-  console.log("first refresh token "+refreshToken);
   var accessToken = useSelector((state) => state.tokenReducer.token);
-  console.log("first token "+accessToken);
   var appliname = "bcweb";
   var fingerprint = Application.getAndroidId().toString()+Application.nativeBuildVersion+Device.deviceYearClass.toString();
   
@@ -98,19 +78,15 @@ const Login = () => {
             "fingerprint": fingerprint,
           },
         }
-      );
-      //let tok = response.data.access + "€";
-      console.log("TEST");
-      
+      ); 
       dispatch(addToken(response.data.access));
       console.log("the new access token : "+accessToken);
       dispatch(addUser(username));
       dispatch(toggleIsLogged(logged));
       console.log("the new logged value : "+logged);
       await hasCommandLine();
-      //Alert.alert("new AccessToken : ", response.data.access);
     } catch (error) {
-      //Alert.alert("Error", `There was an error while refreshing : ${error}`);
+      Alert.alert("Error", `There was an error while refreshing : ${error}`);
     }
   };
 
@@ -146,7 +122,7 @@ const Login = () => {
 
   const appLogout = async () => {
     try {
-      const response = await axios.get(
+      await axios.get(
         endpointLogout,
         {
           headers: {
@@ -157,7 +133,7 @@ const Login = () => {
         }
       );
     } catch (error) {
-      //Alert.alert("Error", `There was an error while logging: ${error}`);
+      Alert.alert("Error", `Problème rencontré durant la phase de déconnexion : ${error}`);
     }
   };
 
@@ -176,40 +152,19 @@ const Login = () => {
           },
         }
       );
-      /* let accessToken = response.data.access;
-      let newRefreshToken = response.data.refresh; */
-      //await appLogout();
       let hasSession = response.data.opened_session;
       console.log(hasSession);
       if (hasSession === "no") {
-        console.log("pas de session ouverte");
-        // appeler fonction asynchrone de login
-        console.log("the fingerprint is : "+fingerprint);
-        console.log("the appliname is : "+appliname);
+        /* appeler fonction asynchrone de login */
         await appLogin();
       } else {
         console.log("session déjà ouverte");
         navigation.push('ShootSession', { username, password, appLogin, renewToken, hasCommandLine, appLogout, endpointRefreshToken, endpointLogin, endpointLogout, endpointCommandLine, appliname, fingerprint })
-        //await appLogout();
-        //await appLogin();
       }
-      /* dispatch(addToken(accessToken));
-      dispatch(toggleIsLogged(logged));
-      dispatch(addRefreshToken(newRefreshToken)); */
-   
-      //console.log(store.getState());
-
-      //Alert.alert("Success", "Login successfull");
-      //console.log (store.getState());
-      //await renewToken(newRefreshToken);
-
     } catch (error) {
-      //Alert.alert("Error", `There was an error while logging: ${error}`);
+      Alert.alert("Error", `Problème rencontré durant la phase d'authentification : ${error}`);
     }
   };
-
-
-
 
   return (
 

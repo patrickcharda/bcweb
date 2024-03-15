@@ -2,15 +2,19 @@
 import Bc from '../Bc';
 import LogoutButton from "../LogoutButton";
 import { SafeAreaView, StyleSheet, BackHandler, Button } from "react-native";
+import Message from "../Message";
 
 const BcScreen = ({ route }) => {
   const { tabPces } = route.params;
   return (
-    <SafeAreaView style={styles.container}>
-      <LogoutButton />
-      <Bc tabPces={ tabPces } />
-      <Button title="Quitter BCWeb" onPress={() => BackHandler.exitApp()} />
-    </SafeAreaView>
+    <>
+      <Message />
+      <SafeAreaView style={styles.container}>
+        <LogoutButton />
+        <Bc tabPces={ tabPces } />
+        <Button title="Quitter BCWeb" onPress={() => BackHandler.exitApp()} />
+      </SafeAreaView>
+    </>
   );
 };
 

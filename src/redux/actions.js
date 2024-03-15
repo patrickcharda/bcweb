@@ -15,6 +15,10 @@ export const API_ERROR = "API_ERROR";
 export const API_EMPTY_DATA = "API_EMPTY_DATA"
 export const API_PENDING_PCES_ACCS = "API_PENDING_PCES_ACCS"
 export const DEFINE_MESSAGE = "DEFINE_MESSAGE"
+export const DEFINE_ERROR = "DEFINE_ERROR"
+export const DEFINE_MSG = "DEFINE_MSG"
+export const DEFINE_ERRORMSG = "DEFINE_ERRORMSG"
+export const CLEAN_ALL_MESSAGES_ERRORS = "CLEAN_ALL_MESSAGES_ERRORS"
 
 //action's type for bc
 export const RECORD_SELECTED_BC = "RECORD_SELECTED_BC";
@@ -242,4 +246,23 @@ export const apiEmptyData = () => ({
 export const defineMessage = (msg) => ({
   type: DEFINE_MESSAGE,
   payload: msg,
+})
+
+export const defineError = (error) => ({
+  type: DEFINE_MESSAGE,
+  payload: error,
+})
+
+export const defineMsg = (msg) => ({
+  type: DEFINE_MSG,
+  payload: msg,
+})
+
+export const defineErrormsg = (error) => ({
+  type: DEFINE_ERRORMSG,
+  payload: error,
+})
+
+export const cleanAllMessagesErrors = () => ({
+  type: CLEAN_ALL_MESSAGES_ERRORS,
 })

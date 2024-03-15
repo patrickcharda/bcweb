@@ -1,6 +1,6 @@
 import Session from '../Session';
 import { BackHandler } from 'react-native';
-
+import Message from "../Message";
 
 const ShootSessionScreen = ({ route, navigation }) => {
 
@@ -8,6 +8,7 @@ const ShootSessionScreen = ({ route, navigation }) => {
 
     return (
         <>
+            <Message />
             <Session
             username={username}
             password={password} 

@@ -11,10 +11,10 @@ import {
 } from "react-native";
 import apiCall from "../redux/apiCall";
 import axios from 'axios';
-import { recordSelectedBc, purgePcesAccs, fetchPceSuccess, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab, defineMessage, apiEmptyData, purgeBc } from "../redux/actions";
+import { recordSelectedBc, purgePcesAccs, fetchPceSuccess, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab,
+defineMessage, apiEmptyData, purgeBc, defineError, defineErrormsg, defineMsg, cleanAllMessagesErrors, CLEAN_ALL_MESSAGES_ERRORS } from "../redux/actions";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import Message from "./Message";
 import { useNavigation } from '@react-navigation/native';
 import * as Device from 'expo-device';
 import * as Application from 'expo-application';
@@ -55,29 +55,23 @@ const BcList = () => {
       .catch((error) => {
         console.error(error);
       });
+    dispatch(cleanAllMessagesErrors())
   }, [refresh, lastEditedBc]);
 
   let data = useSelector((state) => state.apiReducer.data.results);
 
   const error = JSON.stringify(useSelector((state) => state.apiReducer.error));
   
-  //let bc = undefined;
   let bc;
 
 
 
   const defineBc = async (selectedBc) => {
     bc = selectedBc;
-    /* console.log(
-      "THIS IS THE BC " +
-        bc.url +
-        " pces : " +
-        bc.pieces[0] +
-        " pdts : " +
-        bc.produits[0]
-    ); */
     dispatch(recordSelectedBc(bc));
     dispatch(purgePcesAccs());
+    dispatch(cleanAllMessagesErrors());
+    dispatch(defineMsg("Chargement du BC en cours"));
     await ouvrir(token, username, bc.bc_num);
 
     let tabPces = await checkok(token, username, bc.bc_num); // récupère le tableau de tableaux des pièces chargées, proposées et autres
@@ -90,7 +84,8 @@ const BcList = () => {
   const reinit = async (selectedBC) => {
     let bc_num = selectedBC.bc_num;
     let msg = "bc_num to reinit "+bc_num;
-    dispatch(defineMessage(msg));
+    dispatch(cleanAllMessagesErrors());
+    dispatch(defineMsg(msg));
     let body = {"username":username, "bc_num": bc_num};
     let fermer = await reinitialiser(token, appliname, fingerprint, body);
     let signalToGo = false;
@@ -99,11 +94,11 @@ const BcList = () => {
     }
     if (signalToGo) {
       msg = "La réinitialisation s'est bien déroulée";
-      dispatch(defineMessage(msg));
+      dispatch(defineMsg(msg));
       setRefresh(refresh + 1);
     } else {
       msg = "La réinitialisation ne s'est pas bien déroulée, merci de réessayer ultérieurement";
-      dispatch(defineMessage(msg));
+      dispatch(defineMsg(msg));
     }
   }
 
@@ -120,22 +115,26 @@ const BcList = () => {
         },
       }
     );
-    console.log("fermer :" + JSON.stringify(fermer));
+    //console.log("fermer :" + JSON.stringify(fermer));
     return fermer
+  }
+
+  const goRefresh = () => {
+    dispatch(cleanAllMessagesErrors());
+    setRefresh(refresh + 1);
   }
   
   const ouvrir = async (token, username, bc_num ) => {   
     let tab = [];
     tab.push(username);
-    tab.push(bc_num);
-    
+    tab.push(bc_num);   
     try {
       /* qd  un bl est sélectionné ds la liste déroulante, envoi cmde ouvrir pour mettre en pause pdt chargement des données */
       if (bc_num != "") {
           dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/ouvrir/", token, tab));
       }
     } catch (error) {
-    //
+      dispatch(defineError("Problème commande 'ouvrir'"));
     }
   }
 
@@ -329,7 +328,6 @@ const BcList = () => {
 
   return (
     <ScrollView>
-      <Message />
       <Text>--------</Text>
       <Text>Sélectionner un BC</Text>
       {loading ? (
@@ -411,7 +409,7 @@ const BcList = () => {
               </View>
             </Modal>
       }
-      <Button title="refresh" onPress={() => {setRefresh(refresh +1)}} />
+      <Button title="refresh" onPress={goRefresh} />
     </ScrollView>
   );
 };

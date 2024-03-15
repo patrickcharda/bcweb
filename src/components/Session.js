@@ -159,10 +159,10 @@ const Session = ({ username, password, appLogin, renewToken, hasCommandLine, app
 
   const continuer = async () => {
     try {
-        await userAppLogout();
-        await appLogin();
+      await userAppLogout();
+      await appLogin();
     } catch (error) {
-      Alert.alert("Error", `There was an error while logging: ${error}`);
+      Alert.alert("Error", `Problème rencontré durant la phase d'authentification : ${error}`);
     }
   };
 
