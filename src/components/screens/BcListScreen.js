@@ -5,17 +5,21 @@ import BcLast from '../BcLast';
 import { BackHandler, Button, View } from 'react-native';
 import Message from "../Message";
 
+import { useSelector, } from "react-redux";
 
 const BcListScreen = () => {
+
+    const isActionBeingExecuted = useSelector((state) => state.tokenReducer.isActionBeingPerformed);
+
     return (
         <>
             <Message />
             <View>
-                <LogoutButton/>
+                {isActionBeingExecuted? null : <LogoutButton/> }
                 <BcList key={Math.floor(Math.random() * ((Math.random()) * 10000))} />
-                <BcLast></BcLast>
+                {isActionBeingExecuted? null : <BcLast></BcLast>}
             </View>
-            <Button title="Quitter BCWeb" onPress={() => BackHandler.exitApp()} />
+            {isActionBeingExecuted? null :<Button title="Quitter BCWeb" onPress={() => BackHandler.exitApp()} />}
         </>
         
     );

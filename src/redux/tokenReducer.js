@@ -4,6 +4,7 @@ import {
   TOGGLE_IS_LOGGED,
   SIGNOUT,
   ADD_USER,
+  SET_ACTION_IN_PROGRESS,
 } from "./actions";
 
 const initialState = {
@@ -11,6 +12,7 @@ const initialState = {
   refreshToken: "",
   isLogged: false,
   username: "",
+  isActionBeingPerformed: false,
 };
 
 const tokenReducer = (state = initialState, action) => {
@@ -42,7 +44,13 @@ const tokenReducer = (state = initialState, action) => {
         refreshToken: "",
         isLogged: false,
         username: "",
+        isActionBeingPerformed:false,
       };
+    case SET_ACTION_IN_PROGRESS:
+      return {
+        ...state,
+        isActionBeingPerformed : action.payload,
+      }
     default:
       return state;
   }

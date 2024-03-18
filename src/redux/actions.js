@@ -7,6 +7,7 @@ export const ADD_REFRESH_TOKEN = "ADD_REFRESH_TOKEN";
 export const ADD_USER = "ADD_USER";
 export const TOGGLE_IS_LOGGED = "TOGGLE_IS_LOGGED";
 export const SIGNOUT = "SIGNOUT";
+export const SET_ACTION_IN_PROGRESS = "SET_ACTION_IN_PROGRESS";
 
 //action's type for api
 export const API_PENDING = "API_PENDING";
@@ -216,6 +217,13 @@ export const signout = () => {
     type: SIGNOUT,
   };
 };
+
+export const actionInProgress = (true_or_false) => {
+  return {
+    type: SET_ACTION_IN_PROGRESS,
+    payload: true_or_false
+  }
+}
 
 // action creators for API
 

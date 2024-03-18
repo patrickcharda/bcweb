@@ -13,7 +13,7 @@ import {
 import apiCall from "../redux/apiCall";
 import axios from 'axios';
 import { recordSelectedBc, purgePcesAccs, fetchPceSuccess, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab,
-defineMessage, apiEmptyData, purgeBc, defineError, defineErrormsg, defineMsg, cleanAllMessagesErrors, CLEAN_ALL_MESSAGES_ERRORS } from "../redux/actions";
+defineMessage, apiEmptyData, purgeBc, defineError, defineErrormsg, defineMsg, cleanAllMessagesErrors, actionInProgress } from "../redux/actions";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigation } from '@react-navigation/native';
@@ -40,7 +40,6 @@ const BcList = () => {
   const token = useSelector((state) => state.tokenReducer.token);
   const username = useSelector((state) => state.tokenReducer.username);
   const lastEditedBc = useSelector((state) => state.bcReducer.bc);
-
   const [isActionBeingPerformed, setIsActionBeingPerformed] = React.useState(false);
 
   const NB_ITER = 5;
@@ -71,6 +70,7 @@ const BcList = () => {
 
   const defineBc = async (selectedBc) => {
     setIsActionBeingPerformed(true);
+    dispatch(actionInProgress(true));
     bc = selectedBc;
     dispatch(recordSelectedBc(bc));
     dispatch(purgePcesAccs());
@@ -80,6 +80,7 @@ const BcList = () => {
 
     let tabPces = await checkok(token, username, bc.bc_num); // récupère le tableau de tableaux des pièces chargées, proposées et autres
     setIsActionBeingPerformed(false);
+    dispatch(actionInProgress(false));
     if (tabPces != "" && tabPces != undefined && tabPces != null) {
       navigation.navigate('Bc', { tabPces });
     } 
@@ -87,6 +88,7 @@ const BcList = () => {
 
   const reinit = async (selectedBC) => {
     setIsActionBeingPerformed(true);
+    dispatch(actionInProgress(true));
     let bc_num = selectedBC.bc_num;
     let msg = "bc_num to reinit "+bc_num;
     dispatch(cleanAllMessagesErrors());
@@ -106,6 +108,7 @@ const BcList = () => {
       dispatch(defineMsg(msg));
     }
     setIsActionBeingPerformed(false);
+    dispatch(actionInProgress(false));
   }
 
   const reinitialiser = async(token, appliname, fingerprint, body) => {
@@ -301,7 +304,9 @@ const BcList = () => {
 
   const actualiser = async() => {
     //console.log("Updated");
+    setModalActualiserVisible(false);
     setIsActionBeingPerformed(true);
+    dispatch(actionInProgress(true));
     let body = {"username":username};
     let result = await axios.post(
       "https://back-xxx.monkey-soft.fr:54443/bcweb/actualiser/",
@@ -326,8 +331,10 @@ const BcList = () => {
       msg = "L'actualisation des BC ne s'est pas déroulée normalement. Veuillez réessayer ultérieurement"
     }
     dispatch(defineMessage(msg));
-    setModalActualiserVisible(false);
+    
     setIsActionBeingPerformed(false);
+    dispatch(actionInProgress(false));
+    console.log("LE FURET ");
     setRefresh(refresh + 1);
   }
  
@@ -423,7 +430,7 @@ const BcList = () => {
                       <Text>Voulez-vous actualiser la liste de tous les bons de chargement dont le statut n'est pas "en cours" ? 
                          NB : pour retirer le statut "en cours" d'un bon de chargement vous devez le réinitialiser ou le valider.
                       </Text>
-                      <Pressable onPress={() => {handleActuConfirm}}>
+                      <Pressable onPress={() => {handleActuConfirm(true)}}>
                         <Text>Confirm</Text>
                       </Pressable>
                       <Pressable onPress={handleActuCancel}>
