@@ -8,6 +8,7 @@ import {
   View,
   Modal,
   Button,
+  Pressable,
 } from "react-native";
 import apiCall from "../redux/apiCall";
 import axios from 'axios';
@@ -40,6 +41,8 @@ const BcList = () => {
   const username = useSelector((state) => state.tokenReducer.username);
   const lastEditedBc = useSelector((state) => state.bcReducer.bc);
 
+  const [isActionBeingPerformed, setIsActionBeingPerformed] = React.useState(false);
+
   const NB_ITER = 5;
   const DELAY_N_SECONDS = 2000;
 
@@ -67,6 +70,7 @@ const BcList = () => {
 
 
   const defineBc = async (selectedBc) => {
+    setIsActionBeingPerformed(true);
     bc = selectedBc;
     dispatch(recordSelectedBc(bc));
     dispatch(purgePcesAccs());
@@ -75,13 +79,14 @@ const BcList = () => {
     await ouvrir(token, username, bc.bc_num);
 
     let tabPces = await checkok(token, username, bc.bc_num); // récupère le tableau de tableaux des pièces chargées, proposées et autres
-
+    setIsActionBeingPerformed(false);
     if (tabPces != "" && tabPces != undefined && tabPces != null) {
       navigation.navigate('Bc', { tabPces });
     } 
   };
 
   const reinit = async (selectedBC) => {
+    setIsActionBeingPerformed(true);
     let bc_num = selectedBC.bc_num;
     let msg = "bc_num to reinit "+bc_num;
     dispatch(cleanAllMessagesErrors());
@@ -100,6 +105,7 @@ const BcList = () => {
       msg = "La réinitialisation ne s'est pas bien déroulée, merci de réessayer ultérieurement";
       dispatch(defineMsg(msg));
     }
+    setIsActionBeingPerformed(false);
   }
 
   const reinitialiser = async(token, appliname, fingerprint, body) => {
@@ -140,7 +146,7 @@ const BcList = () => {
 
   const handleConfirm = (currentBC) => {
     // Handle the confirm action here
-    console.log("CURRENT BC "+currentBC);
+    //console.log("CURRENT BC "+currentBC);
     reinit(currentBC);
     // si le bc reinitialisé est celui sur lequel on travaillait on réinitialise le state
     if (lastEditedBc !== undefined && lastEditedBc.bc_num == currentBC.bc_num) {
@@ -290,8 +296,12 @@ const BcList = () => {
   };
 
   const handleActuConfirm = async () => {
-    console.log("Updated");
+    await actualiser();
+  };
 
+  const actualiser = async() => {
+    //console.log("Updated");
+    setIsActionBeingPerformed(true);
     let body = {"username":username};
     let result = await axios.post(
       "https://back-xxx.monkey-soft.fr:54443/bcweb/actualiser/",
@@ -317,8 +327,9 @@ const BcList = () => {
     }
     dispatch(defineMessage(msg));
     setModalActualiserVisible(false);
+    setIsActionBeingPerformed(false);
     setRefresh(refresh + 1);
-  };
+  }
  
   const handleActuCancel = () => {
     // Handle the cancel action here
@@ -327,6 +338,7 @@ const BcList = () => {
   };
 
   return (
+    isActionBeingPerformed ? <ActivityIndicator color="red" size="large" /> : 
     <ScrollView>
       <Text>--------</Text>
       <Text>Sélectionner un BC</Text>
@@ -334,14 +346,14 @@ const BcList = () => {
         <ActivityIndicator size="large" color="red" />
       ) : (
         <SafeAreaView>
-          <TouchableOpacity onPress={() => setIsOpen(!isOpen)}>
+          <Pressable onPress={() => setIsOpen(!isOpen)}>
             <Text>{isOpen ? "Fermer la liste" : "Ouvrir la liste"}</Text>
-          </TouchableOpacity>
+          </Pressable>
           {isOpen &&
             data.map((bc, index) => (
-              <TouchableOpacity onPress={() => defineBc(bc)} key={index}>
+              <Pressable onPress={isActionBeingPerformed ? null : () => defineBc(bc)} key={index} disabled={isActionBeingPerformed}>
                 <Text>{bc.bc_num} | {bc.bc_statut}</Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
         </SafeAreaView>
       )}
@@ -354,15 +366,15 @@ const BcList = () => {
         <ActivityIndicator size="large" color="blue" />
       ) : (
         <SafeAreaView> 
-          <TouchableOpacity onPress={() => setIsReinitOpen(!isReinitOpen)}>
+          <Pressable onPress={() => setIsReinitOpen(!isReinitOpen)}>
             <Text>{isReinitOpen ? "Fermer la liste" : "Ouvrir la liste"}</Text>
-          </TouchableOpacity>
+          </Pressable>
           { isReinitOpen &&
             data.map((BC, idx) => (
               <SafeAreaView>
-                <TouchableOpacity onPress={() => {setModalVisible(true); setCurrentBC(BC);}} key={idx}>
+                <Pressable onPress={() => {setModalVisible(true); setCurrentBC(BC);}} key={idx}>
                 <Text>{BC.bc_num} | {BC.bc_statut}</Text>
-                </TouchableOpacity>
+                </Pressable>
               </SafeAreaView>
             ))
           }
@@ -379,8 +391,12 @@ const BcList = () => {
                       <Text>ATTENTION, en réinitialisant le BC, vous perdrez toutes les données non validées.
                         Réinitialiser un BC revient à le récupérer tel qu'il se trouve actuellement dans l'application BTSystem - BTLivraison.
                       </Text>
-                      <Button title="Confirm" onPress={() => {handleConfirm(currentBC)}} />
-                      <Button title="Cancel" onPress={handleCancel}/>
+                      <Pressable onPress={() => {handleConfirm(currentBC)}}>
+                        <Text>Confirm</Text>
+                      </Pressable>
+                      <Pressable onPress={handleCancel}>
+                        <Text>Cancel</Text>
+                      </Pressable>
                 </View>
               </View>
             </Modal>
@@ -389,7 +405,11 @@ const BcList = () => {
         </SafeAreaView>
         
       )} 
-      <Button title="Actualiser" onPress={() => {setModalActualiserVisible(true);}} />
+      <Text>--------</Text>
+      <Text>--------</Text>
+      <Pressable onPress={() => {setModalActualiserVisible(true);}} >
+        <Text>Actualiser</Text>
+      </Pressable>
       { modalActualiserVisible &&
               <Modal
               animationType="slide"
@@ -403,13 +423,19 @@ const BcList = () => {
                       <Text>Voulez-vous actualiser la liste de tous les bons de chargement dont le statut n'est pas "en cours" ? 
                          NB : pour retirer le statut "en cours" d'un bon de chargement vous devez le réinitialiser ou le valider.
                       </Text>
-                      <Button title="Confirm" onPress={handleActuConfirm} />
-                      <Button title="Cancel" onPress={handleActuCancel}/>
+                      <Pressable onPress={() => {handleActuConfirm}}>
+                        <Text>Confirm</Text>
+                      </Pressable>
+                      <Pressable onPress={handleActuCancel}>
+                        <Text>Cancel</Text>
+                      </Pressable>
                 </View>
               </View>
             </Modal>
       }
-      <Button title="refresh" onPress={goRefresh} />
+      <Pressable onPress={goRefresh}>
+        <Text>Refresh</Text>
+      </Pressable>
     </ScrollView>
   );
 };
