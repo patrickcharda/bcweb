@@ -3,16 +3,19 @@ import Bc from '../Bc';
 import LogoutButton from "../LogoutButton";
 import { SafeAreaView, StyleSheet, BackHandler, Button } from "react-native";
 import Message from "../Message";
+import { useSelector, } from "react-redux";
 
 const BcScreen = ({ route }) => {
   const { tabPces } = route.params;
+  const isActionBeingExecuted = useSelector((state) => state.tokenReducer.isActionBeingPerformed);
+
   return (
     <>
       <Message />
       <SafeAreaView style={styles.container}>
-        <LogoutButton />
-        <Bc tabPces={ tabPces } />
-        <Button title="Quitter BCWeb" onPress={() => BackHandler.exitApp()} />
+        {isActionBeingExecuted? null : <LogoutButton/> }
+        {isActionBeingExecuted? null : <Bc tabPces={ tabPces } />}  
+        {isActionBeingExecuted? null :<Button title="Quitter BCWeb" onPress={() => BackHandler.exitApp()} />}
       </SafeAreaView>
     </>
   );

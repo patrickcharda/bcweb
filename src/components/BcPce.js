@@ -8,6 +8,7 @@ import {
   Button,
   Alert,
   View,
+  ActivityIndicator,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { changePceLoadedStatus, changePceObservBc } from "../redux/actions";
@@ -18,6 +19,8 @@ const BcPce = ( {piece, loaded} ) => {
 
   const [modalVisible, setModalVisible] = React.useState(false);
   const [text, setText] = React.useState(piece.pce_observ_bc);
+
+  const isActionBeingExecuted = useSelector((state) => state.tokenReducer.isActionBeingPerformed);
 
   const handleConfirm = () => {
     // Handle the confirm action here
@@ -43,6 +46,7 @@ const BcPce = ( {piece, loaded} ) => {
   const archive = "<TextInput placeholder={pce.pce_observ_bc}></TextInput>";
 
   return (
+    isActionBeingExecuted ? <ActivityIndicator color="red" size="large" /> : 
     <ScrollView style={styles.container}>
         <View></View>
         <SafeAreaView>

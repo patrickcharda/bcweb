@@ -4,7 +4,9 @@ import BcAcc from "./BcAcc";
 //import BcFooter from ".BcFooter";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { defineMessage, changePceDate, changePceLoadedDate, changePcePropDate, changePceOtherDate, loadFullPcesTab, loadLoadedPcesTab, loadPropPcesTab, loadOtherPcesTab, loadLoadedAccs, loadPropAccs, loadAccs, changeAccDate, purgeBc, purgePcesAccs } from "../redux/actions";
+import { defineMessage, changePceDate, changePceLoadedDate, changePcePropDate, changePceOtherDate, loadFullPcesTab, loadLoadedPcesTab,
+   loadPropPcesTab, loadOtherPcesTab, loadLoadedAccs, loadPropAccs, loadAccs, changeAccDate,
+    purgeBc, purgePcesAccs, actionInProgress, defineErrormsg, defineMsg } from "../redux/actions";
 import {
   ScrollView,
   View,
@@ -14,6 +16,8 @@ import {
   Button,
   Modal,
   SafeAreaView,
+  Pressable,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import * as Device from "expo-device";
@@ -26,6 +30,9 @@ const fingerprint =
   Application.nativeBuildVersion +
   Device.deviceYearClass.toString();
 
+const NB_ITER = 5;
+const DELAY_N_SECONDS = 2000;
+const endpointCheckok = "https://back-xxx.monkey-soft.fr:54443/bcweb/checkok/";
 
 const Bc = ({ tabPces }) => {
   const token = useSelector((state) => state.tokenReducer.token);
@@ -40,6 +47,7 @@ const Bc = ({ tabPces }) => {
   const [modalReinitVisible, setModalReinitVisible] = React.useState(false);
   const navigation = useNavigation();
   const bonChargement = useSelector((state) => state.bcReducer.bc);
+  const isActionBeingPerformed = useSelector((state) => state.tokenReducer.isActionBeingPerformed);
 
   const getFormatedDate = () => {
     let dateMajBLModifie = new Date();
@@ -190,86 +198,119 @@ const Bc = ({ tabPces }) => {
     */
 
     /* mise à jour du champ date pour horodater l'enreg ds la bdd (champs pce_date_web) */
-    //console.log("TOUTES PIECES "+pces);
-    pces.map(pce => dispatch(changePceDate(pce)));
-    //console.log("PIECES CHARGEES "+pcesLoaded);
-    pcesLoaded.map(pce => dispatch(changePceLoadedDate(pce)));
-    pcesProp.map(pce => dispatch(changePcePropDate(pce)));
-    pcesOther.map(pce => dispatch(changePceOtherDate(pce)));
-    
+    let result;
+    try {
+      dispatch(actionInProgress(true));
+      dispatch(defineMsg("enregistrement en cours"));
 
-    // Tronçonner le tableau des pièces en tableaux de 500 pièces
-    let sliced_tabs = []; // tableau de tableaux tronçons de 500 pièces
-    for (let i = 0; i < pces.length; i += 500) {
-      let chunk = pces.slice(i, i + 500);
-      sliced_tabs.push(chunk);
-    }
+      pces.map(pce => dispatch(changePceDate(pce)));
+      //console.log("PIECES CHARGEES "+pcesLoaded);
+      pcesLoaded.map(pce => dispatch(changePceLoadedDate(pce)));
+      pcesProp.map(pce => dispatch(changePcePropDate(pce)));
+      pcesOther.map(pce => dispatch(changePceOtherDate(pce)));
+      
 
-    //màj les pces ds la bdd, tronçon de 500 par tronçon de 500
-    for (let j = 0; j < sliced_tabs.length; j++) {
-      patchBlocPces(sliced_tabs[j]);
-    }
-    //màj les accessoires s'il y en a
-    if (accs.length > 0) {
-      accs.map(access => dispatch(changeAccDate(access)));
-      for (let access of accs) {
-        patchAcc(access);
+      // Tronçonner le tableau des pièces en tableaux de 500 pièces
+      let sliced_tabs = []; // tableau de tableaux tronçons de 500 pièces
+      for (let i = 0; i < pces.length; i += 500) {
+        let chunk = pces.slice(i, i + 500);
+        sliced_tabs.push(chunk);
       }
-    }
-    //màj les observations du BC
-    let recordDate = getFormatedDate();
-    let reqBody = {
-      "bc_observ": bonChargement.bc_observ,
-      "bc_date_web": recordDate,
-      "bc_webuser": username,
-    }
-    await axios.patch(
-      "https://back-xxx.monkey-soft.fr:54443/bcweb/bc/"+bonChargement.bc_num,
-      JSON.stringify(reqBody),
-      {
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8",
-          Authorization: "Bearer "+token,
-          appliname: appliname,
-          fingerprint: fingerprint,
-        },
+
+      //màj les pces ds la bdd, tronçon de 500 par tronçon de 500
+      for (let j = 0; j < sliced_tabs.length; j++) {
+        result = patchBlocPces(sliced_tabs[j]);
       }
-    );
-
-
+      //màj les accessoires s'il y en a
+      if (accs.length > 0) {
+        accs.map(access => dispatch(changeAccDate(access)));
+        for (let access of accs) {
+          result = patchAcc(access);
+        }
+      }
+      //màj les observations du BC
+      let recordDate = getFormatedDate();
+      let reqBody = {
+        "bc_observ": bonChargement.bc_observ,
+        "bc_date_web": recordDate,
+        "bc_webuser": username,
+      }
+      result = await axios.patch(
+        "https://back-xxx.monkey-soft.fr:54443/bcweb/bc/"+bonChargement.bc_num,
+        JSON.stringify(reqBody),
+        {
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+            Authorization: "Bearer "+token,
+            appliname: appliname,
+            fingerprint: fingerprint,
+          },
+        }
+      );
+    } catch (error) {
+      console.log("erreur dans la fonction recordBc du Bc ", error)
+      dispatch(defineErrormsg("erreur dans la fonction recordBc du Bc "+error))
+      dispatch(defineMsg(""));
+    } finally {
+      dispatch(actionInProgress(false));
+      return result
+    }
   };
 
   const valideBc = async() => {
-    await recordBc();
-    await valider();
-    await checkOK();
+    let result;
+    try {
+      dispatch(defineMsg("Validation en cours..."));
+      dispatch(actionInProgress(true));
+      result = await recordBc();
+      dispatch(actionInProgress(true));
+      result = await valider();
+      result = await checkOK();
+    } catch (error) {
+      console.log("erreur dans la fonction valideBc du Bc ", error);
+      dispatch(defineErrormsg("erreur dans la fonction valideBc du Bc "+error));
+      dispatch(defineMsg(""));
+    } finally {
+      dispatch(actionInProgress(false));
+    }
     navigation.goBack();
+    return result;
   }
 
   const valider = async() => {
-    let endpointValider = "https://back-xxx.monkey-soft.fr:54443/bcweb/valider/";
-    await axios.post(
-      endpointValider,
-      JSON.stringify({
-        "username": username,
-        "bc_num": bonChargement.bc_num,
-      }),
-      {
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8",
-          Authorization: "Bearer "+token,
-          appliname: appliname,
-          fingerprint: fingerprint,
-        },
-      }
-    );
+    let result;
+    try {
+      let endpointValider = "https://back-xxx.monkey-soft.fr:54443/bcweb/valider/"
+      result = await axios.post(
+        endpointValider,
+        JSON.stringify({
+          "username": username,
+          "bc_num": bonChargement.bc_num,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+            Authorization: "Bearer "+token,
+            appliname: appliname,
+            fingerprint: fingerprint,
+          },
+        }
+      );
+    } catch (error) {
+      console.log("erreur dans la fonction valider du Bc ", error)
+      dispatch(defineErrormsg("erreur dans la fonction valider du Bc "+error));
+    } finally {
+      return result
+    }
   }
   
   /* fct enregistrement d'un ensemble/lot/bloc/tableau/tronçon de pièces   */
   const patchBlocPces = async (tabDePces) => {
-    let endpointPcesToPatch =
-      "https://back-xxx.monkey-soft.fr:54443/bcweb/pcestopatch/";
-    await axios.patch(
+    let endpointPcesToPatch = "https://back-xxx.monkey-soft.fr:54443/bcweb/pcestopatch/";
+    let result;
+    try {
+      dispatch(defineMsg("Enregistrement bloc des pièces du BC "));
+      result = await axios.patch(
       endpointPcesToPatch,
       tabDePces,
       {
@@ -281,27 +322,43 @@ const Bc = ({ tabPces }) => {
         },
       }
     );
+  } catch (error) {
+    console.log("erreur fonction patch bloc pieces du Bc", error)
+    dispatch(defineErrormsg("Erreur enregistrement bloc des pièces du BC "+error));
+  } finally {
+    return result;
+  }
   };
 
 
   const patchAcc = async (access) => {
-    let endpointAccToPatch = "https://back-xxx.monkey-soft.fr:54443/bcweb/pdt/"+access.id;
-    await axios.patch(
-      endpointAccToPatch,
-      access,
-      {
-        headers: {
-          "Content-Type": "application/json;charset=UTF-8",
-          Authorization: "Bearer "+token,
-          appliname: appliname,
-          fingerprint: fingerprint,
-        },
-      }
-    );
+    let endpointAccToPatch = "https://back-xxx.monkey-soft.fr:54443/bcweb/pdt/"+access.id
+    let result;
+    try {
+      result = await axios.patch(
+        endpointAccToPatch,
+        access,
+        {
+          headers: {
+            "Content-Type": "application/json;charset=UTF-8",
+            Authorization: "Bearer "+token,
+            appliname: appliname,
+            fingerprint: fingerprint,
+          },
+        }
+      );
+    } catch {
+      console.log("erreur ds la fonction patch acc ", error);
+      dispatch(defineErrormsg("erreur ds la fonction patch acc "+error));
+    } finally {
+      return result
+    }
+    
   };
 
   const postReprise = async() => {
-    let endpointReprise = "https://back-xxx.monkey-soft.fr:54443/bcweb/reprise/";
+    try {
+      let endpointReprise = "https://back-xxx.monkey-soft.fr:54443/bcweb/reprise/";
     await axios.post(
       endpointReprise,
       JSON.stringify({
@@ -315,30 +372,43 @@ const Bc = ({ tabPces }) => {
           fingerprint: fingerprint,
         },
       }
-    );
+      );
+    } catch (error) {
+      console.log("erreur ds la fonction postReprise de Bc ", error)
+      dispatch(defineErrormsg("Erreur fct postReprise du BC "+error));
+    }
   }
 
   const reinit = async (bonChargement) => {
-    let bc_num = bonChargement.bc_num;
-    let msg = "bc_num to reinit "+bc_num;
-    dispatch(defineMessage(msg));
-    let body = {"username":username, "bc_num": bc_num};
-    let fermer = await reinitialiser(token, appliname, fingerprint, body);
     let signalToGo = false;
-    if (fermer.data.message === "fermer") {
-      signalToGo = await checkOK();
-    }
-    if (signalToGo) {
-      msg = "La réinitialisation s'est bien déroulée";
+    try {
+      let bc_num = bonChargement.bc_num;
+      let msg = "bc_num to reinit "+bc_num;
       dispatch(defineMessage(msg));
-    } else {
-      msg = "La réinitialisation ne s'est pas bien déroulée, merci de réessayer ultérieurement";
-      dispatch(defineMessage(msg));
+      let body = {"username":username, "bc_num": bc_num};
+      let fermer = await reinitialiser(token, appliname, fingerprint, body);
+      if (fermer.data.message === "fermer") {
+        signalToGo = await checkOK();
+      }
+      if (signalToGo) {
+        msg = "La réinitialisation s'est bien déroulée";
+        dispatch(defineMessage(msg));
+      } else {
+        msg = "La réinitialisation ne s'est pas bien déroulée, merci de réessayer ultérieurement";
+        dispatch(defineMessage(msg));
+      }
+    } catch (error) {
+      console.log("erreur ds fonction reinit du Bc ", error);
+      dispatch(defineErrormsg("Erreur fct reinit du BC "+error));
+    } finally {
+      return signalToGo;
     }
   }
 
   const reinitialiser = async(token, appliname, fingerprint, body) => {
-    let fermer = await axios.post(
+    let fermer;
+    try {
+      fermer = await axios.post(
       "https://back-xxx.monkey-soft.fr:54443/bcweb/fermer/",
       JSON.stringify(body),
       {
@@ -351,7 +421,12 @@ const Bc = ({ tabPces }) => {
       }
     );
     console.log("fermer :" + JSON.stringify(fermer));
-    return fermer
+    } catch (error) {
+      console.log("erreur action fermer/reinitialiser ds Bc")
+      dispatch(defineErrormsg("Erreur fct reinitialiser du BC "+error));
+    } finally {
+      return fermer;
+    }
   }
 
   const checkOK = async () => {
@@ -387,7 +462,8 @@ const Bc = ({ tabPces }) => {
         return false;
       }
     } catch (error) {
-      console.log('error : '+error);
+      console.log('error fct checkOK ds Bc : '+ error);
+      dispatch(defineErrormsg("Erreur fct checkOK du BC "+error));
       return false
     }
   };
@@ -411,9 +487,10 @@ const Bc = ({ tabPces }) => {
   }
 
   return (
+    isActionBeingPerformed ? <ActivityIndicator color="red" size="large" /> : 
     <View style={styles.container}>
       <ScrollView style={styles.scrollable_View}>
-        <TouchableOpacity onPress={() => setIsOpened(!isOpened)}>
+        <Pressable onPress={() => setIsOpened(!isOpened)}>
           <Text>
             {isOpened
               ? "Masquer détails BC n° " + bonChargement.bc_num
@@ -427,53 +504,62 @@ const Bc = ({ tabPces }) => {
               : nbPcesChargees + " pièces chargées "}
           </Text>
           <Text>{poids + " T"}</Text>
-        </TouchableOpacity>
+        </Pressable>
         {isOpened && <BcHeader currentBc={bonChargement} />}
       </ScrollView>
       <ScrollView styles={styles.scrollableView2}>
-        <TouchableOpacity onPress = {()=>{setIsLoadListOpen(!isLoadListOpen)}}>
+        <Pressable onPress = {()=>{setIsLoadListOpen(!isLoadListOpen)}}>
           <Text style={styles.text1}> {isLoadListOpen?"Masquer Pièces Chargées":"Voir Pièces chargées"} </Text>
-        </TouchableOpacity>
+        </Pressable>
         {isLoadListOpen &&
            piecesLoaded.map((piece) => (
           <BcPce key={piece.id} piece={piece} loaded={true} />
         ))}
-        <TouchableOpacity onPress = {()=>{setIsPropListOpen(!isPropListOpen)}}>
+        <Pressable onPress = {()=>{setIsPropListOpen(!isPropListOpen)}}>
           <Text style={styles.text2}> {isPropListOpen?"Masquer Pièces Proposées":"Voir Pièces Proposées"} </Text>
-        </TouchableOpacity>
+        </Pressable>
         {isPropListOpen &&
            piecesProp.map((piece) => (
           <BcPce key={piece.id} piece={piece} loaded={false} />
         ))}
-        <TouchableOpacity onPress = {()=>{setIsOtherListOpen(!isOtherListOpen)}}>
+        <Pressable onPress = {()=>{setIsOtherListOpen(!isOtherListOpen)}}>
         <Text style={styles.text3}> {isOtherListOpen?"Masquer Pièces Autres":"Voir Pièces Autres"} </Text>
-        </TouchableOpacity>
+        </Pressable>
         {isOtherListOpen && 
            piecesOther.map((piece) => (
           <BcPce key={piece.id} piece={piece} loaded={false} />
         ))}
         <Text>{"\n\n"}</Text>
-        <TouchableOpacity onPress = {()=>{setIsLoadAccsOpen(!isLoadAccsOpen)}}>
+        <Pressable onPress = {()=>{setIsLoadAccsOpen(!isLoadAccsOpen)}}>
         <Text style={styles.text1}> {isLoadAccsOpen?"Masquer Accessoires chargés":"Voir Accessoires chargés"} </Text>
-        </TouchableOpacity>
+        </Pressable>
         {isLoadAccsOpen && 
           accsLoaded.map((acc) => (
           <BcAcc key={acc.id} accessoire={acc} loaded={true} />
         ))}
-        <TouchableOpacity onPress = {()=>{setIsPropAccsOpen(!isPropAccsOpen)}}>
+        <Pressable onPress = {()=>{setIsPropAccsOpen(!isPropAccsOpen)}}>
         <Text style={styles.text2}> {isPropAccsOpen?"Masquer Accessoires proposés":"Voir Accessoires proposés"} </Text>
-        </TouchableOpacity>
+        </Pressable>
         {isPropAccsOpen && 
           accsProp.map((acc) => (
           <BcAcc key={acc.id} accessoire={acc} loaded={false} />
         ))}
       </ScrollView>
       <View>
-        <Button onPress={() => recordBc()} title="Enregistrer"></Button>
+        {/* <Button onPress={() => recordBc()} title="Enregistrer"></Button> */}
+        <Pressable onPress={() => recordBc()}>
+          <Text>Enregistrer</Text>
+        </Pressable>
         <Text>{"\n\n"}</Text>
-        <Button onPress={() => valideBc()} title="Valider"></Button>
+        {/* <Button onPress={() => valideBc()} title="Valider"></Button> */}
+        <Pressable onPress={() => valideBc()}>
+          <Text>Valider</Text>
+        </Pressable>
         <Text>{"\n\n"}</Text>
-        <Button title="Réinitialiser" onPress={() => {setModalReinitVisible(true);}} />
+        {/* <Button title="Réinitialiser" onPress={() => {setModalReinitVisible(true);}} /> */}
+        <Pressable onPress={() => {setModalReinitVisible(true);}}>
+            <Text>Réinitialiser</Text>
+        </Pressable>
         { modalReinitVisible &&
               <Modal
               animationType="slide"
@@ -487,8 +573,14 @@ const Bc = ({ tabPces }) => {
                       <Text>ATTENTION, en réinitialisant le BC, vous perdrez toutes les données non validées.
                         Réinitialiser un BC revient à le récupérer tel qu'il se trouve actuellement dans l'application BTSystem - BTLivraison.
                       </Text>
-                      <Button title="Confirm" onPress={() => {handleReinitConfirm(bonChargement)}} />
-                      <Button title="Cancel" onPress={handleReinitCancel}/>
+                      { /* <Button title="Confirm" onPress={() => {handleReinitConfirm(bonChargement)}} /> */ }
+                      <Pressable onPress={() => {handleReinitConfirm(bonChargement)}}>
+                        <Text>Confirm</Text>
+                      </Pressable>
+                      {/* <Button title="Cancel" onPress={handleReinitCancel}/> */}
+                      <Pressable onPress={handleReinitCancel}>
+                        <Text>Cancel</Text>
+                      </Pressable>
                 </View>
               </View>
             </Modal>
