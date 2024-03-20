@@ -48,6 +48,7 @@ const Bc = ({ tabPces }) => {
   const navigation = useNavigation();
   const bonChargement = useSelector((state) => state.bcReducer.bc);
   const isActionBeingPerformed = useSelector((state) => state.tokenReducer.isActionBeingPerformed);
+  const [isActionBeingExecuted, setIsActionBeingExecuted] = React.useState(false);
 
   const getFormatedDate = () => {
     let dateMajBLModifie = new Date();
@@ -200,6 +201,7 @@ const Bc = ({ tabPces }) => {
     /* mise à jour du champ date pour horodater l'enreg ds la bdd (champs pce_date_web) */
     let result;
     try {
+      setIsActionBeingExecuted(true);
       dispatch(actionInProgress(true));
       dispatch(defineMsg("enregistrement en cours"));
 
@@ -252,6 +254,7 @@ const Bc = ({ tabPces }) => {
       dispatch(defineErrormsg("erreur dans la fonction recordBc du Bc "+error))
       dispatch(defineMsg(""));
     } finally {
+      setIsActionBeingExecuted(false);
       dispatch(actionInProgress(false));
       return result
     }
@@ -261,8 +264,10 @@ const Bc = ({ tabPces }) => {
     let result;
     try {
       dispatch(defineMsg("Validation en cours..."));
+      setIsActionBeingExecuted(true);
       dispatch(actionInProgress(true));
       result = await recordBc();
+      setIsActionBeingExecuted(true);
       dispatch(actionInProgress(true));
       result = await valider();
       result = await checkOK();
@@ -271,6 +276,7 @@ const Bc = ({ tabPces }) => {
       dispatch(defineErrormsg("erreur dans la fonction valideBc du Bc "+error));
       dispatch(defineMsg(""));
     } finally {
+      setIsActionBeingExecuted(false);
       dispatch(actionInProgress(false));
     }
     navigation.goBack();
@@ -380,6 +386,8 @@ const Bc = ({ tabPces }) => {
   }
 
   const reinit = async (bonChargement) => {
+    setIsActionBeingExecuted(true);
+    dispatch(actionInProgress(true));
     let signalToGo = false;
     try {
       let bc_num = bonChargement.bc_num;
@@ -401,6 +409,8 @@ const Bc = ({ tabPces }) => {
       console.log("erreur ds fonction reinit du Bc ", error);
       dispatch(defineErrormsg("Erreur fct reinit du BC "+error));
     } finally {
+      setIsActionBeingExecuted(false);
+      dispatch(actionInProgress(false));
       return signalToGo;
     }
   }
@@ -487,10 +497,10 @@ const Bc = ({ tabPces }) => {
   }
 
   return (
-    isActionBeingPerformed ? <ActivityIndicator color="red" size="large" /> : 
+    isActionBeingExecuted ? <ActivityIndicator color="red" size="large" /> : 
     <View style={styles.container}>
       <ScrollView style={styles.scrollable_View}>
-        <Pressable onPress={() => setIsOpened(!isOpened)}>
+        <Pressable onPress={() => setIsOpened(!isOpened)} >
           <Text>
             {isOpened
               ? "Masquer détails BC n° " + bonChargement.bc_num
@@ -547,17 +557,17 @@ const Bc = ({ tabPces }) => {
       </ScrollView>
       <View>
         {/* <Button onPress={() => recordBc()} title="Enregistrer"></Button> */}
-        <Pressable onPress={() => recordBc()}>
+        <Pressable onPress={() => recordBc()} disabled={isActionBeingExecuted}>
           <Text>Enregistrer</Text>
         </Pressable>
         <Text>{"\n\n"}</Text>
         {/* <Button onPress={() => valideBc()} title="Valider"></Button> */}
-        <Pressable onPress={() => valideBc()}>
+        <Pressable onPress={() => valideBc()} disabled={isActionBeingExecuted}>
           <Text>Valider</Text>
         </Pressable>
         <Text>{"\n\n"}</Text>
         {/* <Button title="Réinitialiser" onPress={() => {setModalReinitVisible(true);}} /> */}
-        <Pressable onPress={() => {setModalReinitVisible(true);}}>
+        <Pressable onPress={() => {setModalReinitVisible(true);}} disabled={isActionBeingExecuted}>
             <Text>Réinitialiser</Text>
         </Pressable>
         { modalReinitVisible &&
@@ -574,7 +584,7 @@ const Bc = ({ tabPces }) => {
                         Réinitialiser un BC revient à le récupérer tel qu'il se trouve actuellement dans l'application BTSystem - BTLivraison.
                       </Text>
                       { /* <Button title="Confirm" onPress={() => {handleReinitConfirm(bonChargement)}} /> */ }
-                      <Pressable onPress={() => {handleReinitConfirm(bonChargement)}}>
+                      <Pressable onPress={() => {handleReinitConfirm(bonChargement)}} disabled={isActionBeingExecuted}>
                         <Text>Confirm</Text>
                       </Pressable>
                       {/* <Button title="Cancel" onPress={handleReinitCancel}/> */}
