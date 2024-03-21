@@ -111,7 +111,7 @@ const Bc = ({ tabPces }) => {
   let refTabPces = React.useRef(tabPces);
 
   /* ce hook se charge avec la référence au tableau de tableaux de pièces pour alimenter le state;
-  le hook intervient après le rendu du composant */
+  le hook intervient après le 1er (et slt le 1er) rendu du composant */
   React.useEffect(() => {
     let newPcesLoaded = [];
     let newPcesProp = [];
@@ -127,7 +127,7 @@ const Bc = ({ tabPces }) => {
   }, []);
 
   
-  /* ce hook permet de récupérer les éventuels accessoires;*/
+  /* ce hook permet de récupérer les éventuels accessoires après le 1er rendu et slt après celui-ci;*/
   React.useEffect(() => {
     const getAcc = async (acc_id) => {
       console.log(acc_id);
@@ -199,7 +199,7 @@ const Bc = ({ tabPces }) => {
     */
 
     /* mise à jour du champ date pour horodater l'enreg ds la bdd (champs pce_date_web) */
-    let result;
+  
     try {
       setIsActionBeingExecuted(true);
       dispatch(actionInProgress(true));

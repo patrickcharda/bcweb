@@ -8,6 +8,7 @@ import {
   Button,
   Alert,
   View,
+  Pressable,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { changeAccQte, changeAccObservBc, changeLoadAcc } from "../redux/actions";
@@ -25,6 +26,7 @@ const BcAcc = ( {accessoire, loaded} ) => {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [text, setText] = React.useState(observ);
   const [qte, setQte] = React.useState(acc.pdt_qte);
+  const [isOpened, setIsOpened] = React.useState(false);
 
   const handleConfirm = (id) => {
     // Handle the confirm action here
@@ -58,12 +60,16 @@ const BcAcc = ( {accessoire, loaded} ) => {
 
   return (
     <ScrollView style={styles.container}>
-        <View></View>
         <SafeAreaView>
-          <Text>{acc.id}</Text>
-          <Text>{accJson}</Text>
+          <ScrollView>
+            <Pressable onPress={() => setIsOpened(!isOpened)} >
+              <Text>{ isOpened ? acc.id : acc.id }</Text>
+              <Text>{acc.pdt_libel}</Text>
+            </Pressable>
+            { isOpened &&<Text>{accJson}</Text> }
+          </ScrollView>
           <SafeAreaView>
-            <Text>{acc.pdt_libel}</Text>
+            
             <View style={styles.centeredView}>
               <Modal
                 animationType="slide"

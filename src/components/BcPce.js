@@ -9,6 +9,7 @@ import {
   Alert,
   View,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { changePceLoadedStatus, changePceObservBc } from "../redux/actions";
@@ -19,6 +20,7 @@ const BcPce = ( {piece, loaded} ) => {
 
   const [modalVisible, setModalVisible] = React.useState(false);
   const [text, setText] = React.useState(piece.pce_observ_bc);
+  const [isOpened, setIsOpened] = React.useState(false);
 
   const isActionBeingExecuted = useSelector((state) => state.tokenReducer.isActionBeingPerformed);
 
@@ -43,17 +45,20 @@ const BcPce = ( {piece, loaded} ) => {
   let pce = piece;
   const dispatch = useDispatch();
 
-  const archive = "<TextInput placeholder={pce.pce_observ_bc}></TextInput>";
+  //const archive = "<TextInput placeholder={pce.pce_observ_bc}></TextInput>";
 
   return (
     isActionBeingExecuted ? <ActivityIndicator color="red" size="large" /> : 
     <ScrollView style={styles.container}>
-        <View></View>
         <SafeAreaView>
-          <Text>{piece.id}</Text>
-          <Text>{pieceJson}</Text>
+          <ScrollView>
+            <Pressable onPress={() => setIsOpened(!isOpened)} >
+              <Text>{isOpened? piece.id : piece.id}</Text>
+            </Pressable>
+            {isOpened && <Text>{pieceJson}</Text>}
+          </ScrollView>
           <SafeAreaView>
-            <Text>{pce.pce_observ_bc}</Text>
+            {/* <Text>{pce.pce_observ_bc}</Text> */}
             <View style={styles.centeredView}>
               <Modal
                 animationType="slide"
@@ -78,7 +83,7 @@ const BcPce = ( {piece, loaded} ) => {
                 </View>
               </Modal>
               <Button
-                title="Show Modal - Edition"
+                title="Editer observation pièce"
                 onPress={() => {
                   setModalVisible(true);
                 }}
