@@ -40,6 +40,7 @@ const BcList = () => {
   const token = useSelector((state) => state.tokenReducer.token);
   const username = useSelector((state) => state.tokenReducer.username);
   const lastEditedBc = useSelector((state) => state.bcReducer.bc);
+  const err = useSelector((state) => state.apiReducer.error);
   const [isActionBeingPerformed, setIsActionBeingPerformed] = React.useState(false);
 
   const NB_ITER = 5;
@@ -69,50 +70,67 @@ const BcList = () => {
 
 
   const defineBc = async (selectedBc) => {
-    setIsActionBeingPerformed(true);
-    dispatch(actionInProgress(true));
-    bc = selectedBc;
-    dispatch(recordSelectedBc(bc));
-    dispatch(purgePcesAccs());
-    dispatch(cleanAllMessagesErrors());
-    dispatch(defineMsg("Chargement du BC en cours"));
-    await ouvrir(token, username, bc.bc_num);
+    try {
+      setIsActionBeingPerformed(true); // pour contrôler l'affiche des "pressable" lorsqu'une action est en cours
+      dispatch(actionInProgress(true)); // pour contrôler l'affichage du composant BcListScreen lorsqu'une action est en cours
+      bc = selectedBc;
+      dispatch(recordSelectedBc(bc));
+      dispatch(purgePcesAccs());
+      dispatch(cleanAllMessagesErrors());
+      dispatch(defineMsg("Chargement du BC en cours"));
+      await ouvrir(token, username, bc.bc_num);
 
-    let tabPces = await checkok(token, username, bc.bc_num); // récupère le tableau de tableaux des pièces chargées, proposées et autres
-    setIsActionBeingPerformed(false);
-    dispatch(actionInProgress(false));
-    if (tabPces != "" && tabPces != undefined && tabPces != null) {
-      navigation.navigate('Bc', { tabPces });
-    } 
+      let tabPces = await checkok(token, username, bc.bc_num); // récupère le tableau de tableaux des pièces chargées, proposées et autres
+      
+      if (tabPces != "" && tabPces != undefined && tabPces != null) {
+        navigation.navigate('Bc', { tabPces });
+      } 
+    } catch (error) {
+      console.log("erreur dans la fonction defineBc de BcList ", error)
+      dispatch(defineErrormsg("erreur dans la fonction defineBc de BcList "+error))
+      dispatch(defineMsg(""));
+    } finally {
+      setIsActionBeingPerformed(false);
+      dispatch(actionInProgress(false));
+    }
   };
 
   const reinit = async (selectedBC) => {
-    setIsActionBeingPerformed(true);
-    dispatch(actionInProgress(true));
-    let bc_num = selectedBC.bc_num;
-    let msg = "bc_num to reinit "+bc_num;
-    dispatch(cleanAllMessagesErrors());
-    dispatch(defineMsg(msg));
-    let body = {"username":username, "bc_num": bc_num};
-    let fermer = await reinitialiser(token, appliname, fingerprint, body);
-    let signalToGo = false;
-    if (fermer.data.message === "fermer") {
-      signalToGo = await checkOK();
-    }
-    if (signalToGo) {
-      msg = "La réinitialisation s'est bien déroulée";
+    try {
+      setIsActionBeingPerformed(true); // pour contrôler l'affichage des "pressable" lorsqu'une action est en cours
+      dispatch(actionInProgress(true)); // pour contrôler l'affichage du composant BcListScreen lorsqu'une action est en cours
+      let bc_num = selectedBC.bc_num;
+      let msg = "BC en vours de réinitialisation : "+bc_num;
+      dispatch(cleanAllMessagesErrors());
       dispatch(defineMsg(msg));
-      setRefresh(refresh + 1);
-    } else {
-      msg = "La réinitialisation ne s'est pas bien déroulée, merci de réessayer ultérieurement";
-      dispatch(defineMsg(msg));
+      let body = {"username":username, "bc_num": bc_num};
+      let fermer = await reinitialiser(token, appliname, fingerprint, body);
+      let signalToGo = false;
+      if (fermer.data.message === "fermer") {
+        signalToGo = await checkOK();
+      }
+      if (signalToGo) {
+        msg = "La réinitialisation s'est bien déroulée";
+        dispatch(defineMsg(msg));
+        setRefresh(refresh + 1);
+      } else {
+        msg = "La réinitialisation ne s'est pas bien déroulée, merci de réessayer ultérieurement";
+        dispatch(defineMsg(msg));
+      }
+    } catch (error) {
+        console.log("erreur dans la fonction reinit de BcList ", error)
+        dispatch(defineErrormsg("erreur dans la fonction reinit de BcList "+error))
+        dispatch(defineMsg(""));
+    } finally {
+      setIsActionBeingPerformed(false);
+      dispatch(actionInProgress(false));
     }
-    setIsActionBeingPerformed(false);
-    dispatch(actionInProgress(false));
   }
 
   const reinitialiser = async(token, appliname, fingerprint, body) => {
-    let fermer = await axios.post(
+    let fermer=false;
+    try {
+      fermer = await axios.post(
       "https://back-xxx.monkey-soft.fr:54443/bcweb/fermer/",
       JSON.stringify(body),
       {
@@ -124,8 +142,14 @@ const BcList = () => {
         },
       }
     );
-    //console.log("fermer :" + JSON.stringify(fermer));
-    return fermer
+    } catch {
+      console.log("erreur dans la fonction reinitialiser de BcList ", error)
+      dispatch(defineErrormsg("erreur dans la fonction reinitialiser de BcList "+error))
+      dispatch(defineMsg(""));
+    }
+    finally {
+      return fermer;
+    }
   }
 
   const goRefresh = () => {
@@ -136,14 +160,20 @@ const BcList = () => {
   const ouvrir = async (token, username, bc_num ) => {   
     let tab = [];
     tab.push(username);
-    tab.push(bc_num);   
+    tab.push(bc_num); 
+    let result="false";
     try {
       /* qd  un bl est sélectionné ds la liste déroulante, envoi cmde ouvrir pour mettre en pause pdt chargement des données */
       if (bc_num != "") {
           dispatch(apiCall("https://back-xxx.monkey-soft.fr:54443/bcweb/ouvrir/", token, tab));
+          if (err !=="") {
+            result = true;
+          }
       }
     } catch (error) {
       dispatch(defineError("Problème commande 'ouvrir'"));
+    } finally {
+      return result;
     }
   }
 
@@ -250,16 +280,15 @@ const BcList = () => {
       return pceLignes;
       }
 
-
     } catch (error) {
-      console.log('error : '+error);
+      console.log('error : '+ error);
+      console.log("erreur dans la fonction checkok de BcList ", error)
+      dispatch(defineErrormsg("erreur dans la fonction checkok de BcList "+error))
+      dispatch(defineMsg(""));
     }
-    //console.log('data : '+JSON.stringify(data));
-    console.log('error : '+error);
-    return ("");
   };
  
-  /* version atomique de la fonction qui permet de checker une commande > ok en provenance de wib*/
+  /* version atomique de la fonction qui permet de checker une commande : "> ok" en provenance de wib ? */
   const checkOK = async () => {
     try {
       let i = 0;
@@ -293,7 +322,9 @@ const BcList = () => {
         return false;
       }
     } catch (error) {
-      console.log('error : '+error);
+      console.log("erreur dans la fonction checkOK de BcList ", error)
+      dispatch(defineErrormsg("erreur dans la fonction checkOK de BcList "+error))
+      dispatch(defineMsg(""));
       return false
     }
   };
@@ -308,6 +339,7 @@ const BcList = () => {
     setIsActionBeingPerformed(true);
     dispatch(actionInProgress(true));
     let body = {"username":username};
+    try {
     let result = await axios.post(
       "https://back-xxx.monkey-soft.fr:54443/bcweb/actualiser/",
       JSON.stringify(body),
@@ -332,10 +364,16 @@ const BcList = () => {
     }
     dispatch(defineMessage(msg));
     
-    setIsActionBeingPerformed(false);
-    dispatch(actionInProgress(false));
-    console.log("LE FURET ");
-    setRefresh(refresh + 1);
+    } catch (error) {
+      console.log("erreur dans la fonction actualiser de BcList ", error)
+      dispatch(defineErrormsg("erreur dans la fonction actualiser de BcList "+error))
+      dispatch(defineMsg(""));
+    }
+    finally {
+      setIsActionBeingPerformed(false);
+      dispatch(actionInProgress(false));
+      setRefresh(refresh + 1);
+    }
   }
  
   const handleActuCancel = () => {

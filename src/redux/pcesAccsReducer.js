@@ -34,7 +34,7 @@ const initialState = {
   accsProp:[],
 };
 
-const getFormatedDate = () => {
+/* const getFormatedDate = () => {
   let dateMajBLModifie = new Date();
   //formater la date pr la persister
   let formatedDate =
@@ -50,6 +50,24 @@ const getFormatedDate = () => {
     dateMajBLModifie.getMinutes() +
     ":" +
     dateMajBLModifie.getSeconds();
+  return formatedDate;
+} */
+
+const getFormatedDate = () => {
+  let dateMajBLModifie = new Date();
+  let formatedDate =
+    dateMajBLModifie.getFullYear() +
+    "-" +
+    String(dateMajBLModifie.getMonth() + 1).padStart(2, '0') +
+    "-" +
+    String(dateMajBLModifie.getDate()).padStart(2, '0');
+  formatedDate +=
+    "T" +
+    String(dateMajBLModifie.getHours()).padStart(2, '0') +
+    ":" +
+    String(dateMajBLModifie.getMinutes()).padStart(2, '0') +
+    ":" +
+    String(dateMajBLModifie.getSeconds()).padStart(2, '0');
   return formatedDate;
 }
 
@@ -250,23 +268,9 @@ const pcesAccsReducer = (state = initialState, action) => {
         accsProp: newTabAccsProp,
       }
     case CHANGE_PCE_DATE:
-      // récupérer la date du jour
-      let dateMajBLModifie = new Date();
-      //formater la date pr la persister
-      let formatedDate =
-        dateMajBLModifie.getFullYear() +
-        "-" +
-        (dateMajBLModifie.getMonth() + 1) +
-        "-" +
-        dateMajBLModifie.getDate();
-      formatedDate +=
-        "T" +
-        dateMajBLModifie.getHours() +
-        ":" +
-        dateMajBLModifie.getMinutes() +
-        ":" +
-        dateMajBLModifie.getSeconds();
-      //console.log(formatedDate);
+      // récupérer la date du jour et la formater la date pr la persister
+      let formatedDate = getFormatedDate()
+      console.log("formated pce date "+formatedDate);
       // Modifier date ds liste pces
       let newTabPces = cloneDeep(state.pces);
       let indexPce = newTabPces.findIndex(pce => pce.id === action.payload.id);
@@ -278,22 +282,8 @@ const pcesAccsReducer = (state = initialState, action) => {
         pces: newTabPces,
       }  
     case CHANGE_PCE_LOADED_DATE:
-      // récupérer la date du jour
-      let dateMajBLModif = new Date();
-      //formater la date pr la persister
-      let formatedDat =
-        dateMajBLModif.getFullYear() +
-        "-" +
-        (dateMajBLModif.getMonth() + 1) +
-        "-" +
-        dateMajBLModif.getDate();
-      formatedDat +=
-        "T" +
-        dateMajBLModif.getHours() +
-        ":" +
-        dateMajBLModif.getMinutes() +
-        ":" +
-        dateMajBLModif.getSeconds();
+      // récupérer la date du jour et la formater la date pr la persister
+      let formatedDat = getFormatedDate()
       //console.log(formatedDat);
       // Modifier date ds liste pces chargées
       let newTabPcesLoaded = cloneDeep(state.pcesLoaded);
@@ -306,22 +296,8 @@ const pcesAccsReducer = (state = initialState, action) => {
         pcesLoaded: newTabPcesLoaded,
       }
     case CHANGE_PCE_PROP_DATE:
-      // récupérer la date du jour
-      let dateMajBLChanged = new Date();
-      //formater la date pr la persister
-      let formatDate =
-        dateMajBLChanged.getFullYear() +
-        "-" +
-        (dateMajBLChanged.getMonth() + 1) +
-        "-" +
-        dateMajBLChanged.getDate();
-      formatDate +=
-        "T" +
-        dateMajBLChanged.getHours() +
-        ":" +
-        dateMajBLChanged.getMinutes() +
-        ":" +
-        dateMajBLChanged.getSeconds();
+      // récupérer la date du jour et la formater la date pr la persister
+      let formatDate = getFormatedDate()
       //console.log(formatDate);
       // Modifier date ds liste pces proposées
       let newTabPcesProp = cloneDeep(state.pcesProp);
@@ -334,22 +310,8 @@ const pcesAccsReducer = (state = initialState, action) => {
         pcesProp: newTabPcesProp,
       }  
     case CHANGE_PCE_OTHER_DATE:
-      // récupérer la date du jour
-      let dateMajBLChange = new Date();
-      //formater la date pr la persister
-      let formDate =
-        dateMajBLChange.getFullYear() +
-        "-" +
-        (dateMajBLChange.getMonth() + 1) +
-        "-" +
-        dateMajBLChange.getDate();
-      formDate +=
-        "T" +
-        dateMajBLChange.getHours() +
-        ":" +
-        dateMajBLChange.getMinutes() +
-        ":" +
-        dateMajBLChange.getSeconds();
+      // récupérer la date du jour et la formater la date pr la persister
+      let formDate = getFormatedDate()
       //console.log(formDate);
       // Modifier date ds liste pces proposées
       let newTabPcesOther = cloneDeep(state.pcesOther);

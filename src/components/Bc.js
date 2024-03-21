@@ -47,7 +47,7 @@ const Bc = ({ tabPces }) => {
   const [modalReinitVisible, setModalReinitVisible] = React.useState(false);
   const navigation = useNavigation();
   const bonChargement = useSelector((state) => state.bcReducer.bc);
-  const isActionBeingPerformed = useSelector((state) => state.tokenReducer.isActionBeingPerformed);
+  //const isActionBeingPerformed = useSelector((state) => state.tokenReducer.isActionBeingPerformed);
   const [isActionBeingExecuted, setIsActionBeingExecuted] = React.useState(false);
 
   const getFormatedDate = () => {
@@ -194,7 +194,7 @@ const Bc = ({ tabPces }) => {
   /* fct enregistrement d'un bon de chargement   */
   const recordBc = async() => {
     /*
-    Pour économiser de la bande passante et de la charge, on ne se base que sur le tableau pces chargées du state pour executer les appels api de mise à jour de la base de données 
+    Rem : pour économiser de la bande passante et de la charge, on pourrait ne se baser que sur le tableau pces chargées du state pour executer les appels api de mise à jour de la base de données 
     Le traitement se fait toujours par lots, mais il y a moins de données (pièces) à traiter
     */
 
@@ -256,7 +256,7 @@ const Bc = ({ tabPces }) => {
     } finally {
       setIsActionBeingExecuted(false);
       dispatch(actionInProgress(false));
-      return result
+      //return result
     }
   };
 

@@ -14,7 +14,7 @@ const BcScreen = ({ route }) => {
       <Message />
       <SafeAreaView style={styles.container}>
         {isActionBeingExecuted? null : <LogoutButton/> }
-        {isActionBeingExecuted? null : <Bc tabPces={ tabPces } />}  
+        <Bc tabPces={ tabPces } />  
         {isActionBeingExecuted? null :<Button title="Quitter BCWeb" onPress={() => BackHandler.exitApp()} />}
       </SafeAreaView>
     </>
