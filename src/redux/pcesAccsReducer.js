@@ -21,6 +21,7 @@ import {
   CHANGE_ACC_DATE,
   CHANGE_ACC_OBSERV_BC,
   CHANGE_LOAD_ACC,
+  SEARCH_PCE_ID,
 } from "./actions";
 
 const initialState = {
@@ -73,6 +74,59 @@ const getFormatedDate = () => {
 
 const pcesAccsReducer = (state = initialState, action) => {
   switch (action.type) {
+    case SEARCH_PCE_ID:
+      let pce_num = action.payload;
+      console.log("SEARCH... PCE_NUM : "+pce_num);
+      const searchedIdx = state.pces.findIndex(pce => pce.pce_num === String(pce_num));
+      console.log("INDEX PCE DS PCES : "+searchedIdx)
+      let searchedPce="";
+      if (searchedIdx !== -1) {
+        searchedPce = state.pces[searchedIdx];
+        console.log("SEARCHED PCE : "+JSON.stringify(searchedPce));
+      }
+      if (searchedPce !== "") {
+        if (searchedPce.pce_charge) { //la pce est déjà chargée, on retourne le state inchangé
+          return {
+            ...state,
+          }
+        } else { // on va actualiser le state en fonction des cas
+          const new_ArrayPces = cloneDeep(state.pces);
+          const new_ArrayPcesLoaded = cloneDeep(state.pcesLoaded);
+          const new_ArrayPcesProp = cloneDeep(state.pcesProp);
+          const new_ArrayPcesOther = cloneDeep(state.pcesOther);
+
+          // chercher la piece ds le tableau cloné
+          const index = new_ArrayPces.findIndex(pce => pce.pce_num === pce_num);
+          new_ArrayPces[index].pce_charge = true;
+          // ajouter la piece ds le tableau des pces chargées
+          new_ArrayPcesLoaded.push(new_ArrayPces[index]);
+          // si la pce est ds le tableau des pces proposées on le retire de là
+          const idx = new_ArrayPcesProp.findIndex(pce => pce.pce_num === pce_num)
+          if (idx !== -1) {
+            new_ArrayPcesProp.splice(idx, 1);
+            return {
+              ...state,
+              pces: new_ArrayPces,
+              pcesLoaded: new_ArrayPcesLoaded,
+              pcesProp: new_ArrayPcesProp,
+            }
+          } else { // ds ce cas la pce est ds le tableau des autres pieces, on la retire de là
+            const idx = new_ArrayPcesOther.findIndex(pce => pce.pce_num === pce_num)
+            if (idx !== -1) {
+              new_ArrayPcesOther.splice(idx, 1);
+              return {
+                ...state,
+                pces: new_ArrayPces,
+                pcesLoaded: new_ArrayPcesLoaded,
+                pcesOther: new_ArrayPcesOther,
+              }
+            }
+          }
+        } 
+      }
+      return {
+        ...state,
+      }
     case CHANGE_ACC_QTE:
       let obj = action.payload;
       let qte = obj.qte;

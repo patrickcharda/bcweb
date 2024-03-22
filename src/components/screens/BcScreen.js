@@ -1,6 +1,7 @@
 //import { CommonActions } from '@react-navigation/native';
 import Bc from '../Bc';
 import LogoutButton from "../LogoutButton";
+import ScanInput from "../ScanInput";
 import { SafeAreaView, StyleSheet, BackHandler, Button } from "react-native";
 import Message from "../Message";
 import { useSelector, } from "react-redux";
@@ -14,6 +15,7 @@ const BcScreen = ({ route }) => {
       <Message />
       <SafeAreaView style={styles.container}>
         {isActionBeingExecuted? null : <LogoutButton/> }
+        <ScanInput />
         <Bc tabPces={ tabPces } />  
         {isActionBeingExecuted? null :<Button title="Quitter BCWeb" onPress={() => BackHandler.exitApp()} />}
       </SafeAreaView>
