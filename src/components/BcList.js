@@ -397,7 +397,7 @@ const BcList = () => {
           {isOpen &&
             data.map((bc, index) => (
               <Pressable onPress={isActionBeingPerformed ? null : () => defineBc(bc)} key={index} disabled={isActionBeingPerformed}>
-                <Text>{bc.bc_num} | {bc.bc_statut}</Text>
+                <Text>{bc.bc_num} | {bc.bc_statut} | nb pièces : {bc.pieces.length}</Text>
               </Pressable>
             ))}
         </SafeAreaView>

@@ -169,7 +169,7 @@ const Login = () => {
   return (
 
       <SafeAreaView style={styles.container}>
-        <Text style={styles.toolbar}>LOGIN</Text>
+        <Text></Text>
         <ScrollView style={styles.content}>
         <TextInput
             style={styles.input}

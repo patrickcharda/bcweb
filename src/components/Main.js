@@ -2,7 +2,10 @@ import * as React from "react";
 import {
   View,
   StyleSheet,
-  Button
+  Button,
+  Pressable,
+  Text,
+  Image,
 } from 'react-native';
 import LoginScreen from "./screens/LoginScreen";
 import BcListScreen from "./screens/BcListScreen";
@@ -37,23 +40,66 @@ const Main = () => {
       [<Stack.Screen
         name="BcList"
         component={BcListScreen}
-        options={{ title: "Liste des Bons de chargement" }}
+        options={{
+          title: "Bons de chargement",
+          headerStyle: {
+            backgroundColor: '#0000b3',
+          },
+          headerTitle: () => (
+              <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+                {/* <View style={{ flexGrow:0.5, justifyContent: 'flex-start'}}>
+                  <Image
+                  style={{ width: 50, height: 50, }}
+                  source={require('../../assets/LPB.png')}
+                  />
+                </View> */}
+                <View style={{ flexGrow:1, justifyContent: 'center' }}><Text style={{ fontWeight: 'bold', color: 'white', fontSize: 20, textAlign: 'center' }}>Bons de chargement</Text></View>
+                {/* <View style={{ flex:1, justifyContent: 'flex-end' }}>
+                  <Image
+                  style={{ width: 50, height: 50 }}
+                  source={require('../../assets/LPB.png')}
+                  />
+                </View> */}
+              </View>
+          ),
+        }}
         key="1"
       />,
       <Stack.Screen 
-        name="Bc" 
-        component={BcScreen} 
-        options={({ navigation }) => ({
-          headerLeft: () => (
-            <Button
-              onPress={() => navigation.replace('BcList')}
-              title="Retour à la liste des BC"
-            />
-          ),
-          })
-        }
-        key="2"
-      />,
+      name="Bc" 
+      component={BcScreen} 
+      options={({ navigation }) => ({
+      headerLeft: () => (
+      <Pressable onPress={() => navigation.replace('BcList')}>
+        <Text style={{color: 'white'}}> retour </Text>
+      </Pressable>
+      ),
+      headerStyle: {
+        backgroundColor: '#0000b3',
+      },
+      headerTintColor:'#fff',
+      headerTitle: () => (
+          <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+            <View style={{ flexGrow:0.5, justifyContent: 'flex-start'}}>
+              {/* <Image
+              style={{ width: 50, height: 50, }}
+              source={require('../../assets/LPB.png')}
+              /> */}
+            </View>
+            <View style={{ flexGrow:1, justifyContent: 'center' }}><Text style={{ fontWeight: 'bold', color: 'white', fontSize: 20 }}>BC en cours...</Text></View>
+            <View style={{ flex:1, justifyContent: 'flex-end' }}>
+              {/* <Image
+              style={{ width: 50, height: 50 }}
+              source={require('../../assets/LPB.png')}
+              /> */}
+            </View>
+          </View>
+
+      ),
+      })
+    }
+      key="2"
+    />,
       <Stack.Screen
         name="Bc_old"
         component={BcScreen}
@@ -65,7 +111,30 @@ const Main = () => {
       <Stack.Screen
         name="Login"
         component={LoginScreen}
-        options={{ title: "Login" }}
+        options={{
+          title: "Login",
+          headerStyle: {
+            backgroundColor: '#0000b3',
+          },
+          headerTitle: () => (
+              <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+                <View style={{ flexGrow:1, justifyContent: 'flex-start'}}>
+                  <Image
+                  style={{ width: 50, height: 50, }}
+                  source={require('../../assets/LPB.png')}
+                  />
+                </View>
+                <View style={{ flexGrow:1.25, justifyContent: 'center' }}><Text style={{ fontWeight: 'bold', color: 'white', fontSize: 20 }}>LOGIN</Text></View>
+                <View style={{ flex:0.75, justifyContent: 'flex-end' }}>
+                  {/* <Image
+                  style={{ width: 50, height: 50 }}
+                  source={require('../../assets/BTSYSTEM.png')}
+                  /> */}
+                </View>
+              </View>
+
+          ),
+        }}
         key="3"
       />,<Stack.Screen
         name="ShootSession"

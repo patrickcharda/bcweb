@@ -53,7 +53,7 @@ const BcPce = ( {piece, loaded} ) => {
         <SafeAreaView>
           <ScrollView>
             <Pressable onPress={() => setIsOpened(!isOpened)} >
-              <Text>{isOpened? piece.id : piece.id}</Text>
+              <Text>{isOpened? piece.pce_num : piece.pce_num}</Text>
             </Pressable>
             {isOpened && <Text>{pieceJson}</Text>}
           </ScrollView>

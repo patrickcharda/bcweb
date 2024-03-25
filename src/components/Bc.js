@@ -519,21 +519,21 @@ const Bc = ({ tabPces }) => {
       </ScrollView>
       <ScrollView styles={styles.scrollableView2}>
         <Pressable onPress = {()=>{setIsLoadListOpen(!isLoadListOpen)}}>
-          <Text style={styles.text1}> {isLoadListOpen?"Masquer Pièces Chargées":"Voir Pièces chargées"} </Text>
+          <Text style={styles.text1}> {isLoadListOpen?"Masquer Pièces Chargées":"Voir Pièces chargées"} {piecesLoaded.length} / {pces.length}</Text>
         </Pressable>
         {isLoadListOpen &&
            piecesLoaded.map((piece) => (
           <BcPce key={piece.id} piece={piece} loaded={true} />
         ))}
         <Pressable onPress = {()=>{setIsPropListOpen(!isPropListOpen)}}>
-          <Text style={styles.text2}> {isPropListOpen?"Masquer Pièces Proposées":"Voir Pièces Proposées"} </Text>
+          <Text style={styles.text2}> {isPropListOpen?"Masquer Pièces Proposées":"Voir Pièces Proposées"} {piecesProp.length} / {pces.length}</Text>
         </Pressable>
         {isPropListOpen &&
            piecesProp.map((piece) => (
           <BcPce key={piece.id} piece={piece} loaded={false} />
         ))}
         <Pressable onPress = {()=>{setIsOtherListOpen(!isOtherListOpen)}}>
-        <Text style={styles.text3}> {isOtherListOpen?"Masquer Pièces Autres":"Voir Pièces Autres"} </Text>
+        <Text style={styles.text3}> {isOtherListOpen?"Masquer Pièces Autres":"Voir Pièces Autres"} {piecesOther.length} / {pces.length}</Text>
         </Pressable>
         {isOtherListOpen && 
            piecesOther.map((piece) => (
