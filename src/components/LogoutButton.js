@@ -14,17 +14,17 @@ const LogoutButton = () => {
   let url = "https://back-xxx.monkey-soft.fr:54443/apps/userapplogout/";
   let token = "";
 
-  return <Button onPress={() => {dispatch(apiCall(url, token, tab));dispatch(signout()); dispatch(purgePcesAccs()); dispatch(purgeBc()); dispatch(apiEmptyData());}} title="Se déconnecter" style={styles.button}/>
+  return <Button onPress={() => {dispatch(apiCall(url, token, tab));dispatch(signout()); dispatch(purgePcesAccs()); dispatch(purgeBc()); dispatch(apiEmptyData());}} title="Se déconnecter" color="#0000b3"/>
 };
 
-const styles = StyleSheet.create({
-    button: {
+/* const styles = StyleSheet.create({
+    logoutbutton: {
       height: 20,
-      backgroundColor: "#fff",
+      backgroundColor: "green",
       padding: 10,
       borderRadius: 3,
       marginBottom: 30,
     },
-  });
+  }); */
 
 export default LogoutButton;

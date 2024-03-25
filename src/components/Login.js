@@ -183,7 +183,7 @@ const Login = () => {
             value={password}
             placeholder="Password"
         />
-        <TouchableOpacity onPress={onSave} style={styles.button}>
+        <TouchableOpacity onPress={onSave} style={styles.pressable}>
             <Text>Envoyer</Text>
         </TouchableOpacity>
         </ScrollView>
@@ -196,6 +196,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    paddingTop: 100,
   },
   toolbar: {
     backgroundColor: "#3498db",
@@ -221,7 +222,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     flex: 1,
   },
-  button: {
+  pressable: {
     backgroundColor: "#3498db",
     padding: 10,
     borderRadius: 3,

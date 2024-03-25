@@ -117,22 +117,23 @@ const Main = () => {
             backgroundColor: '#0000b3',
           },
           headerTitle: () => (
-              <View style={{ flexDirection: 'row', alignItems: 'center', }}>
-                <View style={{ flexGrow:1, justifyContent: 'flex-start'}}>
-                  <Image
-                  style={{ width: 50, height: 50, }}
+            <View style={{flex:1}}>
+              <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+
+                  {/* <Image
+                  style={{ width: 75, height: 75, }}
                   source={require('../../assets/LPB.png')}
-                  />
-                </View>
-                <View style={{ flexGrow:1.25, justifyContent: 'center' }}><Text style={{ fontWeight: 'bold', color: 'white', fontSize: 20 }}>LOGIN</Text></View>
-                <View style={{ flex:0.75, justifyContent: 'flex-end' }}>
+                  /> */}
+                {/* </View> */}
+                {/* <View style={{ flexGrow:1.25, justifyContent: 'center' }}><Text style={{ fontWeight: 'bold', color: 'white', fontSize: 20 }}>LOGIN</Text></View> */}
+                {/* <View style={{ flex:0.75, justifyContent: 'flex-end' }}> */}
                   {/* <Image
                   style={{ width: 50, height: 50 }}
                   source={require('../../assets/BTSYSTEM.png')}
                   /> */}
-                </View>
-              </View>
 
+              </View>
+            </View>
           ),
         }}
         key="3"
@@ -147,7 +148,7 @@ const Main = () => {
   );
 };
 
-const styles = StyleSheet.create({
+/* const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
@@ -182,6 +183,6 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginBottom: 30,
   },
-});
+}); */
 
 export default Main;
