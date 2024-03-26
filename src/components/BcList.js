@@ -418,7 +418,7 @@ const BcList = () => {
             data.map((BC, idx) => (
               <SafeAreaView>
                 <Pressable onPress={() => {setModalVisible(true); setCurrentBC(BC);}} key={idx}>
-                <Text>{BC.bc_num} | {BC.bc_statut}</Text>
+                <Text>{BC.bc_num} | {BC.bc_statut} | nb pièces : {BC.pieces.length}</Text>
                 </Pressable>
               </SafeAreaView>
             ))

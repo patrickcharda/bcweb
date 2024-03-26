@@ -6,6 +6,7 @@ import {
   Alert,
   ScrollView,
   TouchableOpacity,
+  View,
 } from 'react-native';
 import { useSelector, useDispatch } from "react-redux";  
 import { addToken, addRefreshToken, toggleIsLogged, addUser} from '../redux/actions';
@@ -14,6 +15,7 @@ import axios from 'axios';
 import * as Device from 'expo-device';
 import * as Application from 'expo-application';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
 
 const Login = () => {
@@ -38,6 +40,7 @@ const Login = () => {
 
   const onUsernameChange = (username) => setUsername(username);
   const onPasswordChange = (password) => setPassword(password);
+  const [hidePass, setHidePass] = React.useState(true);
 
   const hasCommandLine = async () => {
     try {
@@ -177,14 +180,25 @@ const Login = () => {
             value={username}
             placeholder="Username"
         />
-        <TextInput
+        {/* <TextInput
             style={styles.input}
             onChangeText={onPasswordChange}
             value={password}
             placeholder="Password"
-        />
-        <TouchableOpacity onPress={onSave} style={styles.pressable}>
-            <Text>Envoyer</Text>
+        /> */}
+        <View style={{...styles.input, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 7 }}>
+          <TextInput
+            secureTextEntry={hidePass}
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Password"
+          />
+          <TouchableOpacity onPress={() => setHidePass(!hidePass)}>
+            <Ionicons name={hidePass ? 'eye-off' : 'eye'} size={20} color="gray" />
+          </TouchableOpacity>
+        </View>
+        <TouchableOpacity onPress={onSave} style={{...styles.pressable, justifyContent: 'center', alignItems: 'center'}}>
+            <Text style={{color: "#fff", fontSize: 20}}>GO</Text>
         </TouchableOpacity>
         </ScrollView>
       </SafeAreaView>
@@ -223,7 +237,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   pressable: {
-    backgroundColor: "#3498db",
+    backgroundColor: "#bdc3c7",
+    color: "#fff",
     padding: 10,
     borderRadius: 3,
     marginBottom: 30,

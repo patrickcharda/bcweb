@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     color: "#bdc3c7",
   },
   scanArea: {
-    backgroundColor: "red",
+    backgroundColor: "green",
     color: "white",
     padding: 5,
     fontSize: 20,
