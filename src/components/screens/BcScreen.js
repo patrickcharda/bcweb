@@ -2,9 +2,10 @@
 import Bc from '../Bc';
 import LogoutButton from "../LogoutButton";
 import ScanInput from "../ScanInput";
-import { SafeAreaView, StyleSheet, BackHandler, Button } from "react-native";
+import { SafeAreaView, StyleSheet, BackHandler, Button, View } from "react-native";
 import Message from "../Message";
 import { useSelector, } from "react-redux";
+import Footer from "../Footer";
 
 const BcScreen = ({ route }) => {
   const { tabPces } = route.params;
@@ -14,11 +15,14 @@ const BcScreen = ({ route }) => {
     <>
       <Message />
       <SafeAreaView style={styles.container}>
-        {isActionBeingExecuted? null : <LogoutButton/> }
+        {/* {isActionBeingExecuted? null : <LogoutButton/> } */}
         <ScanInput />
         <Bc tabPces={ tabPces } />  
-        {isActionBeingExecuted? null :<Button title="Quitter BCWeb" onPress={() => BackHandler.exitApp()} />}
+        {/* {isActionBeingExecuted? null :<Button title="Quitter BCWeb" onPress={() => BackHandler.exitApp()} />} */}
       </SafeAreaView>
+      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 55, backgroundColor: '#0000b3'}}>
+        {isActionBeingExecuted? null : <Footer/>}
+      </View>
     </>
   );
 };

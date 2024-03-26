@@ -1,6 +1,7 @@
 import Session from '../Session';
-import { BackHandler } from 'react-native';
+import { View } from 'react-native';
 import Message from "../Message";
+import Footer from "../Footer";
 
 const ShootSessionScreen = ({ route, navigation }) => {
 
@@ -22,6 +23,9 @@ const ShootSessionScreen = ({ route, navigation }) => {
             endpointCommandLine={endpointCommandLine} 
             appliname={appliname} 
             fingerprint={fingerprint}/>
+            <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 55, backgroundColor: '#0000b3'}}>
+                <Footer/>
+            </View>
         </>
     );
 };

@@ -140,7 +140,17 @@ const Main = () => {
       />,<Stack.Screen
         name="ShootSession"
         component={ShootSessionScreen}
-        options={{ title: "Session" }}
+        options={{
+          title: "Session",
+          headerStyle: {
+            backgroundColor: '#0000b3',
+          },
+          headerTitle: () => (
+            <View style={{flex:1}}>
+              <View style={{ alignItems: 'center', justifyContent: 'center' }}></View>
+            </View>
+          ),
+        }}
         key="4"
       />
       ]}
