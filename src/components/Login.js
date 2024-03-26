@@ -190,7 +190,7 @@ const Login = () => {
           <TextInput
             secureTextEntry={hidePass}
             value={password}
-            onChangeText={setPassword}
+            onChangeText={onPasswordChange}
             placeholder="Password"
           />
           <TouchableOpacity onPress={() => setHidePass(!hidePass)}>

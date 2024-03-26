@@ -34,20 +34,45 @@ const BcHeader = ({ currentBc }) => {
     setModalVisible(false);
   };
 
+  const hasNullValue = (field) => {
+    if (field === null) {
+      console.log("THE VALUE IS NULL");
+      return true;
+    }
+    return false;
+  }
+
+  const strToDate= (strDate) => {
+    /* let newDate = new Date(strDate);
+    let newStrFormatedDate = newDate.getDate() + "/" + (newDate.getMonth() + 1) + "/" + newDate.getFullYear();
+    return newStrFormatedDate; */
+    var newDate = new Date(strDate);
+    var dd = String(newDate.getDate()).padStart(2, '0');
+    var mm = String(newDate.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = newDate.getFullYear();
+
+    var hh = String(newDate.getHours()).padStart(2, '0');
+    var min = String(newDate.getMinutes()).padStart(2, '0');
+    var ss = String(newDate.getSeconds()).padStart(2, '0');
+
+    newDate = dd + '/' + mm + '/' + yyyy + ' ' + hh + ':' + min + ':' + ss;
+    return newDate;
+  }
 
   return (
 
         <SafeAreaView>
-            <Text>{bc.bc_num}</Text>
-            <Text>{"N° Aff: "+bc.bc_num_affaire}</Text>
-            <Text>{"Client: "+bc.bc_client}</Text>
-            <Text>{"Chantier: "+bc.bc_chantier}</Text>
-            <Text>{"Livraison: "+bc.bc_ville_livraison}</Text>
-            <Text>{"Date Chargt prev: "+bc.bc_date_chargement_prev}</Text>
-            <Text>{"Date Livr prev: "+bc.bc_date_livraison_prev}</Text>
-            <Text>{"Transporteur: "+bc.bc_transporteur}</Text>
-            <Text>{"Statut: "+bc.bc_statut}</Text>
-            <Text>{"Observations: "+bc.bc_observ}</Text>
+            <Text>{'\n'}</Text>
+            <Text style={{fontSize: 30, fontWeight: 'bold'}}>{"BC n° "+bc.bc_num}</Text>
+            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_num_affaire)?"N° Aff: " : "N° Aff: "+bc.bc_num_affaire}</Text>
+            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_client)?"Client: " : "Client: "+bc.bc_client}</Text>
+            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_chantier)?"Chantier: " : "Chantier: "+bc.bc_chantier}</Text>
+            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_ville_livraison)?"Livraison: " : "Livraison: "+bc.bc_ville_livraison}</Text>
+            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_date_chargement_prev)?"Date Chargt prev: " : "Date Chargt prev: "+strToDate(bc.bc_date_chargement_prev).substring(0, 10)}</Text>
+            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_date_livraison_prev)?"Date Livr prev: " : "Date Livr prev: "+strToDate(bc.bc_date_livraison_prev).substring(0, 10)}</Text>
+            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_transporteur)?"Transporteur: " : "Transporteur: "+bc.bc_transporteur}</Text>
+            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_statut)?"Statut: " : "Statut: "+bc.bc_statut}</Text>
+            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_observ)? "Observations: " : "Observations: "+bc.bc_observ}</Text>
             <Modal
                 animationType="slide"
                 transparent={true}

@@ -499,9 +499,9 @@ const Bc = ({ tabPces }) => {
   return (
     isActionBeingExecuted ? <ActivityIndicator color="red" size="large" /> : 
     <View style={styles.container}>
-      <ScrollView style={styles.scrollable_View}>
+      <ScrollView style={styles.scrollableView1}>
         <Pressable onPress={() => setIsOpened(!isOpened)} >
-          <Text>
+          <Text style={{fontWeight: 'bold', textDecorationLine: 'underline', fontSize: 22}}>
             {isOpened
               ? "Masquer détails BC n° " + bonChargement.bc_num
               : "Voir détails BC n° " + bonChargement.bc_num}
@@ -605,10 +605,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollableView1: {
-    flex: 0.7,
+    flexGrow: 0.3,
   },
   scrollableView2: {
-    flex: 0.3,
+    flexGrow: 0.7,
   },
   toolbar: {
     backgroundColor: "#3498db",
