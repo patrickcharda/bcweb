@@ -22,6 +22,8 @@ import { useNavigation } from '@react-navigation/native';
 import * as Device from "expo-device";
 import * as Application from "expo-application";
 import axios from "axios";
+import { AntDesign } from '@expo/vector-icons';
+
 
 const appliname = "bcweb";
 const fingerprint =
@@ -38,11 +40,11 @@ const Bc = ({ tabPces }) => {
   const username = useSelector((state) => state.tokenReducer.username);
   const dispatch = useDispatch();
   const [isOpened, setIsOpened] = React.useState(false); //booleen pr affichage/masquage entête BC
-  const [isLoadListOpen, setIsLoadListOpen] = React.useState(true);
-  const [isPropListOpen, setIsPropListOpen] = React.useState(true);
-  const [isOtherListOpen, setIsOtherListOpen] = React.useState(true);
-  const [isLoadAccsOpen, setIsLoadAccsOpen] = React.useState(true);
-  const [isPropAccsOpen, setIsPropAccsOpen] = React.useState(true);
+  const [isLoadListOpen, setIsLoadListOpen] = React.useState(false);
+  const [isPropListOpen, setIsPropListOpen] = React.useState(false);
+  const [isOtherListOpen, setIsOtherListOpen] = React.useState(false);
+  const [isLoadAccsOpen, setIsLoadAccsOpen] = React.useState(false);
+  const [isPropAccsOpen, setIsPropAccsOpen] = React.useState(false);
   const [modalReinitVisible, setModalReinitVisible] = React.useState(false);
   const navigation = useNavigation();
   const bonChargement = useSelector((state) => state.bcReducer.bc);
@@ -507,8 +509,8 @@ const Bc = ({ tabPces }) => {
               ? "BC n° " + bonChargement.bc_num
               : "BC n° " + bonChargement.bc_num}
           </Text>
-          <View style={{ position: 'absolute', right: 0, top: 0, height: 30, backgroundColor: '#007AFF', padding:3}}>
-            <Text style={{color:"white", fontWeight: 'bold', fontSize: 18}}>{poids + " T"}</Text>
+          <View style={{ position: 'absolute', right: 0, top: 0, height: 30, backgroundColor: 'white', padding:3}}>
+            <Text style={{color:"green", fontWeight: 'bold', fontSize: 18}}>{poids + " T"}</Text>
             {/* <Text style={{color:"white", fontWeight: 'bold', fontSize: 18}}>
               {nbPcesChargees == 0
                 ? "aucune pièce chargée"
@@ -522,37 +524,54 @@ const Bc = ({ tabPces }) => {
       </ScrollView>
       {/* zIndex: 3 */}
       <ScrollView style={styles.scrollableView2}>
-        <Pressable onPress = {()=>{setIsLoadListOpen(!isLoadListOpen)}}>
-          <Text style={styles.text1}> {isLoadListOpen?"Masquer Pièces Chargées":"Voir Pièces chargées"} {piecesLoaded.length} / {pces.length}</Text>
+        <Pressable onPress = {()=>{setIsLoadListOpen(!isLoadListOpen)}} style={{backgroundColor:'green'}}>
+          <View style={{flexDirection: 'row', justifyContent:'space-between', padding: 5}}>
+            <Text style={styles.defaultText}> Pièces chargées {piecesLoaded.length} / {pces.length}</Text>
+            {isLoadListOpen?<AntDesign name="downcircle" size={24} color="black" />:<AntDesign name="leftcircle" size={24} color="black" />} 
+          </View>
         </Pressable>
         {isLoadListOpen &&
            piecesLoaded.map((piece) => (
           <BcPce key={piece.id} piece={piece} loaded={true} />
         ))}
-        <Pressable onPress = {()=>{setIsPropListOpen(!isPropListOpen)}}>
-          <Text style={styles.text2}> {isPropListOpen?"Masquer Pièces Proposées":"Voir Pièces Proposées"} {piecesProp.length} / {pces.length}</Text>
+        <Pressable onPress = {()=>{setIsPropListOpen(!isPropListOpen)}} style={{backgroundColor:'blue'}}>
+          <View style={{flexDirection: 'row', justifyContent:'space-between', padding: 5}}>
+            <Text style={styles.defaultText}> Pièces Proposées {piecesProp.length} / {pces.length}</Text>
+            {isPropListOpen?<AntDesign name="downcircle" size={24} color="black" />:<AntDesign name="leftcircle" size={24} color="black" />} 
+          </View>
         </Pressable>
         {isPropListOpen &&
            piecesProp.map((piece) => (
           <BcPce key={piece.id} piece={piece} loaded={false} />
         ))}
-        <Pressable onPress = {()=>{setIsOtherListOpen(!isOtherListOpen)}}>
-        <Text style={styles.text3}> {isOtherListOpen?"Masquer Pièces Autres":"Voir Pièces Autres"} {piecesOther.length} / {pces.length}</Text>
+        <Pressable onPress = {()=>{setIsOtherListOpen(!isOtherListOpen)}} style={{backgroundColor:'gray'}}>
+          <View style={{flexDirection: 'row', justifyContent:'space-between', padding: 5}}>
+            <Text style={styles.defaultText}> Pièces Autres {piecesOther.length} / {pces.length}</Text>
+            {isOtherListOpen?<AntDesign name="downcircle" size={24} color="black" />:<AntDesign name="leftcircle" size={24} color="black" />} 
+          </View>
         </Pressable>
         {isOtherListOpen && 
            piecesOther.map((piece) => (
           <BcPce key={piece.id} piece={piece} loaded={false} />
         ))}
-        <Text>{"\n\n"}</Text>
-        <Pressable onPress = {()=>{setIsLoadAccsOpen(!isLoadAccsOpen)}}>
-        <Text style={styles.text1}> {isLoadAccsOpen?"Masquer Accessoires chargés":"Voir Accessoires chargés"} </Text>
+        <Text>
+          {"\n"}
+        </Text>
+        <Pressable onPress = {()=>{setIsLoadAccsOpen(!isLoadAccsOpen)}} style={{backgroundColor:'green'}}>
+          <View style={{flexDirection: 'row', justifyContent:'space-between', padding: 5}}>
+            <Text style={styles.defaultText}> Accessoires chargés </Text>
+            {isLoadAccsOpen?<AntDesign name="downcircle" size={24} color="black" />:<AntDesign name="leftcircle" size={24} color="black" />} 
+          </View>
         </Pressable>
         {isLoadAccsOpen && 
           accsLoaded.map((acc) => (
           <BcAcc key={acc.id} accessoire={acc} loaded={true} />
         ))}
-        <Pressable onPress = {()=>{setIsPropAccsOpen(!isPropAccsOpen)}}>
-        <Text style={styles.text2}> {isPropAccsOpen?"Masquer Accessoires proposés":"Voir Accessoires proposés"} </Text>
+        <Pressable onPress = {()=>{setIsPropAccsOpen(!isPropAccsOpen)}} style={{backgroundColor:'blue'}}>
+          <View style={{flexDirection: 'row', justifyContent:'space-between', padding: 5}}>
+            <Text style={styles.defaultText}> Accessoires proposés </Text>
+            {isPropAccsOpen?<AntDesign name="downcircle" size={24} color="black" />:<AntDesign name="leftcircle" size={24} color="black" />} 
+          </View>
         </Pressable>
         {isPropAccsOpen && 
           accsProp.map((acc) => (
@@ -566,7 +585,7 @@ const Bc = ({ tabPces }) => {
         <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
           <View>
             <Pressable style={{backgroundColor: 'black', margin: 5, padding: 3}} onPress={() => recordBc()} disabled={isActionBeingExecuted}>
-            <Text style={{color: 'white', fontSize: 20}}>Enregistrer</Text>
+              <Text style={{color: 'white', fontSize: 20}}>Enregistrer </Text>
             </Pressable>
           </View>
           {/* <Text>{"\n"}</Text> */}
@@ -662,6 +681,10 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     marginBottom: 30,
   },
+  defaultText:{
+    fontSize: 20,
+    fontWeight: "bold",
+  },
   text1: {
     color: "green",
     fontSize: 20,
@@ -675,7 +698,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   text3: {
-    color: "grey",
+    color: "gray",
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",

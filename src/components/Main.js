@@ -45,6 +45,7 @@ const Main = () => {
           headerStyle: {
             backgroundColor: '#0000b3',
           },
+          headerTintColor:'#fff',
           headerTitle: () => (
               <View style={{ flexDirection: 'row', alignItems: 'center', }}>
                 {/* <View style={{ flexGrow:0.5, justifyContent: 'flex-start'}}>
