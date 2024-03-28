@@ -502,20 +502,20 @@ const Bc = ({ tabPces }) => {
       {/* zIndex: 4 */}
       <ScrollView style={styles.scrollableView1}>
         <Pressable onPress={() => setIsOpened(!isOpened)} >
-          <Text style={{fontWeight: 'bold', textDecorationLine: 'underline', fontSize: 25, height: 90}}>
+          <Text style={{fontWeight: 'bold', textDecorationLine: 'underline', fontSize: 25, height: 50}}>
             {isOpened
               ? "BC n° " + bonChargement.bc_num
               : "BC n° " + bonChargement.bc_num}
           </Text>
-          <View style={{ position: 'absolute', right: 0, top: 0, height: 60, backgroundColor: '#007AFF', padding:3}}>
+          <View style={{ position: 'absolute', right: 0, top: 0, height: 30, backgroundColor: '#007AFF', padding:3}}>
             <Text style={{color:"white", fontWeight: 'bold', fontSize: 18}}>{poids + " T"}</Text>
-            <Text style={{color:"white", fontWeight: 'bold', fontSize: 18}}>
+            {/* <Text style={{color:"white", fontWeight: 'bold', fontSize: 18}}>
               {nbPcesChargees == 0
                 ? "aucune pièce chargée"
                 : nbPcesChargees === 1
                 ? nbPcesChargees + " pièce chargée"
                 : nbPcesChargees + " pièces chargées "}
-            </Text>
+            </Text> */}
           </View>
         </Pressable>
         {isOpened && <BcHeader currentBc={bonChargement} />}

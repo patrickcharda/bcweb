@@ -7,10 +7,12 @@ import {
   Button,
   TextInput,
   ScrollView,
+  Pressable,
 } from "react-native";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { recordSelectedBc } from "../redux/actions";
+import { FontAwesome } from '@expo/vector-icons';
 
 const BcHeader = ({ currentBc }) => {
 
@@ -62,15 +64,7 @@ const BcHeader = ({ currentBc }) => {
 
         <SafeAreaView>
             {/* <Text>{'\n'}</Text> */}
-            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_num_affaire)?"N° Aff: " : "N° Aff: "+bc.bc_num_affaire}</Text>
-            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_client)?"Client: " : "Client: "+bc.bc_client}</Text>
-            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_chantier)?"Chantier: " : "Chantier: "+bc.bc_chantier}</Text>
-            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_ville_livraison)?"Livraison: " : "Livraison: "+bc.bc_ville_livraison}</Text>
-            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_date_chargement_prev)?"Date Chargt prev: " : "Date Chargt prev: "+strToDate(bc.bc_date_chargement_prev).substring(0, 10)}</Text>
-            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_date_livraison_prev)?"Date Livr prev: " : "Date Livr prev: "+strToDate(bc.bc_date_livraison_prev).substring(0, 10)}</Text>
-            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_transporteur)?"Transporteur: " : "Transporteur: "+bc.bc_transporteur}</Text>
-            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_statut)?"Statut: " : "Statut: "+bc.bc_statut}</Text>
-            <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_observ)? "Observations: " : "Observations: "+bc.bc_observ}</Text>
+            <View style={{flexDirection: 'row', justifyContent:'space-between', paddingRight: 10}}><Text style={styles.textHeader}>Observations : </Text><Text style={{...styles.textContent, maxWidth: '50%'}}>{hasNullValue(bc.bc_observ)?"" : bc.bc_observ}</Text>
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -92,14 +86,29 @@ const BcHeader = ({ currentBc }) => {
                     </ScrollView>
                   </View>
                 </View>
-              </Modal>
-              <Button
+            </Modal>
+            {/* <Button
                 title="Show Modal - Edition"
                 onPress={() => {
                   setModalVisible(true);
                 }}
-              />
-            <Text></Text>
+              /> */}
+            <Pressable onPress={() => { setModalVisible(true); }}>
+              <FontAwesome name="pencil-square" size={34} color="gray" />
+            </Pressable>
+          </View>
+            <View style={{flexDirection: 'row'}}><Text style={styles.textHeader}>N° Aff : </Text><Text style={styles.textContent}>{hasNullValue(bc.bc_num_affaire)?"" : bc.bc_num_affaire}</Text></View>
+            <View style={{flexDirection: 'row'}}><Text style={styles.textHeader}>Client : </Text><Text style={styles.textContent}>{hasNullValue(bc.bc_client)?"" : bc.bc_client}</Text></View>
+            <View style={{flexDirection: 'row'}}><Text style={styles.textHeader}>Chantier : </Text><Text style={styles.textContent}>{hasNullValue(bc.bc_chantier)?"" : bc.bc_chantier}</Text></View>
+            <View style={{flexDirection: 'row'}}><Text style={styles.textHeader}>Livraison : </Text><Text style={styles.textContent}>{hasNullValue(bc.bc_ville_livraison)?"" : bc.bc_ville_livraison}</Text></View>
+            <View style={{flexDirection: 'row'}}><Text style={styles.textHeader}>Date Chargt prev : </Text><Text style={styles.textContent}>{hasNullValue(bc.bc_date_chargement_prev)?"" : strToDate(bc.bc_date_chargement_prev).substring(0, 10)}</Text></View>
+            <View style={{flexDirection: 'row'}}><Text style={styles.textHeader}>Date Livr prev : </Text><Text style={styles.textContent}>{hasNullValue(bc.bc_date_livraison_prev)?"" : strToDate(bc.bc_date_livraison_prev).substring(0, 10)}</Text></View>
+            {/* <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_date_livraison_prev)?"Date Livr prev: " : "Date Livr prev: "+strToDate(bc.bc_date_livraison_prev).substring(0, 10)}</Text> */}
+            <View style={{flexDirection: 'row'}}><Text style={styles.textHeader}>Transporteur : </Text><Text style={styles.textContent}>{hasNullValue(bc.bc_transporteur)?"" : bc.bc_transporteur}</Text></View>
+            <View style={{flexDirection: 'row'}}><Text style={styles.textHeader}>Statut : </Text><Text style={styles.textContent}>{hasNullValue(bc.bc_statut)?"" : bc.bc_statut}</Text></View>
+            
+
+            
         </SafeAreaView>
     
   );
@@ -110,6 +119,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#aaa",
     color: "#bdc3c7",
+  },
+  textHeader: {
+    fontsize: 30,
+    fontWeight: 'bold'
+  },
+  textContent: {
+    fontsize: 30,
   },
   toolbar: {
     backgroundColor: "#3498db",
@@ -143,11 +159,12 @@ const styles = StyleSheet.create({
   },
   centeredView: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     marginTop: 22,
   },
   modalView: {
+    maxHeight: 300,
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
