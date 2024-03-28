@@ -86,7 +86,7 @@ const Main = () => {
               source={require('../../assets/LPB.png')}
               /> */}
             </View>
-            <View style={{ flexGrow:1, justifyContent: 'center' }}><Text style={{ fontWeight: 'bold', color: 'white', fontSize: 20 }}>BC en cours...</Text></View>
+            <View style={{ flexGrow:1, justifyContent: 'center' }}><Text style={{ fontWeight: 'bold', color: 'white', fontSize: 20 }}>BC en cours</Text></View>
             <View style={{ flex:1, justifyContent: 'flex-end' }}>
               {/* <Image
               style={{ width: 50, height: 50 }}

@@ -36,7 +36,6 @@ const BcHeader = ({ currentBc }) => {
 
   const hasNullValue = (field) => {
     if (field === null) {
-      console.log("THE VALUE IS NULL");
       return true;
     }
     return false;
@@ -62,8 +61,7 @@ const BcHeader = ({ currentBc }) => {
   return (
 
         <SafeAreaView>
-            <Text>{'\n'}</Text>
-            <Text style={{fontSize: 30, fontWeight: 'bold'}}>{"BC n° "+bc.bc_num}</Text>
+            {/* <Text>{'\n'}</Text> */}
             <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_num_affaire)?"N° Aff: " : "N° Aff: "+bc.bc_num_affaire}</Text>
             <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_client)?"Client: " : "Client: "+bc.bc_client}</Text>
             <Text style={{fontsize: 25, fontWeight: 'bold'}}>{hasNullValue(bc.bc_chantier)?"Chantier: " : "Chantier: "+bc.bc_chantier}</Text>

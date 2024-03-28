@@ -1,7 +1,6 @@
 import BcHeader from "./BcHeader";
 import BcPce from "./BcPce";
 import BcAcc from "./BcAcc";
-//import BcFooter from ".BcFooter";
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { defineMessage, changePceDate, changePceLoadedDate, changePcePropDate, changePceOtherDate, loadFullPcesTab, loadLoadedPcesTab,
@@ -498,26 +497,31 @@ const Bc = ({ tabPces }) => {
 
   return (
     isActionBeingExecuted ? <ActivityIndicator color="red" size="large" /> : 
+    <>
     <View style={styles.container}>
+      {/* zIndex: 4 */}
       <ScrollView style={styles.scrollableView1}>
         <Pressable onPress={() => setIsOpened(!isOpened)} >
-          <Text style={{fontWeight: 'bold', textDecorationLine: 'underline', fontSize: 22}}>
+          <Text style={{fontWeight: 'bold', textDecorationLine: 'underline', fontSize: 25, height: 90}}>
             {isOpened
-              ? "Masquer détails BC n° " + bonChargement.bc_num
-              : "Voir détails BC n° " + bonChargement.bc_num}
+              ? "BC n° " + bonChargement.bc_num
+              : "BC n° " + bonChargement.bc_num}
           </Text>
-          <Text>
-            {nbPcesChargees == 0
-              ? "aucune pièce chargée"
-              : nbPcesChargees === 1
-              ? nbPcesChargees + " pièce chargée"
-              : nbPcesChargees + " pièces chargées "}
-          </Text>
-          <Text>{poids + " T"}</Text>
+          <View style={{ position: 'absolute', right: 0, top: 0, height: 60, backgroundColor: '#007AFF', padding:3}}>
+            <Text style={{color:"white", fontWeight: 'bold', fontSize: 18}}>{poids + " T"}</Text>
+            <Text style={{color:"white", fontWeight: 'bold', fontSize: 18}}>
+              {nbPcesChargees == 0
+                ? "aucune pièce chargée"
+                : nbPcesChargees === 1
+                ? nbPcesChargees + " pièce chargée"
+                : nbPcesChargees + " pièces chargées "}
+            </Text>
+          </View>
         </Pressable>
         {isOpened && <BcHeader currentBc={bonChargement} />}
       </ScrollView>
-      <ScrollView styles={styles.scrollableView2}>
+      {/* zIndex: 3 */}
+      <ScrollView style={styles.scrollableView2}>
         <Pressable onPress = {()=>{setIsLoadListOpen(!isLoadListOpen)}}>
           <Text style={styles.text1}> {isLoadListOpen?"Masquer Pièces Chargées":"Voir Pièces chargées"} {piecesLoaded.length} / {pces.length}</Text>
         </Pressable>
@@ -555,60 +559,78 @@ const Bc = ({ tabPces }) => {
           <BcAcc key={acc.id} accessoire={acc} loaded={false} />
         ))}
       </ScrollView>
-      <View>
-        {/* <Button onPress={() => recordBc()} title="Enregistrer"></Button> */}
-        <Pressable onPress={() => recordBc()} disabled={isActionBeingExecuted}>
-          <Text>Enregistrer</Text>
-        </Pressable>
-        <Text>{"\n\n"}</Text>
-        {/* <Button onPress={() => valideBc()} title="Valider"></Button> */}
-        <Pressable onPress={() => valideBc()} disabled={isActionBeingExecuted}>
-          <Text>Valider</Text>
-        </Pressable>
-        <Text>{"\n\n"}</Text>
-        {/* <Button title="Réinitialiser" onPress={() => {setModalReinitVisible(true);}} /> */}
-        <Pressable onPress={() => {setModalReinitVisible(true);}} disabled={isActionBeingExecuted}>
-            <Text>Réinitialiser</Text>
-        </Pressable>
-        { modalReinitVisible &&
-              <Modal
-              animationType="slide"
-              transparent={true}
-              visible={modalReinitVisible}
-              onRequestClose={handleReinitCancel}
-            >
-              <View style={styles.centeredView}>
-                <View style={styles.modalView}>
-                      <Text>REINITIALISER</Text>
-                      <Text>ATTENTION, en réinitialisant le BC, vous perdrez toutes les données non validées.
-                        Réinitialiser un BC revient à le récupérer tel qu'il se trouve actuellement dans l'application BTSystem - BTLivraison.
-                      </Text>
-                      { /* <Button title="Confirm" onPress={() => {handleReinitConfirm(bonChargement)}} /> */ }
-                      <Pressable onPress={() => {handleReinitConfirm(bonChargement)}} disabled={isActionBeingExecuted}>
-                        <Text>Confirm</Text>
-                      </Pressable>
-                      {/* <Button title="Cancel" onPress={handleReinitCancel}/> */}
-                      <Pressable onPress={handleReinitCancel}>
-                        <Text>Cancel</Text>
-                      </Pressable>
-                </View>
-              </View>
-            </Modal>
-        }
-      </View>
+      {/* zIndex: 7 */}
     </View>
+    <View style={styles.container2}>
+        {/* <Button onPress={() => recordBc()} title="Enregistrer"></Button> */}
+        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'space-between'}}>
+          <View>
+            <Pressable style={{backgroundColor: 'black', margin: 5, padding: 3}} onPress={() => recordBc()} disabled={isActionBeingExecuted}>
+            <Text style={{color: 'white', fontSize: 20}}>Enregistrer</Text>
+            </Pressable>
+          </View>
+          {/* <Text>{"\n"}</Text> */}
+          {/* <Button onPress={() => valideBc()} title="Valider"></Button> */}
+          <View>
+            <Pressable style={{backgroundColor: 'black', margin: 5, padding: 3}}  onPress={() => valideBc()} disabled={isActionBeingExecuted}>
+            <Text style={{color: 'white', fontSize: 20}}>Valider</Text>
+            </Pressable>
+            {/* <Text>{"\n"}</Text> */}
+          </View>
+          {/* <Button title="Réinitialiser" onPress={() => {setModalReinitVisible(true);}} /> */}
+          <View>
+            <Pressable style={{backgroundColor: 'black', margin: 5, padding: 3}}  onPress={() => {setModalReinitVisible(true);}} disabled={isActionBeingExecuted}>
+              <Text style={{ color: 'white', fontSize: 20 }}>Réinitialiser</Text>
+            </Pressable>
+            { modalReinitVisible &&
+                <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalReinitVisible}
+                onRequestClose={handleReinitCancel}
+              >
+                <View style={styles.centeredView}>
+                  <View style={styles.modalView}>
+                        <Text>REINITIALISER</Text>
+                        <Text>ATTENTION, en réinitialisant le BC, vous perdrez toutes les données non validées.
+                          Réinitialiser un BC revient à le récupérer tel qu'il se trouve actuellement dans l'application BTSystem - BTLivraison.
+                        </Text>
+                        { /* <Button title="Confirm" onPress={() => {handleReinitConfirm(bonChargement)}} /> */ }
+                        <Pressable onPress={() => {handleReinitConfirm(bonChargement)}} disabled={isActionBeingExecuted}>
+                          <Text>Confirm</Text>
+                        </Pressable>
+                        {/* <Button title="Cancel" onPress={handleReinitCancel}/> */}
+                        <Pressable onPress={handleReinitCancel}>
+                          <Text>Cancel</Text>
+                        </Pressable>
+                  </View>
+                </View>
+              </Modal>
+            }
+          </View>
+        </View>
+      </View>
+    
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 0.9, backgroundColor: '#DEDDDB'
+
+  },
+  container2: {
+    flex: 0.1, minHeight: 30
+
   },
   scrollableView1: {
-    flexGrow: 0.3,
-  },
+    flexGrow: 0.1,   },
   scrollableView2: {
     flexGrow: 0.7,
+  },
+  View3: {
+    position : 'absolute', bottom : 55, backgroundColor: 'black',
   },
   toolbar: {
     backgroundColor: "#3498db",
