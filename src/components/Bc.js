@@ -504,11 +504,11 @@ const Bc = ({ tabPces }) => {
       {/* zIndex: 4 */}
       <ScrollView style={styles.scrollableView1}>
         <Pressable onPress={() => setIsOpened(!isOpened)} >
-          <Text style={{fontWeight: 'bold', textDecorationLine: 'underline', fontSize: 25, height: 50}}>
-            {isOpened
-              ? "BC n° " + bonChargement.bc_num
-              : "BC n° " + bonChargement.bc_num}
-          </Text>
+        <View style={{flex: 1, flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'flex-start'}}>
+          <Text style={{fontWeight: 'bold', fontSize: 25, height: 50}}>BC n° {bonChargement.bc_num}  </Text>
+          {isOpened ?<AntDesign name="downcircleo" size={20} color="black" style={{paddingTop: 10}}/>:<AntDesign name="leftcircleo" size={20} color="black" style={{paddingTop: 10}}/>}
+          
+        </View>
           <View style={{ position: 'absolute', right: 0, top: 0, height: 30, backgroundColor: 'white', padding:3}}>
             <Text style={{color:"green", fontWeight: 'bold', fontSize: 18}}>{poids + " T"}</Text>
             {/* <Text style={{color:"white", fontWeight: 'bold', fontSize: 18}}>

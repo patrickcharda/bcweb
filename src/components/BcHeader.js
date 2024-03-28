@@ -64,7 +64,7 @@ const BcHeader = ({ currentBc }) => {
 
         <SafeAreaView>
             {/* <Text>{'\n'}</Text> */}
-            <View style={{flexDirection: 'row', justifyContent:'space-between', paddingRight: 10}}><Text style={styles.textHeader}>Observations : </Text><Text style={{...styles.textContent, maxWidth: '50%'}}>{hasNullValue(bc.bc_observ)?"" : bc.bc_observ}</Text>
+            <View style={{flexDirection: 'row', justifyContent:'space-between', paddingRight: 10, backgroundColor: '#fff'}}><Text style={styles.textHeader}>Observations : </Text><Text style={{...styles.textContent, maxWidth: '50%'}}>{hasNullValue(bc.bc_observ)?"" : bc.bc_observ}</Text>
             <Modal
                 animationType="slide"
                 transparent={true}
@@ -94,7 +94,7 @@ const BcHeader = ({ currentBc }) => {
                 }}
               /> */}
             <Pressable onPress={() => { setModalVisible(true); }}>
-              <FontAwesome name="pencil-square" size={34} color="gray" />
+              <FontAwesome name="pencil-square" size={28} color="gray" />
             </Pressable>
           </View>
             <View style={{flexDirection: 'row'}}><Text style={styles.textHeader}>N° Aff : </Text><Text style={styles.textContent}>{hasNullValue(bc.bc_num_affaire)?"" : bc.bc_num_affaire}</Text></View>
